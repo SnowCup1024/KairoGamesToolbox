@@ -1,0 +1,10 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- 所有生成物统一进入仓库根目录的 .Build。 -->
+    <BaseOutputPath>$(MSBuildThisFileDirectory).Build\Output\$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).Build\Obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+</Project>

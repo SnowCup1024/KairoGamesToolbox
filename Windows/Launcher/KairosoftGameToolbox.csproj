@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>KairosoftGameToolbox</RootNamespace>
+    <AssemblyName>KairosoftGameToolbox</AssemblyName>
+    <!-- v0.1.0：首个构建版本，许可证 GPL-3.0（见仓库根目录 LICENSE） -->
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <FileVersion>0.1.0</FileVersion>
+    <InformationalVersion>0.1.0</InformationalVersion>
+    <Product>开罗游戏工具箱</Product>
+    <ApplicationManifest>Source\app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Data\Assets\KairosoftGameToolbox.ico</ApplicationIcon>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!--
+    Release 构建与发布必须从编译阶段就使用同一套单文件属性。
+    BuildRelease.ps1 会先 build 再 publish；若只在 publish 命令行临时切换这些属性，
+    MSBuild 可能复用普通构建的增量中间产物，生成无法完成 WinRT 激活的单文件程序。
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 只引入启动器实际使用的 WinUI 与运行时；不要用总包把 AI/ML/Widgets 一起带进发行版。 -->
+    <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.1.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.1.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- App.xaml 位于 Source 目录时必须显式标记为 ApplicationDefinition。 -->
+    <Page Remove="Source\App.xaml" />
+    <ApplicationDefinition Include="Source\App.xaml" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <Content Include="Data\KairosoftGames.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Data\Assets\KairosoftGameToolbox.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Data\Assets\Covers\*.jpg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\LICENSE">
+      <Link>LICENSE</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

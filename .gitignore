@@ -1,0 +1,30 @@
+# Generated build, test, publish, and package output
+.Build/
+
+# .NET / WinUI fallback output
+**/[Bb]in/
+**/[Oo]bj/
+
+# User-specific IDE state
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local secrets, backups, and operating-system files
+*.bak
+*.local
+*.user.json
+[Tt]humbs.db
+Desktop.ini
+
+# Local commercial game copies and saves
+.TestGames/
+
+# Local environment secrets
+.env
+.env.*
+!.env.example

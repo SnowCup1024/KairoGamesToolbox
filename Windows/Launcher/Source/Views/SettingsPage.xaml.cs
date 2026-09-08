@@ -8,7 +8,7 @@ namespace KairosoftGameToolbox.Views;
 
 /// <summary>
 /// 设置页：主题 / Steam 路径（覆盖）/ API Key / 游玩记录。
-/// API Key 和 Steam 路径通过各自的保存按钮写入；主题即时保存到 %LocalAppData%\KairosoftGameToolbox\settings.json。
+/// API Key 和 Steam 路径通过各自的保存按钮写入；主题即时保存到 %LocalAppData%\KairoGamesToolbox\settings.json。
 /// </summary>
 public sealed partial class SettingsPage : UserControl
 {

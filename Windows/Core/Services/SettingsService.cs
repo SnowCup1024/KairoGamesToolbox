@@ -21,7 +21,7 @@ public sealed class LauncherSettings
 }
 
 /// <summary>
-/// 设置持久化：%LocalAppData%\KairosoftGameToolbox\settings.json。
+/// 设置持久化：%LocalAppData%\KairoGamesToolbox\settings.json。
 /// 任何改动即时落盘；API Key 以 DPAPI CurrentUser 密文写入 JSON，失败静默保持内存值。
 /// </summary>
 public sealed class SettingsService
@@ -39,8 +39,7 @@ public sealed class SettingsService
     {
         if (file is null)
         {
-            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            _file = Path.Combine(localAppData, "KairosoftGameToolbox", "settings.json");
+            _file = AppDataPaths.SettingsFile;
         }
         else
         {

@@ -4,18 +4,26 @@ using System.Text.RegularExpressions;
 
 namespace KairosoftGameToolbox.Services;
 
-/// <summary>从 Steam 商店元数据解析 library JPG 地址，下载结果只缓存在内存中。</summary>
+/// <summary>从 Steam 商店元数据解析 library JPG 地址，按磁盘缓存 → 网络 → Steam 本地缓存的顺序加载。</summary>
 public sealed class SteamCoverClient
 {
     private sealed record CacheEntry(DateTime ExpiresAt, Lazy<Task<byte[]?>> Download);
 
     private readonly HttpClient _http;
+    private readonly string? _cacheDirectory;
+    private readonly Func<IEnumerable<string>>? _steamPaths;
+    private readonly Func<byte[], Task<bool>>? _validateImage;
+    private const int MaximumImageBytes = 8 * 1024 * 1024;
     private readonly SemaphoreSlim _downloads = new(4, 4);
     private readonly ConcurrentDictionary<uint, CacheEntry> _cache = new();
 
-    public SteamCoverClient(HttpClient http)
+    public SteamCoverClient(HttpClient http, string? cacheDirectory = null,
+        Func<IEnumerable<string>>? steamPaths = null, Func<byte[], Task<bool>>? validateImage = null)
     {
         _http = http;
+        _cacheDirectory = cacheDirectory;
+        _steamPaths = steamPaths;
+        _validateImage = validateImage;
     }
 
     public Task<byte[]?> DownloadAsync(uint appId)
@@ -32,7 +40,52 @@ public sealed class SteamCoverClient
     private async Task<byte[]?> DownloadCoreAsync(uint appId)
     {
         byte[]? result = null;
-        await _downloads.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            var cachePath = _cacheDirectory == null ? null : Path.Combine(_cacheDirectory, $"{appId}.jpg");
+            if (cachePath != null)
+            {
+                result = await ReadImageAsync(cachePath).ConfigureAwait(false);
+                if (result != null) return result;
+            }
+
+            await _downloads.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                result = await FetchImageAsync(appId).ConfigureAwait(false);
+            }
+            finally
+            {
+                _downloads.Release();
+            }
+
+            if (result == null && _steamPaths != null)
+            {
+                foreach (var steamPath in _steamPaths().Where(path => !string.IsNullOrWhiteSpace(path))
+                    .Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    result = await ReadImageAsync(Path.Combine(steamPath, "appcache", "librarycache",
+                        appId.ToString(), "library_600x900.jpg")).ConfigureAwait(false);
+                    if (result != null) break;
+                }
+            }
+            if (result != null && cachePath != null)
+                await SaveImageAsync(cachePath, result).ConfigureAwait(false);
+            return result;
+        }
+        finally
+        {
+            // 成功保留一小时；失败短暂缓存，避免卡片重建时反复请求，随后允许恢复。
+            if (_cache.TryGetValue(appId, out var entry))
+                _cache.TryUpdate(appId, entry with
+                {
+                    ExpiresAt = DateTime.UtcNow.Add(result == null ? TimeSpan.FromSeconds(30) : TimeSpan.FromHours(1)),
+                }, entry);
+        }
+    }
+
+    private async Task<byte[]?> FetchImageAsync(uint appId)
+    {
         try
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
@@ -47,26 +100,53 @@ public sealed class SteamCoverClient
             var json = await _http.GetStringAsync(endpoint, timeout.Token).ConfigureAwait(false);
             var uri = ParseCoverUri(json, appId);
             if (uri == null) return null;
-
             var bytes = await _http.GetByteArrayAsync(uri, timeout.Token).ConfigureAwait(false);
-            // 解码与尺寸检查由界面层完成；拒绝 HTML 错误页或其他非 JPEG 响应。
-            if (bytes.Length >= 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
-                result = bytes;
-            return result;
+            return await IsValidImageAsync(bytes).ConfigureAwait(false) ? bytes : null;
         }
         catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException)
         {
             return null;
         }
+    }
+
+    private async Task<bool> IsValidImageAsync(byte[] bytes)
+        => bytes.Length is >= 3 and <= MaximumImageBytes
+            && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF
+            && (_validateImage == null || await _validateImage(bytes).ConfigureAwait(false));
+
+    private async Task<byte[]?> ReadImageAsync(string path)
+    {
+        try
+        {
+            var info = new FileInfo(path);
+            if (!info.Exists || info.Length > MaximumImageBytes) return null;
+            var bytes = await File.ReadAllBytesAsync(path).ConfigureAwait(false);
+            return await IsValidImageAsync(bytes).ConfigureAwait(false) ? bytes : null;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return null;
+        }
+    }
+
+    private static async Task SaveImageAsync(string path, byte[] bytes)
+    {
+        // 独立临时文件避免多进程互相覆盖半写入文件；失败不影响当前已取得的封面。
+        var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            await File.WriteAllBytesAsync(temporary, bytes).ConfigureAwait(false);
+            File.Move(temporary, path, overwrite: true);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            // 只保留当前进程的内存结果，下次启动可以重新尝试写入。
+        }
         finally
         {
-            _downloads.Release();
-            // 成功保留一小时；失败短暂缓存，避免卡片重建时反复请求，随后允许恢复。
-            if (_cache.TryGetValue(appId, out var entry))
-                _cache.TryUpdate(appId, entry with
-                {
-                    ExpiresAt = DateTime.UtcNow.Add(result == null ? TimeSpan.FromSeconds(30) : TimeSpan.FromHours(1)),
-                }, entry);
+            try { File.Delete(temporary); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException) { }
         }
     }
 

@@ -333,6 +333,93 @@ finally
     if (Directory.Exists(currentSettingsRoot)) Directory.Delete(currentSettingsRoot, true);
 }
 
+Check("用户数据：配置与封面统一使用 KairoGamesToolbox 目录",
+    AppDataPaths.SettingsFile == Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "KairoGamesToolbox", "settings.json")
+    && AppDataPaths.CoversDirectory == Path.Combine(AppDataPaths.Root, "Covers"));
+
+var coverCacheRoot = Path.Combine(Path.GetTempPath(), "kairo_cover_cache_" + Guid.NewGuid().ToString("N"));
+try
+{
+    var cachePath = Path.Combine(coverCacheRoot, "Covers");
+    var cachedFile = Path.Combine(cachePath, "2191490.jpg");
+    var diskHandler = new CoverHttpHandler((request, _) => Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+    {
+        Content = request.RequestUri!.Host == "api.steampowered.com"
+            ? new StringContent(classicMetadata) : new ByteArrayContent(jpeg),
+    }));
+    using var diskHttp = new HttpClient(diskHandler);
+    var firstRun = new SteamCoverClient(diskHttp, cachePath);
+    var parallelLoads = await Task.WhenAll(Enumerable.Range(0, 6).Select(_ => firstRun.DownloadAsync(2191490)));
+    Check("磁盘封面：首次联网并原子写入 AppID 缓存，并发请求复用下载",
+        parallelLoads.All(bytes => bytes?.SequenceEqual(jpeg) == true)
+        && File.ReadAllBytes(cachedFile).SequenceEqual(jpeg) && diskHandler.RequestCount == 2
+        && Directory.GetFiles(cachePath, "*.tmp").Length == 0);
+    var restarted = new SteamCoverClient(diskHttp, cachePath);
+    Check("磁盘封面：新服务实例模拟重启，缓存命中完全不联网",
+        (await restarted.DownloadAsync(2191490))?.SequenceEqual(jpeg) == true && diskHandler.RequestCount == 2);
+
+    File.WriteAllText(cachedFile, "broken image");
+    Check("磁盘封面：损坏缓存重新下载并替换",
+        (await new SteamCoverClient(diskHttp, cachePath).DownloadAsync(2191490))?.SequenceEqual(jpeg) == true
+        && diskHandler.RequestCount == 4 && File.ReadAllBytes(cachedFile).SequenceEqual(jpeg));
+    File.WriteAllBytes(cachedFile, new byte[] { 0xFF, 0xD8, 0xFF, 0x00 });
+    var validating = new SteamCoverClient(diskHttp, cachePath,
+        validateImage: bytes => Task.FromResult(bytes.SequenceEqual(jpeg)));
+    Check("磁盘封面：JPEG 签名正确但解码校验失败仍重新获取",
+        (await validating.DownloadAsync(2191490))?.SequenceEqual(jpeg) == true && diskHandler.RequestCount == 6);
+
+    var steamRoot = Path.Combine(coverCacheRoot, "Steam");
+    var steamCover = Path.Combine(steamRoot, "appcache", "librarycache", "2191490", "library_600x900.jpg");
+    Directory.CreateDirectory(Path.GetDirectoryName(steamCover)!);
+    File.WriteAllBytes(steamCover, jpeg);
+    foreach (var reason in new[] { "http", "timeout", "metadata", "image" })
+    {
+        var fallbackDirectory = Path.Combine(coverCacheRoot, reason);
+        var fallbackHandler = new CoverHttpHandler((request, _) =>
+        {
+            if (reason == "timeout") throw new TaskCanceledException("synthetic timeout");
+            return Task.FromResult(new HttpResponseMessage(reason == "http"
+                ? System.Net.HttpStatusCode.ServiceUnavailable : System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(reason == "image" && request.RequestUri!.Host == "api.steampowered.com"
+                    ? classicMetadata : "{}"),
+            });
+        });
+        using var fallbackHttp = new HttpClient(fallbackHandler);
+        var fallback = new SteamCoverClient(fallbackHttp, fallbackDirectory,
+            () => new[] { Path.Combine(coverCacheRoot, "missing-steam"), steamRoot });
+        Check($"Steam 兜底：{reason} 失败后复制本地 library 封面，源文件不变",
+            (await fallback.DownloadAsync(2191490))?.SequenceEqual(jpeg) == true
+            && File.ReadAllBytes(Path.Combine(fallbackDirectory, "2191490.jpg")).SequenceEqual(jpeg)
+            && File.ReadAllBytes(steamCover).SequenceEqual(jpeg) && fallbackHandler.RequestCount > 0);
+        var previousRequests = fallbackHandler.RequestCount;
+        Check($"Steam 兜底：{reason} 复制完成后重启只读 Covers",
+            (await new SteamCoverClient(fallbackHttp, fallbackDirectory).DownloadAsync(2191490))?.SequenceEqual(jpeg) == true
+            && fallbackHandler.RequestCount == previousRequests);
+    }
+
+    var unavailable = new CoverHttpHandler((_, _) => throw new HttpRequestException("offline"));
+    using var unavailableHttp = new HttpClient(unavailable);
+    var emptyCache = Path.Combine(coverCacheRoot, "empty");
+    Check("Steam 兜底：网络和本地图片均缺失时返回占位，不生成空缓存",
+        await new SteamCoverClient(unavailableHttp, emptyCache, () => new[] { steamRoot }).DownloadAsync(4424950) == null
+        && !File.Exists(Path.Combine(emptyCache, "4424950.jpg")));
+    File.WriteAllText(steamCover, "broken fallback");
+    Check("Steam 兜底：损坏源图片不写入 Covers",
+        await new SteamCoverClient(unavailableHttp, emptyCache, () => new[] { steamRoot }).DownloadAsync(2191490) == null
+        && !File.Exists(Path.Combine(emptyCache, "2191490.jpg")));
+    var blockedCache = Path.Combine(coverCacheRoot, "not-a-directory");
+    File.WriteAllText(blockedCache, "keep this file");
+    Check("磁盘封面：缓存目录无法写入时仍返回下载图片，不改动阻挡文件",
+        (await new SteamCoverClient(diskHttp, blockedCache).DownloadAsync(2191490))?.SequenceEqual(jpeg) == true
+        && File.ReadAllText(blockedCache) == "keep this file");
+}
+finally
+{
+    if (Directory.Exists(coverCacheRoot)) Directory.Delete(coverCacheRoot, true);
+}
+
 Console.WriteLine(failures == 0 ? "ALL PASS" : $"{failures} FAILED");
 return failures;
 

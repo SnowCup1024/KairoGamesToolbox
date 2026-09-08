@@ -9,7 +9,7 @@ namespace KairosoftGameToolbox.Services;
 
 /// <summary>
 /// 从 Steam CDN 加载 600×900 library JPG，资源地址由商店元数据提供。
-/// 仅缓存于内存；网络不可用时由卡片显示占位图。
+/// 优先读取用户 Covers 缓存，联网失败后尝试 Steam 本地封面；均不可用时显示占位图。
 /// </summary>
 public sealed class CoverService
 {
@@ -22,7 +22,37 @@ public sealed class CoverService
         Timeout = TimeSpan.FromSeconds(20),
         MaxResponseContentBufferSize = 8 * 1024 * 1024,
     };
-    private static readonly SteamCoverClient Downloads = new(Http);
+    private static readonly SteamCoverClient Downloads = new(Http, AppDataPaths.CoversDirectory,
+        FindSteamPaths, ValidateImageAsync);
+
+    private static IEnumerable<string> FindSteamPaths()
+    {
+        var detected = new SteamLibraryService().DetectSteamPath(SettingsService.Instance.Current.SteamPathOverride);
+        if (detected != null) yield return detected;
+        yield return @"E:\Steam";
+    }
+
+    private static bool HasCoverDimensions(uint width, uint height)
+        => (width == 600 && height == 900) || (width == 300 && height == 450);
+
+    private static async Task<bool> ValidateImageAsync(byte[] bytes)
+    {
+        try
+        {
+            using var stream = new InMemoryRandomAccessStream();
+            await stream.WriteAsync(bytes.AsBuffer());
+            stream.Seek(0);
+            var decoder = await BitmapDecoder.CreateAsync(stream);
+            if (!HasCoverDimensions(decoder.PixelWidth, decoder.PixelHeight)) return false;
+            // 完整解码后才写缓存，避免只有 JPEG 文件头的损坏文件持续阻止下载。
+            _ = await decoder.GetPixelDataAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     private CoverService() { }
 
@@ -57,7 +87,7 @@ public sealed class CoverService
             }
             stream.Seek(0);
             var decoder = await BitmapDecoder.CreateAsync(stream);
-            if (decoder.PixelWidth != 600 || decoder.PixelHeight != 900) return null;
+            if (!HasCoverDimensions(decoder.PixelWidth, decoder.PixelHeight)) return null;
             stream.Seek(0);
             if (saturation >= 0.999)
             {

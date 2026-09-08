@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^0\.[1-9]\d*\.0$')]
-    [string]$Version = '0.1.0',
+    [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')]
+    [string]$Version = '0.1.1',
     [switch]$SkipLaunchCheck
 )
 
@@ -93,7 +93,7 @@ function Assert-X64Executable {
 function Test-ApplicationLaunch {
     param([Parameter(Mandatory = $true)][string]$Path)
 
-    $process = Start-Process -FilePath $Path -WorkingDirectory (Split-Path -Parent $Path) -PassThru
+    $process = Start-Process -FilePath $Path -WorkingDirectory (Split-Path -Parent $Path) -PassThru -WindowStyle Hidden
     try {
         $deadline = [DateTime]::UtcNow.AddSeconds(20)
         while ([DateTime]::UtcNow -lt $deadline) {

@@ -54,7 +54,7 @@ public sealed partial class MainWindow : Window
         LibraryPage.Visibility = library ? Visibility.Visible : Visibility.Collapsed;
         SettingsPage.Visibility = settings ? Visibility.Visible : Visibility.Collapsed;
         AboutPage.Visibility = tag == "about" ? Visibility.Visible : Visibility.Collapsed;
-        if (library) _ = LibraryPage.RefreshAsync(); // 回到库页自动重扫并刷新 Covers
+        if (library) _ = LibraryPage.RefreshAsync(); // 回到库页自动重扫，联网封面复用内存缓存
     }
 
     public void ApplyTheme(string? preference)

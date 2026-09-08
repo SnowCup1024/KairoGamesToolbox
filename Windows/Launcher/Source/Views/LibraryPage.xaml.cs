@@ -35,8 +35,6 @@ public sealed partial class LibraryPage : UserControl
     /// <summary>重新扫描游戏库并重建视图；新请求会取消旧请求，扫描本身串行执行。</summary>
     public async Task RefreshAsync()
     {
-        // Covers 可能在程序外被更新；每次进入/刷新库页都让卡片重新读取发布目录。
-        CoverService.Default.Reload();
         var cancellation = BeginRefresh();
         try
         {
@@ -64,7 +62,7 @@ public sealed partial class LibraryPage : UserControl
         }
         catch (OperationCanceledException)
         {
-            // 页面离开或新的设置保存触发刷新时，旧结果不再提交。
+            // 新刷新请求取消当前操作后，不再提交其结果。
         }
         finally
         {
@@ -130,7 +128,6 @@ public sealed partial class LibraryPage : UserControl
             Name = displayName,
             EnglishName = englishName,
             IsInstalled = info != null,
-            SteamPath = _steam.SteamPath,
         };
         if (info != null)
         {
@@ -176,7 +173,7 @@ public sealed partial class LibraryPage : UserControl
         }
     }
 
-    /// <summary>加载可选 Steam 数据：拥有状态用于排序，游玩记录由设置开关控制显示。</summary>
+    /// <summary>加载可选 Steam 数据：拥有状态用于排序，配置 API Key 后显示游玩记录。</summary>
     private async Task ApplySteamDataIfAvailableAsync(CancellationToken cancellationToken)
     {
         var s = SettingsService.Instance.Current;
@@ -394,15 +391,15 @@ public sealed partial class LibraryPage : UserControl
         });
         content.Children.Add(new TextBlock
         {
-            Text = "启动并注入 Mod 将在后续版本提供，当前版本请使用“仅启动”。",
+            Text = "Mod 补丁将直接修改游戏原文件。当前版本尚未提供补丁，请使用“仅启动”。",
             FontSize = 12,
             Foreground = (Brush)Application.Current.Resources["TextSecondaryBrush"],
             TextWrapping = TextWrapping.Wrap,
         });
 
-        var injectButton = new Button
+        var patchButton = new Button
         {
-            Content = "启动并注入Mod",
+            Content = "应用 Mod 补丁",
             HorizontalAlignment = HorizontalAlignment.Stretch,
             // ContentDialog 的默认按钮边框会产生约 1px 的视觉内缩，向两侧扩展后与下方按钮组等宽。
             Margin = new Thickness(-1, 0, -1, 0),
@@ -410,7 +407,7 @@ public sealed partial class LibraryPage : UserControl
             Background = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0, 120, 212)),
             Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255)),
         };
-        ToolTipService.SetToolTip(injectButton, "注入功能将在后续版本提供");
+        ToolTipService.SetToolTip(patchButton, "查看应用 Mod 补丁的注意事项");
 
         var actionGrid = new Grid { ColumnSpacing = 10, Margin = new Thickness(0, 4, 0, 0) };
         actionGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -432,7 +429,7 @@ public sealed partial class LibraryPage : UserControl
         Grid.SetColumn(cancelButton, 1);
         actionGrid.Children.Add(launchButton);
         actionGrid.Children.Add(cancelButton);
-        content.Children.Add(injectButton);
+        content.Children.Add(patchButton);
         content.Children.Add(actionGrid);
 
         var dialog = new ContentDialog
@@ -442,18 +439,45 @@ public sealed partial class LibraryPage : UserControl
             Title = game.Name,
             Content = content,
         };
-        injectButton.Click += (_, _) =>
+        bool patchRequested = false;
+        bool launchRequested = false;
+        patchButton.Click += (_, _) =>
         {
-            // 保持蓝色主入口，但在功能完成之前不执行任何注入动作。
-            injectButton.Content = "启动并注入Mod（尚未开放）";
-        };
-        launchButton.Click += async (_, _) =>
-        {
+            patchRequested = true;
             dialog.Hide();
-            await LaunchGameAsync(game);
+        };
+        launchButton.Click += (_, _) =>
+        {
+            launchRequested = true;
+            dialog.Hide();
         };
         cancelButton.Click += (_, _) => dialog.Hide();
         _ = await dialog.ShowAsync();
+        // 等待第一个弹窗完全关闭后再显示二级弹窗，避免 WinUI 同时打开多个 ContentDialog。
+        if (patchRequested)
+            await ShowPatchWarningAsync(game);
+        else if (launchRequested)
+            await LaunchGameAsync(game);
+    }
+
+    private async Task ShowPatchWarningAsync(KairoGame game)
+    {
+        var warning = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            RequestedTheme = ActualTheme,
+            Title = "应用 Mod 补丁 · " + game.Name,
+            Content = new TextBlock
+            {
+                Text = "此过程不可逆，如需恢复请到 Steam 运行‘验证游戏文件的完整性’。\n\n"
+                    + "路径：Steam 游戏库 → 游戏属性 → 已安装文件 → 验证游戏文件的完整性。\n\n"
+                    + "当前版本尚未提供可应用的 Mod 补丁，不会修改游戏文件。",
+                TextWrapping = TextWrapping.Wrap,
+            },
+            CloseButtonText = "我知道了",
+            DefaultButton = ContentDialogButton.Close,
+        };
+        await warning.ShowAsync();
     }
 
     private async Task<FrameworkElement> CreateCoverPreviewAsync(KairoGame game)

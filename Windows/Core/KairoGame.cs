@@ -49,9 +49,6 @@ public sealed class KairoGame
     /// <summary>存档目录（saves/&lt;SteamID&gt;，未安装或没有合法目录为 null）。</summary>
     public string? SaveDir { get; set; }
 
-    /// <summary>Steam 安装根目录（用于找 appcache 本地封面）。</summary>
-    public string? SteamPath { get; set; }
-
     /// <summary>本地 appmanifest 中的最近游玩时间（Unix 秒），作为 API 不可用时的排序依据。</summary>
     public long? LastPlayedUnix { get; set; }
 

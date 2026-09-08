@@ -6,11 +6,11 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>KairosoftGameToolbox</RootNamespace>
     <AssemblyName>KairosoftGameToolbox</AssemblyName>
-    <!-- v0.1.0：首个构建版本，许可证 GPL-3.0（见仓库根目录 LICENSE） -->
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0</AssemblyVersion>
-    <FileVersion>0.1.0</FileVersion>
-    <InformationalVersion>0.1.0</InformationalVersion>
+    <!-- v0.1.1：联网封面与 Mod 补丁入口，许可证 GPL-3.0（见仓库根目录 LICENSE） -->
+    <Version>0.1.1</Version>
+    <AssemblyVersion>0.1.1</AssemblyVersion>
+    <FileVersion>0.1.1</FileVersion>
+    <InformationalVersion>0.1.1</InformationalVersion>
     <Product>开罗游戏工具箱</Product>
     <ApplicationManifest>Source\app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
@@ -52,7 +52,6 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <Content Include="Data\KairosoftGames.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Data\Assets\KairosoftGameToolbox.ico" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Data\Assets\Covers\*.jpg" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\LICENSE">
       <Link>LICENSE</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

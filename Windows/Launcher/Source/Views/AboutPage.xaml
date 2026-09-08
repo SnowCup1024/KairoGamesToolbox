@@ -21,7 +21,7 @@
                     <TextBlock Text="开罗游戏工具箱" FontSize="22" FontWeight="SemiBold" />
                     <TextBlock x:Name="VersionText" Foreground="{ThemeResource TextSecondaryBrush}" />
                     <TextBlock
-                        Text="面向 Steam 正版开罗游戏的启动器与 MOD 框架。启动器只读取 Steam 和游戏信息，不改写游戏文件。"
+                        Text="面向 Steam 开罗游戏的启动器与 Mod 补丁工具。当前版本提供游戏库与启动功能，补丁功能将在后续版本提供。"
                         TextWrapping="Wrap"
                         Foreground="{ThemeResource TextSecondaryBrush}" />
                 </StackPanel>

@@ -12,7 +12,7 @@ namespace KairosoftGameToolbox.Views;
 /// </summary>
 public sealed partial class SettingsPage : UserControl
 {
-    /// <summary>设置变化（Steam 路径 / API Key / 开关）→ 主窗触发游戏库重扫。</summary>
+    /// <summary>设置变化（Steam 路径 / API Key）→ 主窗触发游戏库重扫。</summary>
     public event EventHandler? SettingsChanged;
 
     /// <summary>主题变化 → 主窗切换 RequestedTheme。</summary>

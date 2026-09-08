@@ -111,8 +111,8 @@ public sealed class SteamStatsService
                 uint appId = a.GetUInt32();
                 long playtime = g.TryGetProperty("playtime_forever", out var pf) ? pf.GetInt64() : 0;
                 long? twoWeeks = g.TryGetProperty("playtime_2weeks", out var p2) ? p2.GetInt64() : null;
-                // Steam GetOwnedGames uses rtime_last_played; keep last_played as a compatibility fallback.
-                long? lastPlayed = ReadUnixTime(g, "rtime_last_played", "last_played");
+                // Steam GetOwnedGames 使用 rtime_last_played。
+                long? lastPlayed = ReadUnixTime(g, "rtime_last_played");
                 result[appId] = new GamePlayStats(appId, playtime, twoWeeks, lastPlayed);
             }
 
@@ -132,20 +132,15 @@ public sealed class SteamStatsService
         }
     }
 
-    private static long? ReadUnixTime(JsonElement game, params string[] propertyNames)
+    private static long? ReadUnixTime(JsonElement game, string propertyName)
     {
-        foreach (var propertyName in propertyNames)
+        if (!game.TryGetProperty(propertyName, out var value)) return null;
+        long timestamp = value.ValueKind switch
         {
-            if (!game.TryGetProperty(propertyName, out var value)) continue;
-
-            long timestamp = value.ValueKind switch
-            {
-                JsonValueKind.Number when value.TryGetInt64(out var number) => number,
-                JsonValueKind.String when long.TryParse(value.GetString(), out var text) => text,
-                _ => 0,
-            };
-            return timestamp > 0 ? timestamp : null;
-        }
-        return null;
+            JsonValueKind.Number when value.TryGetInt64(out var number) => number,
+            JsonValueKind.String when long.TryParse(value.GetString(), out var text) => text,
+            _ => 0,
+        };
+        return timestamp > 0 ? timestamp : null;
     }
 }

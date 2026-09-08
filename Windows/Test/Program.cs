@@ -1,5 +1,5 @@
 // 启动器核心服务无头验证（不依赖 WinUI / 网络 / Steam 本体）。
-// 覆盖：VDF 解析、KairosoftGames.json 目录、合成 Steam 库布局扫描、文件检测和发布封面目录。
+// 覆盖：VDF 解析、KairosoftGames.json 目录、合成 Steam 库布局扫描、文件检测和联网封面地址解析。
 // 运行：dotnet run --project Windows/Test
 using KairosoftGameToolbox.Services;
 using KairosoftGameToolbox.Models;
@@ -156,23 +156,6 @@ finally
     if (Directory.Exists(fixtureRoot)) Directory.Delete(fixtureRoot, true);
 }
 
-var coverDir = Path.Combine(AppContext.BaseDirectory, "Data", "Assets", "Covers");
-var coverFiles = Directory.Exists(coverDir)
-    ? Directory.GetFiles(coverDir, "*.jpg", SearchOption.TopDirectoryOnly)
-    : Array.Empty<string>();
-var coverFilesAreJpeg = coverFiles.All(path =>
-{
-    var bytes = File.ReadAllBytes(path);
-    return bytes.Length >= 3
-        && bytes[0] == 0xFF
-        && bytes[1] == 0xD8
-        && bytes[2] == 0xFF;
-});
-Check("固定封面目录包含 63 张 AppID 封面",
-    coverFiles.Length == catalog.Count
-        && coverFilesAreJpeg
-        && catalog.Entries.All(entry => File.Exists(Path.Combine(coverDir, $"{entry.AppId}.jpg"))));
-
 var serializedSettings = JsonSerializer.Serialize(new LauncherSettings { SteamWebApiKey = "not-written-in-plain-text" });
 using (var settingsDocument = JsonDocument.Parse(serializedSettings))
 {
@@ -247,5 +230,125 @@ Check("搜索：支持中文、英文和忽略空格的模糊匹配",
         && GameSearch.Matches(bilingualSearchGame, "cafe nica")
         && !GameSearch.Matches(bilingualSearchGame, "冒险村"));
 
+// 联网封面使用合成 HTTP 响应测试，不连接 Steam。
+string CoverMetadata(uint appId, string filename, string? format = null)
+    => JsonSerializer.Serialize(new
+    {
+        response = new
+        {
+            store_items = new[]
+            {
+                new
+                {
+                    appid = appId,
+                    success = 1,
+                    assets = new
+                    {
+                        asset_url_format = format ?? $"steam/apps/{appId}/${{FILENAME}}?t=123",
+                        library_capsule = "library_600x900.jpg",
+                        library_capsule_2x = filename,
+                    },
+                },
+            },
+        },
+    });
+
+var classicMetadata = CoverMetadata(2191490, "library_600x900_2x.jpg");
+var hashFilename = "b3e500ef923ebc345e073894f1411e4488e87475/library_capsule_2x.jpg";
+var hashMetadata = CoverMetadata(4424950, hashFilename);
+Check("封面：旧路径选择 2x JPG，避免下载 300×450 缩略图",
+    SteamCoverClient.ParseCoverUri(classicMetadata, 2191490)?.AbsoluteUri
+        == "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2191490/library_600x900_2x.jpg?t=123");
+Check("封面：新路径保留 library 自身 hash 和更新时间",
+    SteamCoverClient.ParseCoverUri(hashMetadata, 4424950)?.AbsoluteUri
+        == $"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4424950/{hashFilename}?t=123");
+Check("封面：拒绝其他游戏、损坏 JSON 与缺少资源的响应",
+    SteamCoverClient.ParseCoverUri(hashMetadata, 2191490) == null
+        && SteamCoverClient.ParseCoverUri("{", 2191490) == null
+        && SteamCoverClient.ParseCoverUri("{\"response\":{}}", 2191490) == null
+        && SteamCoverClient.ParseCoverUri("{\"response\":{\"store_items\":[null]}}", 2191490) == null);
+Check("封面：拒绝外部 URL、路径穿越和非 JPG 资源",
+    SteamCoverClient.ParseCoverUri(CoverMetadata(1, "library_capsule_2x.jpg", "https://example.com/${FILENAME}"), 1) == null
+        && SteamCoverClient.ParseCoverUri(CoverMetadata(1, "../library_capsule_2x.jpg"), 1) == null
+        && SteamCoverClient.ParseCoverUri(CoverMetadata(1, "library_capsule_2x.png"), 1) == null);
+
+var jpeg = new byte[] { 0xFF, 0xD8, 0xFF, 0xD9 }; // 下载层只检查签名，界面层负责完整解码和尺寸检查。
+var handler = new CoverHttpHandler(async (request, token) =>
+{
+    await Task.Delay(10, token);
+    return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+    {
+        Content = request.RequestUri!.Host == "api.steampowered.com"
+            ? new StringContent(classicMetadata)
+            : new ByteArrayContent(jpeg),
+    };
+});
+using (var http = new HttpClient(handler))
+{
+    var covers = new SteamCoverClient(http);
+    var downloads = await Task.WhenAll(Enumerable.Range(0, 8).Select(_ => covers.DownloadAsync(2191490)));
+    Check("封面：并发同 AppID 只请求一次元数据和一次图片",
+        handler.RequestCount == 2 && downloads.All(bytes => bytes?.SequenceEqual(jpeg) == true));
+    Check("封面：重复读取复用内存缓存",
+        (await covers.DownloadAsync(2191490))?.SequenceEqual(jpeg) == true && handler.RequestCount == 2);
+}
+
+foreach (var failureKind in new[] { "http", "network", "timeout", "html" })
+{
+    var failingHandler = new CoverHttpHandler((request, _) =>
+    {
+        if (failureKind == "network") throw new HttpRequestException("synthetic offline");
+        if (failureKind == "timeout") throw new TaskCanceledException("synthetic timeout");
+        return Task.FromResult(new HttpResponseMessage(failureKind == "http"
+            ? System.Net.HttpStatusCode.ServiceUnavailable : System.Net.HttpStatusCode.OK)
+        {
+            Content = new StringContent(request.RequestUri!.Host == "api.steampowered.com"
+                ? classicMetadata : "<html>not an image</html>"),
+        });
+    });
+    using var http = new HttpClient(failingHandler);
+    var covers = new SteamCoverClient(http);
+    Check($"封面：{failureKind} 失败降级为占位，不抛出异常", await covers.DownloadAsync(2191490) == null);
+    var requestCount = failingHandler.RequestCount;
+    Check($"封面：{failureKind} 失败短暂缓存，防止重复请求", await covers.DownloadAsync(2191490) == null
+        && failingHandler.RequestCount == requestCount);
+}
+
+var currentSettingsRoot = Path.Combine(Path.GetTempPath(), "kairo_current_settings_" + Guid.NewGuid().ToString("N"));
+try
+{
+    Directory.CreateDirectory(currentSettingsRoot);
+    var file = Path.Combine(currentSettingsRoot, "settings.json");
+    File.WriteAllText(file, "{\"SteamWebApiKey\":\"discard-this-key\",\"UseDarkTheme\":true}");
+    var settings = new SettingsService(file);
+    Check("设置：忽略明文 API Key 和已移除的主题字段",
+        settings.Current.SteamWebApiKey == null && settings.Current.ThemePreference == "system");
+    settings.Current.ThemePreference = "dark";
+    settings.Current.SteamWebApiKey = "synthetic-current-key";
+    Check("设置：当前 DPAPI 配置可保存并重新加载",
+        settings.Save() && new SettingsService(file).Current is { ThemePreference: "dark", SteamWebApiKey: "synthetic-current-key" });
+}
+finally
+{
+    if (Directory.Exists(currentSettingsRoot)) Directory.Delete(currentSettingsRoot, true);
+}
+
 Console.WriteLine(failures == 0 ? "ALL PASS" : $"{failures} FAILED");
 return failures;
+
+sealed class CoverHttpHandler : HttpMessageHandler
+{
+    private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _respond;
+    private int _requestCount;
+
+    public int RequestCount => _requestCount;
+
+    public CoverHttpHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> respond)
+        => _respond = respond;
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        Interlocked.Increment(ref _requestCount);
+        return _respond(request, cancellationToken);
+    }
+}

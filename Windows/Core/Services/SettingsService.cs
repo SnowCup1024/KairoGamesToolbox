@@ -22,7 +22,6 @@ public sealed class LauncherSettings
 
 /// <summary>
 /// 设置持久化：%LocalAppData%\KairosoftGameToolbox\settings.json。
-/// 首次启动时兼容迁移旧的 %LocalAppData%\KairosoftGameMods\settings.json。
 /// 任何改动即时落盘；API Key 以 DPAPI CurrentUser 密文写入 JSON，失败静默保持内存值。
 /// </summary>
 public sealed class SettingsService
@@ -30,7 +29,6 @@ public sealed class SettingsService
     public static SettingsService Instance { get; } = new();
 
     private readonly string _file;
-    private readonly string? _legacyFile;
 
     public LauncherSettings Current { get; private set; } = new();
 
@@ -43,12 +41,10 @@ public sealed class SettingsService
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             _file = Path.Combine(localAppData, "KairosoftGameToolbox", "settings.json");
-            _legacyFile = Path.Combine(localAppData, "KairosoftGameMods", "settings.json");
         }
         else
         {
             _file = file;
-            _legacyFile = null;
         }
         Load();
     }
@@ -57,30 +53,9 @@ public sealed class SettingsService
     {
         try
         {
-            var loadFile = _file;
-            bool migrateLegacyFile = false;
-            if (!File.Exists(loadFile) && _legacyFile is not null && File.Exists(_legacyFile))
-            {
-                loadFile = _legacyFile;
-                migrateLegacyFile = true;
-            }
+            if (!File.Exists(_file)) return;
+            Current = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(_file)) ?? new LauncherSettings();
 
-            if (!File.Exists(loadFile)) return;
-
-            var json = File.ReadAllText(loadFile);
-            Current = JsonSerializer.Deserialize<LauncherSettings>(json) ?? new LauncherSettings();
-
-            // v0.0.3 及更早版本把 API Key 明文写入 SteamWebApiKey；仅在迁移时读取一次。
-            using var document = JsonDocument.Parse(json);
-            var root = document.RootElement;
-            string? legacyApiKey = null;
-            if (root.TryGetProperty("SteamWebApiKey", out var legacyKey)
-                && legacyKey.ValueKind == JsonValueKind.String)
-            {
-                legacyApiKey = legacyKey.GetString();
-            }
-
-            bool migrateLegacyApiKey = false;
             if (!string.IsNullOrWhiteSpace(Current.SteamWebApiKeyProtected))
             {
                 Current.SteamWebApiKey = Dpapi.Unprotect(Current.SteamWebApiKeyProtected);
@@ -88,28 +63,8 @@ public sealed class SettingsService
                 if (Current.SteamWebApiKey == null)
                     Current.SteamWebApiKeyProtected = null;
             }
-            else if (!string.IsNullOrWhiteSpace(legacyApiKey))
-            {
-                Current.SteamWebApiKey = legacyApiKey.Trim();
-                migrateLegacyApiKey = true;
-            }
-
-            // v0.0.1 stored the theme as UseDarkTheme. Preserve that choice once when upgrading.
-            if (!root.TryGetProperty("ThemePreference", out _)
-                && root.TryGetProperty("UseDarkTheme", out var legacyTheme)
-                && (legacyTheme.ValueKind == JsonValueKind.True || legacyTheme.ValueKind == JsonValueKind.False))
-            {
-                Current.ThemePreference = legacyTheme.GetBoolean() ? "dark" : "light";
-            }
-
             if (!IsValidThemePreference(Current.ThemePreference))
                 Current.ThemePreference = "system";
-
-            if (migrateLegacyFile || migrateLegacyApiKey)
-            {
-                // 迁移失败时 Save 保留原文件，不会静默覆盖旧配置。
-                Save();
-            }
         }
         catch
         {

@@ -55,7 +55,7 @@ public sealed class AppIdCatalog
 
     public bool Contains(uint appId) => _entries.ContainsKey(appId);
 
-    /// <summary>返回稳定的英文名，供内部排序、日志和兼容调用使用。</summary>
+    /// <summary>返回稳定的英文名，供内部排序与日志使用。</summary>
     public string? TryGetName(uint appId)
         => _entries.TryGetValue(appId, out var entry) ? entry.Name : null;
 

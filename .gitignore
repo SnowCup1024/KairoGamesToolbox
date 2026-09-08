@@ -28,3 +28,6 @@ Desktop.ini
 .env
 .env.*
 !.env.example
+
+# Local agent instructions
+AGENTS.md

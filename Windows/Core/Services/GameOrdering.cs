@@ -44,7 +44,7 @@ public static class GameOrdering
         .ToList();
     }
 
-    /// <summary>保留扁平结果供非 UI 调用和旧测试使用。</summary>
+    /// <summary>返回按分区顺序展开的扁平结果。</summary>
     public static List<KairoGame> Order(IEnumerable<KairoGame> games)
         => GroupAndOrder(games).SelectMany(section => section.Games).ToList();
 

@@ -338,7 +338,7 @@ public sealed partial class LibraryPage : UserControl
                 DefaultButton = ContentDialogButton.Primary,
             };
             bool nonSteamRequested = false;
-            installDialog.Title = CreateLaunchDialogTitle(game, () =>
+            installDialog.Title = CreateLaunchDialogTitle(game, installContent, () =>
             {
                 nonSteamRequested = true;
                 installDialog.Hide();
@@ -451,7 +451,7 @@ public sealed partial class LibraryPage : UserControl
             Content = content,
         };
         bool nonSteamPatchRequested = false;
-        dialog.Title = CreateLaunchDialogTitle(game, () =>
+        dialog.Title = CreateLaunchDialogTitle(game, content, () =>
         {
             nonSteamPatchRequested = true;
             dialog.Hide();
@@ -479,7 +479,7 @@ public sealed partial class LibraryPage : UserControl
             await LaunchGameAsync(game);
     }
 
-    private static FrameworkElement CreateLaunchDialogTitle(KairoGame game, Action requestNonSteamPatch)
+    private static FrameworkElement CreateLaunchDialogTitle(KairoGame game, FrameworkElement content, Action requestNonSteamPatch)
     {
         const string label = "将 Mod 补丁应用于非 Steam 下载版本";
         var moreButton = new Button
@@ -492,8 +492,11 @@ public sealed partial class LibraryPage : UserControl
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(moreButton, label);
         moreButton.Click += (_, _) => requestNonSteamPatch();
         var title = new Grid { ColumnSpacing = 12 };
-        title.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         title.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        title.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        // ContentDialog 标题容器默认左对齐；跟随正文宽度，确保按钮位于右边缘。
+        content.SizeChanged += (_, e) => title.Width = e.NewSize.Width;
+        Grid.SetColumn(moreButton, 1);
         title.Children.Add(moreButton);
         var name = new TextBlock
         {
@@ -501,7 +504,7 @@ public sealed partial class LibraryPage : UserControl
             TextWrapping = TextWrapping.Wrap,
             VerticalAlignment = VerticalAlignment.Center,
         };
-        Grid.SetColumn(name, 1);
+        Grid.SetColumn(name, 0);
         title.Children.Add(name);
         return title;
     }
@@ -515,13 +518,22 @@ public sealed partial class LibraryPage : UserControl
             Title = "非 Steam 版本 · " + game.Name,
             Content = new TextBlock
             {
-                Text = "此过程不可逆，请先确保已经备份",
+                Text = "Mod 补丁将直接修改所选游戏的原文件，工具箱无法实现文件回滚。请先备份完整游戏目录和存档，并确认备份可用。\n\n"
+                    + "非 Steam 下载版本可能与补丁要求的游戏版本或文件结构不同，应用不匹配的补丁可能导致游戏无法启动、文件损坏或存档丢失。\n\n"
+                    + "此目标不能依靠 Steam 的文件完整性验证恢复；如需恢复，请使用自行保存的备份。没有可用备份时，请取消操作。\n\n"
+                    + "点击“我知道了”后选择当前游戏的 EXE。当前版本尚未提供可应用的 Mod 补丁，不会修改游戏文件。",
                 TextWrapping = TextWrapping.Wrap,
             },
             PrimaryButtonText = "我知道了",
             CloseButtonText = "取消",
             DefaultButton = ContentDialogButton.Close,
         };
+        // 仅此弹窗的默认“取消”按钮使用红色；保留系统键盘焦点和按钮状态行为。
+        backupWarning.Resources["AccentButtonBackground"] = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 180, 35, 45));
+        backupWarning.Resources["AccentButtonBackgroundPointerOver"] = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 155, 27, 37));
+        backupWarning.Resources["AccentButtonBackgroundPressed"] = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 130, 22, 32));
+        foreach (var key in new[] { "AccentButtonForeground", "AccentButtonForegroundPointerOver", "AccentButtonForegroundPressed" })
+            backupWarning.Resources[key] = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255));
         if (await backupWarning.ShowAsync() != ContentDialogResult.Primary) return;
 
         string? executablePath;

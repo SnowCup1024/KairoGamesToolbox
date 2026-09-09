@@ -29,7 +29,6 @@ public sealed class CoverService
     {
         var detected = new SteamLibraryService().DetectSteamPath(SettingsService.Instance.Current.SteamPathOverride);
         if (detected != null) yield return detected;
-        yield return @"E:\Steam";
     }
 
     private static bool HasCoverDimensions(uint width, uint height)

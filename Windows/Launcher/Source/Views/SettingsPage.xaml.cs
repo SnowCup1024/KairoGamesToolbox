@@ -58,7 +58,12 @@ public sealed partial class SettingsPage : UserControl
     {
         var s = SettingsService.Instance.Current;
         if (saveSteamPath)
-            s.SteamPathOverride = string.IsNullOrWhiteSpace(SteamPathBox.Text) ? null : SteamPathBox.Text.Trim();
+        {
+            s.SteamPathOverride = string.IsNullOrWhiteSpace(SteamPathBox.Text)
+                ? new SteamLibraryService().DetectSteamPath(null)
+                : SteamLibraryService.NormalizeDirectoryPath(SteamPathBox.Text);
+            SteamPathBox.Text = s.SteamPathOverride ?? "";
+        }
         if (saveApiKey)
         {
             _apiKeyValue = _apiKeyDirty && !string.IsNullOrWhiteSpace(ApiKeyBox.Text)

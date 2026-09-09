@@ -64,6 +64,43 @@ Check("锚点：Steam 简体中文名读取正确",
     catalog.TryGetChineseName(1952170) == "美食梦物语"
         && catalog.TryGetChineseName(2934180) == "哆啦A梦的铜锣烧店物语");
 
+// 首次启动设置及路径大小写：只使用临时目录，不读取真实 Steam 注册表。
+var startupRoot = Path.Combine(Path.GetTempPath(), "kairo_startup_" + Guid.NewGuid().ToString("N"));
+try
+{
+    var steamDirectory = Path.Combine(startupRoot, "MiXeD", "Steam");
+    Directory.CreateDirectory(steamDirectory);
+    var canonical = SteamLibraryService.NormalizeDirectoryPath(steamDirectory);
+    var inputPath = OperatingSystem.IsWindows() ? steamDirectory.ToLowerInvariant().Replace('\\', '/') : steamDirectory;
+    Check("路径还原磁盘目录大小写及分隔符",
+        SteamLibraryService.NormalizeDirectoryPath(inputPath + "/") == canonical
+        && canonical.EndsWith(Path.Combine("MiXeD", "Steam"), StringComparison.Ordinal));
+    Check("用户路径识别统一格式", new SteamLibraryService().DetectSteamPath(inputPath) == canonical);
+    var settingsPath = Path.Combine(startupRoot, "Config", "settings.json");
+    var initial = new SettingsService(settingsPath);
+    Check("首次启动自动定位并保存配置", initial.InitializeSteamPath(() => inputPath)
+        && File.Exists(settingsPath) && new SettingsService(settingsPath).Current.SteamPathOverride == canonical);
+    initial.Current.ThemePreference = "dark";
+    initial.Save();
+    var saved = File.ReadAllText(settingsPath);
+    Check("再次启动保留用户路径且不重复写配置", initial.InitializeSteamPath(() => throw new Exception("不应检测"))
+        && File.ReadAllText(settingsPath) == saved && initial.Current.ThemePreference == "dark");
+    initial.Current.SteamPathOverride = inputPath;
+    initial.Save();
+    Check("已有配置的路径大小写在启动时修正并保存", initial.InitializeSteamPath(() => null)
+        && new SettingsService(settingsPath).Current.SteamPathOverride == canonical);
+    var missing = new SettingsService(Path.Combine(startupRoot, "NoSteam.json"));
+    Check("未安装 Steam 也创建默认配置", missing.InitializeSteamPath(() => null)
+        && File.Exists(Path.Combine(startupRoot, "NoSteam.json")) && missing.Current.SteamPathOverride == null);
+    var blocked = new SettingsService(steamDirectory);
+    Check("启动保存失败返回失败且保留内存设置", !blocked.InitializeSteamPath(() => canonical)
+        && blocked.Current.SteamPathOverride == canonical);
+}
+finally
+{
+    Directory.Delete(startupRoot, recursive: true);
+}
+
 // 4) 合成 Steam 库布局：扫描 + 文件检测 + AppID 兜底
 var root = Path.Combine(Path.GetTempPath(), "kairo_smoketest_" + Guid.NewGuid().ToString("N"));
 try

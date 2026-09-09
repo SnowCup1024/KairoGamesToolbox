@@ -24,19 +24,48 @@ public sealed class SteamLibraryService
     public string? DetectSteamPath(string? overridePath)
     {
         if (!string.IsNullOrWhiteSpace(overridePath) && Directory.Exists(overridePath))
-            return overridePath.TrimEnd('\\');
+            return NormalizeDirectoryPath(overridePath);
 
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam");
             var v = key?.GetValue("SteamPath") as string;
-            if (!string.IsNullOrWhiteSpace(v) && Directory.Exists(v)) return v.TrimEnd('\\');
+            if (!string.IsNullOrWhiteSpace(v) && Directory.Exists(v)) return NormalizeDirectoryPath(v);
         }
         catch
         {
             // 注册表不可读时忽略
         }
         return null;
+    }
+
+    /// <summary>统一分隔符，并按磁盘中的实际目录名称恢复大小写；不强制修改目录名大小写。</summary>
+    public static string NormalizeDirectoryPath(string path)
+    {
+        var input = path.Trim();
+        try
+        {
+            var full = Path.GetFullPath(input);
+            var root = Path.GetPathRoot(full)!;
+            if (OperatingSystem.IsWindows() && root.Length >= 2 && root[1] == ':')
+                root = char.ToUpperInvariant(root[0]) + root[1..];
+            var current = root;
+            foreach (var part in full[root.Length..].Split(
+                new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar },
+                StringSplitOptions.RemoveEmptyEntries))
+            {
+                var names = Directory.GetDirectories(current);
+                var match = names.FirstOrDefault(entry => Path.GetFileName(entry) == part)
+                    ?? names.FirstOrDefault(entry => string.Equals(Path.GetFileName(entry), part,
+                        StringComparison.OrdinalIgnoreCase));
+                current = Path.Combine(current, match == null ? part : Path.GetFileName(match));
+            }
+            return current;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return input;
+        }
     }
 
     /// <summary>重新扫描：解析库与已安装游戏。失败时保留空结果（UI 显示空态引导）。</summary>

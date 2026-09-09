@@ -48,6 +48,18 @@ public sealed class SettingsService
         Load();
     }
 
+    /// <summary>在创建主窗口前初始化配置；测试可注入自动识别结果。</summary>
+    public bool InitializeSteamPath(Func<string?>? detectSteamPath = null)
+    {
+        var previous = Current.SteamPathOverride;
+        Current.SteamPathOverride = string.IsNullOrWhiteSpace(previous)
+            ? (detectSteamPath ?? (() => new SteamLibraryService().DetectSteamPath(null)))()
+            : SteamLibraryService.NormalizeDirectoryPath(previous);
+        if (!string.IsNullOrWhiteSpace(Current.SteamPathOverride))
+            Current.SteamPathOverride = SteamLibraryService.NormalizeDirectoryPath(Current.SteamPathOverride);
+        return File.Exists(_file) && previous == Current.SteamPathOverride || Save();
+    }
+
     public void Load()
     {
         try

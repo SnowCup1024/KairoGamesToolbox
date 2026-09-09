@@ -47,9 +47,9 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 
 启动器通过 Steam 的 `IStoreBrowseService/GetItems` 获取 `asset_url_format` 和 `library_capsule_2x`，保留资源独立的 hash 路径，再从 Steam CDN 下载 JPG。普通 `library_capsule` 可能仅为 300×450；CDN 请求仍使用 600×900 资源；Steam 本地缓存兜底也接受 300×450 的 library 封面。
 
-配置保存在 `%LocalAppData%\KairoGamesToolbox\settings.json`，封面保存在 `%LocalAppData%\KairoGamesToolbox\Covers\<appid>.jpg`。不读取或迁移旧应用目录。
+配置保存在 `%LocalAppData%\KairoGamesToolbox\settings.json`，封面保存在 `%LocalAppData%\KairoGamesToolbox\Covers\<appid>.jpg`。首次启动在创建主窗口前自动识别 Steam 并保存配置；已保存的用户路径优先。路径统一分隔符，并还原磁盘目录的实际大小写。不读取或迁移旧应用目录。
 
-每次启动优先读取并验证 Covers 磁盘缓存，命中后不联网。缺失或损坏时才查询 Steam CDN，下载成功后原子写入缓存。下载失败（包括无资源、超时或图片损坏）后，尝试从 Steam 根目录的 `appcache\librarycache\<appid>\library_600x900.jpg` 读取并复制到 Covers；优先使用设置或注册表识别的 Steam 根目录，另尝试 `E:\Steam`。不会修改 Steam 源图片。
+每次启动优先读取并验证 Covers 磁盘缓存，命中后不联网。缺失或损坏时才查询 Steam CDN，下载成功后原子写入缓存。下载失败（包括无资源、超时或图片损坏）后，尝试从 Steam 根目录的 `appcache\librarycache\<appid>\library_600x900.jpg` 读取并复制到 Covers；只使用用户设置或注册表自动识别的 Steam 路径，不使用固定盘符。不会修改 Steam 源图片。
 
 封面查询不需要 Steam Web API Key，最多同时下载四款游戏的资源。磁盘写入失败不影响当前显示；所有来源均失败时显示占位图，30 秒后再次刷新可重试。切页复用内存缓存，重新打开应用复用磁盘缓存。本次热更新保持版本号 0.1.1。
 
@@ -64,6 +64,8 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 ## 后续开发
 
 已确定下一个里程碑为“启动器稳定性与可测试性完善”：优先完善安装与账号识别、异常和设置保存反馈，并补充对应测试。
+
+封面缓存后续增加 31 天检查：重新查询资源哈希，相同则保留图片，不同则下载更新；检查失败保留可用缓存。本次热补丁不加入过期检查。
 
 后续版本的 Mod 采用直接修改游戏原文件的补丁形式，具体补丁制作、应用与恢复机制待设计。当前阶段不实现该功能；启动器的其他功能想法另行讨论。
 

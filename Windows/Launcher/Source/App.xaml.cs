@@ -14,6 +14,7 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        Services.SettingsService.Instance.InitializeSteamPath();
         MainWindowInstance = new MainWindow();
         MainWindowInstance.Activate();
     }

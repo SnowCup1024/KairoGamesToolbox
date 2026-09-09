@@ -234,6 +234,8 @@ public sealed partial class LibraryPage
         {
             BasedOn = (Style)Application.Current.Resources["DefaultButtonStyle"],
         };
+        // 与默认强调按钮一致，背景覆盖边框外缘，避免约 1px 的视觉内缩。
+        dangerStyle.Setters.Add(new Setter(Control.BackgroundSizingProperty, BackgroundSizing.OuterBorderEdge));
         dangerStyle.Setters.Add(new Setter(Control.BackgroundProperty,
             new SolidColorBrush(Windows.UI.Color.FromArgb(255, 235, 0, 0))));
         dangerStyle.Setters.Add(new Setter(Control.ForegroundProperty,

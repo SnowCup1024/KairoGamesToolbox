@@ -291,6 +291,27 @@ Check("搜索：支持中文、英文和忽略空格的模糊匹配",
         && GameSearch.Matches(bilingualSearchGame, "cafe nica")
         && !GameSearch.Matches(bilingualSearchGame, "冒险村"));
 
+// 拼音由目录维护，避免多音字误读；新增目录条目必须补齐音节。
+Check("搜索：63 款游戏均提供拼音并可用全拼及首字母找到",
+    catalog.Entries.All(entry => !string.IsNullOrWhiteSpace(entry.PinyinName)
+        && GameSearch.Matches(new KairoGame { PinyinName = entry.PinyinName }, entry.PinyinName)
+        && GameSearch.Matches(new KairoGame { PinyinName = entry.PinyinName },
+            string.Concat(entry.PinyinName.Split(' ').Select(part => part[0])))));
+var pinyinGame = new KairoGame { Name = "口袋学院物语3", PinyinName = catalog.TryGetPinyinName(2191490) };
+Check("搜索：全拼、大小写、分隔符与首字母", GameSearch.Matches(pinyinGame, "kou dai xue yuan")
+    && GameSearch.Matches(pinyinGame, "KDX Y3") && GameSearch.Matches(pinyinGame, "kou-dai3"));
+Check("搜索：允许省略部分拼音并保留数字", GameSearch.Matches(pinyinGame, "koudai3")
+    && !GameSearch.Matches(pinyinGame, "koudai2") && !GameSearch.Matches(pinyinGame, "zzzz"));
+var musicGame = new KairoGame { PinyinName = catalog.TryGetPinyinName(1952160) };
+Check("搜索：乐曲使用 yue 读音", GameSearch.Matches(musicGame, "yuequ")
+    && !GameSearch.Matches(musicGame, "lequ"));
+Check("搜索：保留中英文混合名称与后缀",
+    GameSearch.Matches(new KairoGame { PinyinName = catalog.TryGetPinyinName(2934180) }, "duolaameng")
+    && GameSearch.Matches(new KairoGame { PinyinName = catalog.TryGetPinyinName(2072420) }, "kaituodx"));
+Check("搜索：无拼音的目录外游戏仍支持英文，空查询显示全部",
+    GameSearch.Matches(new KairoGame { EnglishName = "Unknown Game" }, "unknown")
+    && GameSearch.Matches(pinyinGame, " ") && !GameSearch.Matches(new KairoGame(), "abc"));
+
 // 联网封面使用合成 HTTP 响应测试，不连接 Steam。
 string CoverMetadata(uint appId, string filename, string? format = null)
     => JsonSerializer.Serialize(new

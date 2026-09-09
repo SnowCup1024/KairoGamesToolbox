@@ -25,6 +25,9 @@ public sealed class KairoGame
     /// <summary>Steam 英文名，仅用于双语搜索、稳定排序和内部标识。</summary>
     public string EnglishName { get; init; } = "";
 
+    /// <summary>目录提供的无声调拼音，音节用空格分隔，保留数字及英文后缀。</summary>
+    public string PinyinName { get; init; } = "";
+
     /// <summary>标准全名格式，界面当前不直接显示。</summary>
     public string FullName
         => string.IsNullOrWhiteSpace(EnglishName) || EnglishName == Name

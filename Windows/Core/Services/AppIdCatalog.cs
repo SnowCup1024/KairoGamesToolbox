@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace KairosoftGameToolbox.Services;
 
-public sealed record CatalogEntry(uint AppId, string Name, string ChineseName)
+public sealed record CatalogEntry(uint AppId, string Name, string ChineseName, string PinyinName = "")
 {
     public string FullName => $"{ChineseName} ({Name})";
 }
@@ -39,7 +39,8 @@ public sealed class AppIdCatalog
                             : "";
                         if (string.IsNullOrWhiteSpace(chineseName)) chineseName = name;
 
-                        var entry = new CatalogEntry(appId, name, chineseName);
+                        string pinyinName = g.TryGetProperty("name_pinyin", out var py) ? py.GetString() ?? "" : "";
+                        var entry = new CatalogEntry(appId, name, chineseName, pinyinName);
                         list.Add(entry);
                         _entries[appId] = entry;
                     }
@@ -52,6 +53,9 @@ public sealed class AppIdCatalog
         }
         Entries = list;
     }
+
+    public string TryGetPinyinName(uint appId)
+        => _entries.TryGetValue(appId, out var entry) ? entry.PinyinName : "";
 
     public bool Contains(uint appId) => _entries.ContainsKey(appId);
 

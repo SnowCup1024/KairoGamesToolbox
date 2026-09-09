@@ -30,7 +30,7 @@
         <Grid Grid.Row="0" ColumnSpacing="16">
             <TextBox
                 x:Name="SearchBox"
-                PlaceholderText="搜索中文名或英文名…"
+                PlaceholderText="搜索中文、英文、拼音或首字母…"
                 CornerRadius="8"
                 VerticalAlignment="Center"
                 TextChanged="SearchBox_TextChanged" />

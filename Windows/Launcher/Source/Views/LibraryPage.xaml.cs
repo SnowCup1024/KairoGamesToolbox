@@ -129,6 +129,7 @@ public sealed partial class LibraryPage : UserControl
             AppId = appId,
             Name = displayName,
             EnglishName = englishName,
+            PinyinName = _catalog.TryGetPinyinName(appId),
             IsInstalled = info != null,
         };
         if (info != null)

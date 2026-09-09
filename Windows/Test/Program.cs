@@ -70,6 +70,8 @@ try
 {
     var steamDirectory = Path.Combine(startupRoot, "MiXeD", "Steam");
     Directory.CreateDirectory(steamDirectory);
+    File.WriteAllText(Path.Combine(steamDirectory, "Steam.exe"), "");
+    Directory.CreateDirectory(Path.Combine(steamDirectory, "steamapps"));
     var canonical = SteamLibraryService.NormalizeDirectoryPath(steamDirectory);
     var inputPath = OperatingSystem.IsWindows() ? steamDirectory.ToLowerInvariant().Replace('\\', '/') : steamDirectory;
     Check("路径还原磁盘目录大小写及分隔符",
@@ -105,6 +107,8 @@ finally
 var root = Path.Combine(Path.GetTempPath(), "kairo_smoketest_" + Guid.NewGuid().ToString("N"));
 try
 {
+    Directory.CreateDirectory(root);
+    File.WriteAllText(Path.Combine(root, "Steam.exe"), "");
     var steamapps = Path.Combine(root, "steamapps");
     var installDir = Path.Combine(steamapps, "common", "Pocket Academy 3");
     Directory.CreateDirectory(installDir);
@@ -126,10 +130,30 @@ try
     Check("文件检测命中开罗（KairoGames.exe + KairoGames_Data）",
         steam.KairoInstalledApps(catalog).ContainsKey(2191490));
 
+    Check("Steam 安装根目录验证通过", SteamLibraryService.IsValidSteamPath(root));
+    Check("Steam 路径拒绝普通目录及不存在目录", !SteamLibraryService.IsValidSteamPath(installDir)
+        && !SteamLibraryService.IsValidSteamPath(Path.Combine(root, "missing")));
+    Check("Steam 路径拒绝相对路径与空值", !SteamLibraryService.IsValidSteamPath(".")
+        && !SteamLibraryService.IsValidSteamPath(null));
+    Check("无效手动路径不静默回退注册表", new SteamLibraryService().DetectSteamPath(installDir) == null);
+    Check("非 Steam 文件夹包含入口即可通过", GameFolderService.ContainsExecutable(installDir));
+    Check("非 Steam 文件夹拒绝上级目录、EXE 路径及空值", !GameFolderService.ContainsExecutable(steamapps)
+        && !GameFolderService.ContainsExecutable(Path.Combine(installDir, "KairoGames.exe"))
+        && !GameFolderService.ContainsExecutable(null));
+    Directory.CreateDirectory(Path.Combine(root, "config"));
+    var loginPath = Path.Combine(root, "config", "loginusers.vdf");
+    File.WriteAllText(loginPath, "\"Users\" { \"76561198000000001\" { \"MostRecent\" \"0\" } \"76561198000000002\" { \"MostRecent\" \"1\" } }");
+    Check("账号识别兼容 Steam 字段大小写并选择最近账号", SteamAccountService.ResolveSteamId(steam) == "76561198000000002");
+    File.WriteAllText(loginPath, "\"users\" { \"76561198000000001\" { \"mostrecent\" \"1\" } }");
+    Check("账号识别兼容小写字段", SteamAccountService.ResolveSteamId(steam) == "76561198000000001");
+    File.Delete(loginPath);
+    Check("无登录记录及存档时无账号", SteamAccountService.ResolveSteamId(steam) == null);
+
     var saves = Path.Combine(installDir, "saves");
     Directory.CreateDirectory(Path.Combine(saves, "76561198000000001"));
     Directory.CreateDirectory(Path.Combine(saves, "76561198000000002"));
     Directory.CreateDirectory(Path.Combine(saves, "not-a-steamid"));
+    Check("无登录记录时从存档兜底账号", SteamAccountService.ResolveSteamId(steam) is "76561198000000001" or "76561198000000002");
     Check("存档目录优先选择当前 SteamID",
         SaveDirectoryService.Find(installDir, "76561198000000002")
             == Path.Combine(saves, "76561198000000002"));

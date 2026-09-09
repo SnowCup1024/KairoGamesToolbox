@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
 using KairosoftGameToolbox.Services;
 using Microsoft.UI.Xaml;
@@ -27,6 +27,11 @@ public sealed partial class SettingsPage : UserControl
     {
         InitializeComponent();
         Loaded += (_, _) => LoadFromSettings();
+        Unloaded += (_, _) => RestoreApiKey();
+        RegisterPropertyChangedCallback(VisibilityProperty, (_, _) =>
+        {
+            if (Visibility != Visibility.Visible) RestoreApiKey();
+        });
     }
 
     private void LoadFromSettings()
@@ -54,15 +59,28 @@ public sealed partial class SettingsPage : UserControl
         }
     }
 
-    private void Save(bool saveSteamPath, bool saveApiKey = false, bool maskApiKey = false)
+    private async Task SaveAsync(bool saveSteamPath, bool saveApiKey = false, bool maskApiKey = false)
     {
         var s = SettingsService.Instance.Current;
         if (saveSteamPath)
         {
-            s.SteamPathOverride = string.IsNullOrWhiteSpace(SteamPathBox.Text)
+            var path = string.IsNullOrWhiteSpace(SteamPathBox.Text)
                 ? new SteamLibraryService().DetectSteamPath(null)
                 : SteamLibraryService.NormalizeDirectoryPath(SteamPathBox.Text);
-            SteamPathBox.Text = s.SteamPathOverride ?? "";
+            if (!SteamLibraryService.IsValidSteamPath(path))
+            {
+                await new ContentDialog
+                {
+                    XamlRoot = XamlRoot,
+                    RequestedTheme = ActualTheme,
+                    Title = "Steam 路径无效",
+                    Content = "请选择同时包含 Steam.exe 和 steamapps 文件夹的 Steam 安装目录。当前设置未更改。",
+                    CloseButtonText = "关闭",
+                }.ShowAsync();
+                return;
+            }
+            s.SteamPathOverride = path;
+            SteamPathBox.Text = path ?? "";
         }
         if (saveApiKey)
         {
@@ -77,14 +95,14 @@ public sealed partial class SettingsPage : UserControl
         SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void SaveAndRescan_Click(object sender, RoutedEventArgs e)
+    private async void SaveAndRescan_Click(object sender, RoutedEventArgs e)
     {
-        Save(saveSteamPath: true);
+        await SaveAsync(saveSteamPath: true);
     }
 
-    private void SaveApiKeyAndRescan_Click(object sender, RoutedEventArgs e)
+    private async void SaveApiKeyAndRescan_Click(object sender, RoutedEventArgs e)
     {
-        Save(saveSteamPath: false, saveApiKey: true, maskApiKey: true);
+        await SaveAsync(saveSteamPath: false, saveApiKey: true, maskApiKey: true);
     }
 
     private void OpenApiKeyPage_Click(object sender, RoutedEventArgs e)
@@ -107,15 +125,30 @@ public sealed partial class SettingsPage : UserControl
     {
         if (_loading || !_apiKeyMasked) return;
         _loading = true;
-        ApiKeyBox.Text = _apiKeyValue ?? "";
+        ApiKeyBox.Text = "";
         ApiKeyBox.SelectAll();
         _loading = false;
         _apiKeyMasked = false;
+        _apiKeyDirty = true;
     }
 
     private void ApiKeyBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        if (_loading || _apiKeyDirty || string.IsNullOrWhiteSpace(_apiKeyValue)) return;
+        if (_loading) return;
+        // 焦点先于 Click 离开文本框；允许保存按钮读取草稿，其余离开操作丢弃未保存输入。
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            var focused = Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(XamlRoot);
+            if (ReferenceEquals(focused, SaveApiKeyButton) || ReferenceEquals(focused, ApiKeyBox))
+                return;
+            RestoreApiKey();
+        });
+    }
+
+    private void RestoreApiKey()
+    {
+        _apiKeyValue = SettingsService.Instance.Current.SteamWebApiKey;
+        _apiKeyDirty = false;
         SetApiKeyMasked();
     }
 
@@ -140,16 +173,10 @@ public sealed partial class SettingsPage : UserControl
 
     private void SetApiKeyMasked()
     {
-        if (string.IsNullOrWhiteSpace(_apiKeyValue))
-        {
-            _apiKeyMasked = false;
-            return;
-        }
-
         _loading = true;
-        ApiKeyBox.Text = MaskApiKey(_apiKeyValue);
+        _apiKeyMasked = !string.IsNullOrWhiteSpace(_apiKeyValue);
+        ApiKeyBox.Text = _apiKeyMasked ? MaskApiKey(_apiKeyValue!) : "";
         _loading = false;
-        _apiKeyMasked = true;
     }
 
     private static string MaskApiKey(string apiKey)

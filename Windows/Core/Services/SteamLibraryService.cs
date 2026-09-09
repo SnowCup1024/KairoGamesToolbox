@@ -23,20 +23,36 @@ public sealed class SteamLibraryService
     /// <summary>检测 Steam 安装根目录：设置覆盖优先，其次注册表 HKCU\Software\Valve\Steam\SteamPath。</summary>
     public string? DetectSteamPath(string? overridePath)
     {
-        if (!string.IsNullOrWhiteSpace(overridePath) && Directory.Exists(overridePath))
-            return NormalizeDirectoryPath(overridePath);
+        if (!string.IsNullOrWhiteSpace(overridePath))
+            return IsValidSteamPath(overridePath) ? NormalizeDirectoryPath(overridePath) : null;
 
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam");
             var v = key?.GetValue("SteamPath") as string;
-            if (!string.IsNullOrWhiteSpace(v) && Directory.Exists(v)) return NormalizeDirectoryPath(v);
+            if (IsValidSteamPath(v)) return NormalizeDirectoryPath(v!);
         }
         catch
         {
             // 注册表不可读时忽略
         }
         return null;
+    }
+
+    /// <summary>安装根目录必须同时包含 Steam.exe 和 steamapps，拒绝普通文件夹及库子目录。</summary>
+    public static bool IsValidSteamPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+        try
+        {
+            return Path.IsPathFullyQualified(path.Trim())
+                && File.Exists(Path.Combine(path.Trim(), "Steam.exe"))
+                && Directory.Exists(Path.Combine(path.Trim(), "steamapps"));
+        }
+        catch (Exception ex) when (ex is ArgumentException or IOException or NotSupportedException)
+        {
+            return false;
+        }
     }
 
     /// <summary>统一分隔符，并按磁盘中的实际目录名称恢复大小写；不强制修改目录名大小写。</summary>

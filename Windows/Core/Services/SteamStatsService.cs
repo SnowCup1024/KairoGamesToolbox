@@ -6,7 +6,7 @@ namespace KairosoftGameToolbox.Services;
 /// <summary>
 /// Steam 游玩记录（可选，默认关）：
 /// Steam Web API IPlayerService/GetOwnedGames（官方，钥匙所有者本人返回完整时长）。
-/// SteamID 自动获取：loginusers.vdf mostrecent → 已安装游戏 saves/&lt;SteamID&gt; 目录。
+/// SteamID 由调用方通过 SteamAccountService 统一识别并传入。
 /// 任何失败返回 null/空 → UI 静默隐藏时长信息，不阻塞主界面。
 /// </summary>
 public sealed class SteamStatsService
@@ -18,64 +18,6 @@ public sealed class SteamStatsService
     private DateTime _cacheTime;
     private string? _cacheApiKey;
     private string? _cacheSteamId;
-
-    /// <summary>自动解析 SteamID64：loginusers.vdf 的 mostrecent 优先，其次已装游戏存档目录。</summary>
-    public string? ResolveSteamId(SteamLibraryService steam)
-    {
-        var steamPath = steam.SteamPath;
-        if (!string.IsNullOrEmpty(steamPath))
-        {
-            var loginFile = Path.Combine(steamPath, "config", "loginusers.vdf");
-            if (File.Exists(loginFile))
-            {
-                try
-                {
-                    var vdf = VdfParser.Parse(File.ReadAllText(loginFile));
-                    var users = vdf.TryGetValue("users", out var usersValue)
-                        && usersValue is Dictionary<string, object> nestedUsers
-                        ? nestedUsers
-                        : vdf;
-                    string? bestId = null;
-                    int best = -1;
-                    foreach (var (key, val) in users)
-                    {
-                        if (val is not Dictionary<string, object> acc || !ulong.TryParse(key, out _)) continue;
-                        if (acc.TryGetValue("mostrecent", out var mr) && mr is string mrs
-                            && int.TryParse(mrs, out var mri) && mri > best)
-                        {
-                            best = mri;
-                            bestId = key;
-                        }
-                    }
-                    if (bestId != null) return bestId;
-                }
-                catch
-                {
-                    // 解析失败走存档目录兜底
-                }
-            }
-        }
-
-        // 兜底：已装游戏 saves/<SteamID> 目录
-        foreach (var info in steam.InstalledApps.Values)
-        {
-            var saves = Path.Combine(info.InstallDir, "saves");
-            if (!Directory.Exists(saves)) continue;
-            try
-            {
-                foreach (var d in Directory.EnumerateDirectories(saves))
-                {
-                    var name = Path.GetFileName(d);
-                    if (ulong.TryParse(name, out _)) return name;
-                }
-            }
-            catch
-            {
-                // 继续下一个
-            }
-        }
-        return null;
-    }
 
     /// <summary>拉取持有游戏的游玩时长（分钟）与最近游玩（Unix 秒）。失败返回 null。</summary>
     public async Task<Dictionary<uint, GamePlayStats>?> FetchOwnedGamesAsync(

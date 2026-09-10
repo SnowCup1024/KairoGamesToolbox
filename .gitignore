@@ -40,3 +40,8 @@ KairoMods/
 **/.Backups/
 **/.Downloads/
 **/interop/
+
+# Mods contains source only; packages belong in .Build/ModPackages
+/Mods/*
+!/Mods/Source/
+/Mods/**/*.zip

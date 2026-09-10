@@ -11,7 +11,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
-$gameMods = Join-Path $root "Mods/$GameFolder"
+$gameMods = Join-Path $root ".Build/ModPackages/$GameFolder"
 New-Item -ItemType Directory -Force "$gameMods/Alpha", "$gameMods/Beta" | Out-Null
 $destination = if ($Channel -eq 'Stable') { $gameMods } else { Join-Path $gameMods $Channel }
 $archivePath = Join-Path $destination "$GameFolder-$Version.zip"

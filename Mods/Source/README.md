@@ -2,17 +2,11 @@
 
 启动器安装包不包含本目录。模组独立发布，0.2.2 通过“选择本地 Mod ZIP”导入，GitHub 在线下载暂未实现。
 
-## 目录
+## 源码与产物目录
 
-```
-Mods/
-  DoraemonDorayakiShopStory/
-    Alpha/DoraemonDorayakiShopStory-0.0.3.zip
-    Beta/
-    （Stable 包最终直接放在本层）
-```
+仓库 `Mods` 只跟踪 `Source`：KairoMods.Observer、ControlTests、MetadataInspect 及此说明。0.0.3 ZIP 已从当前版本删除，不再提交模组二进制包。
 
-游戏目录名由目录表英文名保留 ASCII 字母与数字生成，移除空格及标点。运行时缓存位于 %LocalAppData%/KairoGamesToolbox/Mods，EXE 同级不创建缓存。Mods/Source 保存独立开发源码，不参与启动器打包。
+独立打包脚本输出到 `.Build/ModPackages/<英文无空格游戏名>/Alpha` 或 `Beta`，Stable 直接位于游戏名目录；这些生成物被 Git 忽略。用户导入缓存仍位于 `%LocalAppData%/KairoGamesToolbox/Mods`，与源码及构建输出分离。
 
 ## ZIP
 
@@ -31,7 +25,7 @@ Mods/
 
 首次安装的未知冲突拒绝覆盖。安装清单保存在游戏目录 .kairomods-install.json；更新时校验旧文件指纹，替换旧文件并移除清单中已淘汰的文件。先暂存和备份，异常时恢复；恢复失败保留暂存目录并报错。不保证断电后的跨文件事务，不提供卸载。Steam 完整性验证通常不会删除新增模组文件。
 
-## 首个 Alpha
+## 历史 Alpha 0.0.3（当前仓库已移除包）
 
 AppID 2934180；观察插件 0.0.3，BepInEx 6.0.0-be.788（5b766a3），Unity IL2CPP x86。
 进入存档后按 F8，日志出现 MoneyTrace ready 后观察 SubMoney/AddMoney；不提供金钱反加，也未接入工具箱实时控制。

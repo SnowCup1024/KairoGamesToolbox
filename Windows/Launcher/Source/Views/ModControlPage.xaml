@@ -11,16 +11,19 @@
      <TextBlock Text="游戏连接" FontSize="20" FontWeight="SemiBold"/>
      <TextBlock x:Name="Status" Text="尚未连接" TextWrapping="Wrap"/>
      <Button Content="刷新连接状态" Click="Refresh_Click"/>
-     <TextBlock Text="先启动游戏并进入存档，看到余额后再启用控制。不要在首页启用。测试模组需 0.0.4；仓库现有 0.0.3 ZIP 不支持通信。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
+     <TextBlock Text="先启动游戏并进入存档，看到余额后再启用控制。不要在首页启用。模组需 0.0.4 或兼容版本。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
+     <TextBlock x:Name="Feedback" TextWrapping="Wrap" Visibility="Collapsed"/>
      <Button x:Name="ActivateButton" Content="我已进入存档 · 启用控制" Click="Activate_Click" IsEnabled="False"/>
     </StackPanel>
    </Border>
    <Border Padding="24" CornerRadius="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
     <StackPanel Spacing="12">
-     <ToggleSwitch x:Name="MoneySwitch" Header="金钱反加" OnContent="已开启" OffContent="已关闭" Toggled="Money_Toggled" IsEnabled="False"/>
-     <TextBlock Text="开启后，将已观察到的扣款入口产生的实际消费转为等额增加。正常收入保持原样，购买条件仍由游戏判断。" TextWrapping="Wrap"/>
-     <TextBlock Text="每次启动游戏默认关闭。离开此页或关闭启动器不会撤销已生效的开关；断线时显示未知。关闭开关只影响后续消费，不恢复余额或存档。请使用已备份的测试存档。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
-     <TextBlock x:Name="Feedback" TextWrapping="Wrap"/>
+     <TextBlock Text="修改菜单" FontSize="20" FontWeight="SemiBold"/>
+     <Grid ColumnSpacing="24">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <TextBlock Text="金钱反加" VerticalAlignment="Center" ToolTipService.ToolTip="将实际扣款转为等额增加，正常收入不变。"/>
+      <ToggleSwitch x:Name="MoneySwitch" Grid.Column="1" OnContent="" OffContent="" AutomationProperties.Name="金钱反加" Toggled="Money_Toggled" IsEnabled="False"/>
+     </Grid>
     </StackPanel>
    </Border>
   </StackPanel>

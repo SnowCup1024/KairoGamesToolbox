@@ -31,6 +31,26 @@ public sealed partial class GameDetailsPage : UserControl
         Loaded += async (_, _) => Cover.Source = await CoverService.Default.LoadCoverImageAsync(game.AppId, 1);
     }
 
+    private void Control_Click(object sender, RoutedEventArgs e)
+    {
+        if (busy) return;
+        if (string.IsNullOrWhiteSpace(target))
+        {
+            ResultText.Text = "请先选择此游戏的安装目录，再进入修改页面。";
+            return;
+        }
+        var page = new ModControlPage(game, target);
+        page.BackRequested += (_, _) =>
+        {
+            ControlHost.Content = null;
+            ControlHost.Visibility = Visibility.Collapsed;
+            DetailsScroll.Visibility = Visibility.Visible;
+        };
+        ControlHost.Content = page;
+        ControlHost.Visibility = Visibility.Visible;
+        DetailsScroll.Visibility = Visibility.Collapsed;
+    }
+
     private void UpdateTarget()
     {
         TargetText.Text = string.IsNullOrWhiteSpace(target) ? "尚未选择游戏目录" : (nonSteam ? "非 Steam · " : "Steam · ") + target;

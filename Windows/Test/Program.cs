@@ -503,6 +503,7 @@ finally
 }
 
 ModPackageChecks.Run(Check);
+await ModControlChecks.RunAsync(Check);
 
 Console.WriteLine(failures == 0 ? "ALL PASS" : $"{failures} FAILED");
 return failures;

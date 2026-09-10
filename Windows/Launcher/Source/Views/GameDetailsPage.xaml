@@ -10,11 +10,12 @@
    <Setter Property="Padding" Value="24" />
   </Style>
  </UserControl.Resources>
- <ScrollViewer HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+ <Grid>
+ <ScrollViewer x:Name="DetailsScroll" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
   <StackPanel x:Name="PageBody" Margin="28,8,28,28" Spacing="18" MaxWidth="1050" HorizontalAlignment="Stretch">
    <Button x:Name="BackButton" Click="Back_Click" Style="{StaticResource SubtleButtonStyle}"><StackPanel Orientation="Horizontal" Spacing="10"><SymbolIcon Symbol="Back"/><TextBlock Text="返回游戏库"/></StackPanel></Button>
    <Border Style="{StaticResource SectionCard}">
-    <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+    <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <Border CornerRadius="10" Background="{ThemeResource CoverGradientBrush}" Height="180"><Image x:Name="Cover" Stretch="UniformToFill"/></Border>
      <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
       <TextBlock Text="MOD 与存档修改" FontSize="12" Foreground="{ThemeResource AccentBrush}"/>
@@ -22,6 +23,7 @@
       <TextBlock x:Name="GameStatus" Foreground="{ThemeResource TextSecondaryBrush}" TextWrapping="Wrap"/>
       <Button x:Name="LaunchButton" Content="启动游戏" Style="{StaticResource AccentButtonStyle}" Click="Launch_Click"/>
      </StackPanel>
+     <Button Grid.Column="2" Content="进入修改页面 →" Click="Control_Click" VerticalAlignment="Center"/>
     </Grid>
    </Border>
    <Border Style="{StaticResource SectionCard}">
@@ -47,9 +49,11 @@
    </Border>
    <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
     <TextBlock Text="03  ·  存档与功能" FontSize="20" FontWeight="SemiBold"/>
-    <TextBlock Text="存档编辑与实时开关将在后续版本接入。目前 Alpha 模组仅用于观察金钱变化，不提供金钱反加。安装或测试前请备份存档。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
+    <TextBlock Text="实时控制请使用上方“进入修改页面”。金钱反加需本地测试模组 0.0.4；现有 Alpha ZIP 0.0.3 仅观察，不支持通信。存档编辑尚未开放，测试前请备份存档。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
     <Button Content="打开存档目录" Click="Saves_Click"/>
    </StackPanel></Border>
   </StackPanel>
  </ScrollViewer>
+ <ContentControl x:Name="ControlHost" Visibility="Collapsed" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+ </Grid>
 </UserControl>

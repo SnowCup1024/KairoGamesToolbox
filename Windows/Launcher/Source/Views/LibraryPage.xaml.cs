@@ -65,6 +65,10 @@ public sealed partial class LibraryPage : UserControl
         {
             // 新刷新请求取消当前操作后，不再提交其结果。
         }
+        catch (Exception ex)
+        {
+            await new ContentDialog { XamlRoot = XamlRoot, Title = "游戏库刷新失败", Content = ex.Message, CloseButtonText = "关闭" }.ShowAsync();
+        }
         finally
         {
             lock (_refreshSync)
@@ -113,6 +117,20 @@ public sealed partial class LibraryPage : UserControl
             list.Add(MakeGame(appId, englishName, englishName, info, preferredSteamId));
         }
 
+        foreach (var local in new NonSteamLibraryService().Load())
+        {
+            var game = list.FirstOrDefault(g => g.AppId == local.AppId);
+            if (game == null || !GameFolderService.ContainsExecutable(local.Directory)) continue;
+            try { if (NonSteamLibraryService.Identify(local.Directory, _catalog).AppId != game.AppId) continue; }
+            catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException) { continue; }
+            game.NonSteamDirectory = local.Directory;
+            if (!game.IsInstalled)
+            {
+                game.InstallDir = local.Directory;
+                game.IsInstalled = true;
+                game.SaveDir = SaveDirectoryService.Find(local.Directory, null);
+            }
+        }
         list.Sort((a, b) => string.Compare(a.SortName, b.SortName, StringComparison.OrdinalIgnoreCase));
         return list;
     }
@@ -203,8 +221,10 @@ public sealed partial class LibraryPage : UserControl
             NotOwnedRepeater,
             sections.GetValueOrDefault(GameSectionKind.NotOwnedOrUnknown));
 
+        InstalledSection.Visibility = Visibility.Visible;
+        if (!sections.ContainsKey(GameSectionKind.Installed)) InstalledSectionTitle.Text = "已安装 · 0款";
         bool empty = filtered.Count == 0;
-        GridScroll.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
+        GridScroll.Visibility = Visibility.Visible;
         EmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
         EmptyTitle.Text = _search.Length > 0 ? "没有匹配的游戏" : "未检测到开罗游戏";
         EmptyDescription.Text = _search.Length > 0
@@ -229,11 +249,12 @@ public sealed partial class LibraryPage : UserControl
     private void Card_GameClicked(object sender, KairoGame game)
     {
         var page = new GameDetailsPage(game);
-        page.BackRequested += (_, _) =>
+        page.BackRequested += async (_, _) =>
         {
             DetailHost.Content = null;
             DetailHost.Visibility = Visibility.Collapsed;
             LibraryRoot.Visibility = Visibility.Visible;
+            await RefreshAsync();
         };
         DetailHost.Content = page;
         LibraryRoot.Visibility = Visibility.Collapsed;
@@ -293,6 +314,25 @@ public sealed partial class LibraryPage : UserControl
     {
         _search = SearchBox.Text?.Trim() ?? "";
         RebuildView();
+    }
+
+    private async void AddNonSteam_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FolderPicker();
+            picker.FileTypeFilter.Add("*");
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance!));
+            var selected = await picker.PickSingleFolderAsync();
+            if (selected == null) return;
+            var entry = await Task.Run(() => NonSteamLibraryService.Identify(selected.Path, _catalog));
+            new NonSteamLibraryService().Save(entry.AppId, selected.Path);
+            await RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            await new ContentDialog { XamlRoot = XamlRoot, Title = "添加非 Steam 游戏未完成", Content = ex.Message, CloseButtonText = "关闭" }.ShowAsync();
+        }
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e)

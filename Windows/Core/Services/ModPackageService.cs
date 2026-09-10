@@ -9,7 +9,7 @@ public sealed record ModFile(string Path, string Sha256);
 public sealed record ModManifest(int SchemaVersion, uint AppId, string GameFolder, string Version,
     string Channel, string Description, List<ModFile> Targets, List<ModFile> Files);
 
-/// <summary>声明式 ZIP 模组：先校验整个包和游戏，暂存后安装；不同内容的已有文件拒绝覆盖。</summary>
+/// <summary>声明式 ZIP 模组：先校验整个包和游戏，暂存后安装；更新只覆盖清单管理且指纹匹配的文件。</summary>
 public static class ModPackageService
 {
     private const long MaxBytes = 512L * 1024 * 1024;
@@ -120,7 +120,44 @@ public static class ModPackageService
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
 
-    public static ModManifest Install(string package, string gameRoot, uint appId, string folder)
+    private const string ReceiptName = ".kairomods-install.json";
+    public static bool HasInstalledMod(string root) => File.Exists(Path.Combine(root, ReceiptName))
+        || File.Exists(Path.Combine(root, "BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll"));
+
+    private static ModManifest? Previous(string root, uint appId, string folder)
+    {
+        var receipt = SafePath(root, ReceiptName);
+        ModManifest? previous;
+        if (File.Exists(receipt))
+        {
+            if (new FileInfo(receipt).Length > 1024 * 1024) throw new InvalidDataException("安装记录过大。");
+            previous = JsonSerializer.Deserialize<ModManifest>(File.ReadAllText(receipt), JsonOptions);
+        }
+        else if (HasInstalledMod(root) && appId == 2934180)
+        {
+            using var resource = typeof(ModPackageService).Assembly.GetManifestResourceStream("KairosoftGameToolbox.LegacyModManifest.json")!;
+            previous = JsonSerializer.Deserialize<ModManifest>(resource, JsonOptions);
+            // 已手动验证的本地 0.0.4，仅允许这个确切 DLL 作为旧版识别。
+            const string plugin = "BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll";
+            const string testedHash = "D8A673A7783FEF1822D738E15D47CC4EBE47D0ACDBC02D03BE4B4201849C1E19";
+            if (File.Exists(SafePath(root, plugin)) && Matches(SafePath(root, plugin), testedHash))
+                previous = previous! with { Files = previous!.Files.Select(f => f.Path == plugin ? new ModFile(plugin, testedHash) : f).ToList() };
+        }
+        else return null;
+        if (previous == null || previous.SchemaVersion != 1 || previous.AppId != appId || previous.GameFolder != folder
+            || previous.Files == null || previous.Files.Count == 0 || previous.Files.Count > 4096)
+            throw new InvalidDataException("安装记录与当前游戏不匹配。");
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var f in previous.Files)
+        {
+            SafePath(root, f.Path);
+            if (!AllowedPayload(f.Path) || !names.Add(f.Path) || !Regex.IsMatch(f.Sha256 ?? "", "^[A-Fa-f0-9]{64}$"))
+                throw new InvalidDataException("旧安装记录包含无效文件。");
+        }
+        return previous;
+    }
+
+    public static ModManifest Install(string package, string gameRoot, uint appId, string folder, bool update = false)
     {
         using var zip = ZipFile.OpenRead(package);
         var m = Inspect(zip, appId, folder);
@@ -132,42 +169,87 @@ public static class ModPackageService
             if (!File.Exists(target) || !Matches(target, f.Sha256))
                 throw new InvalidDataException("游戏或版本不匹配，未释放任何文件：" + f.Path);
         }
-        // 在所有写入之前完成冲突检查。
-        foreach (var f in m.Files)
+        var old = update ? Previous(gameRoot, appId, folder) : null;
+        if (update && old == null) throw new IOException("无法识别旧模组，未覆盖任何文件。");
+        var oldFiles = old?.Files.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase) ?? new();
+        var newFiles = m.Files.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
+        var paths = oldFiles.Keys.Union(newFiles.Keys, StringComparer.OrdinalIgnoreCase).ToList();
+        var originalHashes = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+        foreach (var relative in paths)
         {
-            var target = SafePath(gameRoot, f.Path);
-            if (Directory.Exists(target) || (File.Exists(target) && !Matches(target, f.Sha256)))
-                throw new IOException("已有不同内容的文件，拒绝覆盖：" + f.Path);
+            var target = SafePath(gameRoot, relative);
+            if (Directory.Exists(target)) throw new IOException("目标文件位置存在目录：" + relative);
+            string? hash = null;
+            if (File.Exists(target)) { using var stream = File.OpenRead(target); hash = Hash(stream); }
+            originalHashes[relative] = hash;
+            if (hash == null) continue;
+            bool knownOld = oldFiles.TryGetValue(relative, out var prior) && hash.Equals(prior.Sha256, StringComparison.OrdinalIgnoreCase);
+            bool sameNew = newFiles.TryGetValue(relative, out var next) && hash.Equals(next.Sha256, StringComparison.OrdinalIgnoreCase);
+            if (!knownOld && !sameNew) throw new IOException("未知或被修改的模组文件，拒绝覆盖：" + relative);
         }
+        var receipt = SafePath(gameRoot, ReceiptName);
         var stage = SafePath(gameRoot, ".kairomods-" + Guid.NewGuid().ToString("N"));
-        var created = new List<string>();
+        var changed = new List<(string Target, string? Backup)>();
+        bool preserveStage = false;
         try
         {
             foreach (var f in m.Files)
             {
-                var file = SafePath(stage, f.Path);
-                Directory.CreateDirectory(Path.GetDirectoryName(file)!);
-                zip.GetEntry("payload/" + f.Path)!.ExtractToFile(file);
+                var staged = SafePath(stage, "new/" + f.Path);
+                Directory.CreateDirectory(Path.GetDirectoryName(staged)!);
+                zip.GetEntry("payload/" + f.Path)!.ExtractToFile(staged);
             }
-            foreach (var f in m.Files)
+            // 先备份所有将被替换的文件，再开始提交写入。
+            foreach (var relative in paths.Append(ReceiptName))
             {
-                var target = SafePath(gameRoot, f.Path);
-                if (File.Exists(target))
-                {
-                    if (!Matches(target, f.Sha256)) throw new IOException("安装期间目标文件发生变化。");
-                    continue;
-                }
-                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-                File.Move(SafePath(stage, f.Path), target);
-                created.Add(target);
+                var target = SafePath(gameRoot, relative);
+                if (!File.Exists(target)) continue;
+                var backup = SafePath(stage, "backup/" + relative);
+                Directory.CreateDirectory(Path.GetDirectoryName(backup)!);
+                File.Copy(target, backup);
             }
+            foreach (var relative in paths)
+            {
+                var target = SafePath(gameRoot, relative);
+                var before = originalHashes[relative];
+                if (before == null ? File.Exists(target) : !File.Exists(target) || !Matches(target, before))
+                    throw new IOException("安装期间文件发生变化。");
+                if (newFiles.TryGetValue(relative, out var next) && before != null && before.Equals(next.Sha256, StringComparison.OrdinalIgnoreCase)) continue;
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                if (next != null) File.Move(SafePath(stage, "new/" + relative), target, true);
+                else if (File.Exists(target)) File.Delete(target);
+                changed.Add((target, before == null ? null : SafePath(stage, "backup/" + relative)));
+            }
+            var stagedReceipt = SafePath(stage, "receipt.json");
+            File.WriteAllText(stagedReceipt, JsonSerializer.Serialize(m));
+            var receiptBackup = File.Exists(receipt) ? SafePath(stage, "backup/" + ReceiptName) : null;
+            File.Move(stagedReceipt, receipt, true);
+            changed.Add((receipt, receiptBackup));
         }
         catch
         {
-            foreach (var file in created.AsEnumerable().Reverse()) File.Delete(file);
+            try
+            {
+                var failures = new List<Exception>();
+                foreach (var entry in changed.AsEnumerable().Reverse())
+                {
+                    try
+                    {
+                        if (entry.Backup != null) File.Copy(entry.Backup, entry.Target, true);
+                        else if (File.Exists(entry.Target)) File.Delete(entry.Target);
+                    }
+                    catch (Exception ex) { failures.Add(ex); }
+                }
+                if (failures.Count > 0) throw new AggregateException(failures);
+            }
+            catch (Exception rollback)
+            {
+                preserveStage = true;
+                throw new IOException("自动恢复未完成，备份保留在：" + stage, rollback);
+            }
             throw;
         }
-        finally { if (Directory.Exists(stage)) Directory.Delete(stage, true); }
+        finally { if (!preserveStage && Directory.Exists(stage)) Directory.Delete(stage, true); }
         return m;
     }
 }

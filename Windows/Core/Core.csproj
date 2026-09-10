@@ -9,4 +9,5 @@
     <NoWarn>$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup><EmbeddedResource Include="LegacyModManifest.json" /></ItemGroup>
 </Project>

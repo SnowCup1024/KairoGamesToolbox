@@ -15,8 +15,7 @@ public sealed partial class GameDetailsPage : UserControl
     private bool nonSteam;
     private bool busy;
     private string FolderName => ModPackageService.GameFolder(game.EnglishName);
-    // 单文件程序的 BaseDirectory 是解压目录；Mods 必须跟随实际 EXE。
-    private static string ModsRoot => Path.Combine(Path.GetDirectoryName(Environment.ProcessPath)!, "Mods");
+    private static string ModsRoot => AppDataPaths.ModsDirectory;
     public event EventHandler? BackRequested;
 
     public GameDetailsPage(KairoGame game)
@@ -25,8 +24,9 @@ public sealed partial class GameDetailsPage : UserControl
         this.game = game;
         GameTitle.Text = game.Name;
         GameStatus.Text = $"{game.LibraryStatusText} · AppID {game.AppId}";
-        target = game.InstallDir;
-        SteamButton.IsEnabled = game.IsInstalled;
+        target = game.NonSteamDirectory ?? game.InstallDir;
+        nonSteam = game.NonSteamDirectory != null;
+        SteamButton.IsEnabled = game.IsInstalled && !game.IsNonSteam;
         UpdateTarget();
         Loaded += async (_, _) => Cover.Source = await CoverService.Default.LoadCoverImageAsync(game.AppId, 1);
     }
@@ -56,6 +56,12 @@ public sealed partial class GameDetailsPage : UserControl
         TargetText.Text = string.IsNullOrWhiteSpace(target) ? "尚未选择游戏目录" : (nonSteam ? "非 Steam · " : "Steam · ") + target;
         InstallButton.IsEnabled = package != null && !string.IsNullOrWhiteSpace(target);
         LaunchButton.Content = nonSteam || game.IsInstalled ? "启动游戏" : "打开 Steam 商店";
+        var selected = GameFolderService.ContainsExecutable(target);
+        GameStatus.Text = $"{(selected && nonSteam ? "已安装 · 非 Steam" : game.LibraryStatusText)} · AppID {game.AppId}";
+        ModSection.Visibility = ControlSection.Visibility = selected ? Visibility.Visible : Visibility.Collapsed;
+        var installed = selected && ModPackageService.HasInstalledMod(target!);
+        InstallButton.Content = installed ? "更新 Mod" : "校验并释放 Mod";
+        InstalledModText.Text = installed ? "检测到已安装的模组；更新前会检查原安装清单和文件。" : "尚未检测到已安装的模组";
         ResultText.Text = "";
     }
 
@@ -82,7 +88,10 @@ public sealed partial class GameDetailsPage : UserControl
         InitializePicker(picker);
         var selected = await picker.PickSingleFolderAsync();
         if (selected == null) return;
-        if (!GameFolderService.ContainsExecutable(selected.Path)) throw new IOException("所选目录中未找到 KairoGames.exe。");
+        var catalog = new AppIdCatalog(Path.Combine(AppContext.BaseDirectory, "Data", "KairosoftGames.json"));
+        var identity = await Task.Run(() => NonSteamLibraryService.Identify(selected.Path, catalog));
+        if (identity.AppId != game.AppId) throw new IOException("所选目录属于其他游戏：" + identity.ChineseName);
+        new NonSteamLibraryService().Save(game.AppId, selected.Path);
         target = selected.Path;
         nonSteam = true;
         UpdateTarget();
@@ -112,7 +121,7 @@ public sealed partial class GameDetailsPage : UserControl
             Title = "释放 Mod · " + game.Name,
             Content = "模组会向游戏目录安装可执行代码。请仅使用可信来源的 ZIP，并先备份游戏目录和存档。\n\n"
                 + (nonSteam ? "非 Steam 版本无法依靠 Steam 验证恢复，请确认备份可用。\n\n" : "Steam 验证不会自动删除新增的模组文件。\n\n")
-                + "工具箱暂不提供卸载或文件回滚；已有不同内容的文件将拒绝覆盖。\n\n目标：" + target,
+                + "工具箱暂不提供卸载或手动回滚；更新会替换已识别的旧模组文件，未知冲突文件会拒绝覆盖。\n\n目标：" + target,
             PrimaryButtonText = "我已知晓并确认", CloseButtonText = "取消", DefaultButton = ContentDialogButton.Close,
         };
         var danger = new Style(typeof(Button)) { BasedOn = (Style)Application.Current.Resources["DefaultButtonStyle"] };
@@ -126,8 +135,9 @@ public sealed partial class GameDetailsPage : UserControl
             var running = Process.GetProcessesByName("KairoGames");
             try { if (running.Length > 0) throw new IOException("请先退出正在运行的开罗游戏，再释放 Mod。"); }
             finally { foreach (var process in running) process.Dispose(); }
-            ModPackageService.Install(package, target, game.AppId, FolderName);
+            ModPackageService.Install(package, target, game.AppId, FolderName, update: ModPackageService.HasInstalledMod(target));
         });
+        UpdateTarget();
         ResultText.Text = "校验通过，Mod 已释放。请正常启动游戏，并按模组说明操作。";
     });
 
@@ -140,21 +150,6 @@ public sealed partial class GameDetailsPage : UserControl
             Process.Start(new ProcessStartInfo(Path.Combine(target, "KairoGames.exe")) { UseShellExecute = true, WorkingDirectory = target });
         }
         else Open(game.IsInstalled ? SteamLinkService.Run(game.AppId) : SteamLinkService.Store(game.AppId));
-        return Task.CompletedTask;
-    });
-    private async void Mods_Click(object sender, RoutedEventArgs e) => await RunAsync(() =>
-    {
-        var path = Path.Combine(ModsRoot, FolderName);
-        Directory.CreateDirectory(Path.Combine(path, "Alpha"));
-        Directory.CreateDirectory(Path.Combine(path, "Beta"));
-        Open(path);
-        return Task.CompletedTask;
-    });
-    private async void Saves_Click(object sender, RoutedEventArgs e) => await RunAsync(() =>
-    {
-        var path = nonSteam && target != null ? SaveDirectoryService.Find(target, null) : game.SaveDir;
-        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) throw new IOException("未找到存档目录，请先在游戏中建立存档。");
-        Open(path);
         return Task.CompletedTask;
     });
 }

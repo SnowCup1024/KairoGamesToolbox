@@ -45,6 +45,8 @@ public sealed class KairoGame
 
     /// <summary>安装目录（未安装为 null）。</summary>
     public string? InstallDir { get; set; }
+    public string? NonSteamDirectory { get; set; }
+    public bool IsNonSteam => string.IsNullOrWhiteSpace(LibraryPath) && !string.IsNullOrWhiteSpace(NonSteamDirectory);
 
     /// <summary>所在 Steam 库根目录（含 steamapps 的目录）。</summary>
     public string? LibraryPath { get; set; }

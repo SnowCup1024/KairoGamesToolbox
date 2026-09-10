@@ -34,3 +34,9 @@ AGENTS.md
 
 # Local-only Mod development (also when nested)
 KairoMods/
+
+# Local test dependencies and backups, at any depth
+**/.TestGames/
+**/.Backups/
+**/.Downloads/
+**/interop/

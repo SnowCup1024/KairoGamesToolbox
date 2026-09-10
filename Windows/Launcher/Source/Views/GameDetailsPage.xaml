@@ -23,7 +23,7 @@
       <TextBlock x:Name="GameStatus" Foreground="{ThemeResource TextSecondaryBrush}" TextWrapping="Wrap"/>
       <Button x:Name="LaunchButton" Content="启动游戏" Style="{StaticResource AccentButtonStyle}" Click="Launch_Click"/>
      </StackPanel>
-     <Button Grid.Column="2" Content="进入修改页面 →" Click="Control_Click" VerticalAlignment="Center"/>
+
     </Grid>
    </Border>
    <Border Style="{StaticResource SectionCard}">
@@ -34,24 +34,24 @@
      <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择非 Steam 游戏目录" Click="Folder_Click"/><Button x:Name="SteamButton" Content="使用 Steam 目录" Click="Steam_Click"/></StackPanel>
     </StackPanel>
    </Border>
-   <Border Style="{StaticResource SectionCard}">
+   <Border x:Name="ModSection" Style="{StaticResource SectionCard}">
     <StackPanel Spacing="12">
      <TextBlock Text="02  ·  模组文件" FontSize="20" FontWeight="SemiBold"/>
      <TextBlock Text="模组独立于启动器发布。选择 ZIP 后自动归档；释放前校验游戏及版本，不支持的目标不会写入。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
-     <Button Content="下载并释放 Mod · 尚未开放" IsEnabled="False"/>
-     <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择本地 Mod ZIP" Click="Package_Click"/><Button Content="打开 Mods 文件夹" Click="Mods_Click"/></StackPanel>
+     <Button Content="下载最新 Mod 并选择 · 尚未开放" IsEnabled="False"/>
+     <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择本地 Mod ZIP" Click="Package_Click"/></StackPanel>
      <TextBlock x:Name="PackageText" Text="尚未选择模组" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
      <TextBlock x:Name="PackageDescription" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
      <Button x:Name="InstallButton" Content="校验并释放 Mod" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Click="Install_Click"/>
-     <TextBlock x:Name="ResultText" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
-     <ProgressBar x:Name="Progress" IsIndeterminate="True" Visibility="Collapsed"/>
+     <TextBlock x:Name="InstalledModText" TextWrapping="Wrap"/>
     </StackPanel>
    </Border>
-   <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
-    <TextBlock Text="03  ·  存档与功能" FontSize="20" FontWeight="SemiBold"/>
-    <TextBlock Text="实时控制请使用上方“进入修改页面”。金钱反加需本地测试模组 0.0.4；现有 Alpha ZIP 0.0.3 仅观察，不支持通信。存档编辑尚未开放，测试前请备份存档。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
-    <Button Content="打开存档目录" Click="Saves_Click"/>
+   <Border x:Name="ControlSection" Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
+    <TextBlock Text="03  ·  模组控制" FontSize="20" FontWeight="SemiBold"/>
+    <Button Content="进入修改页面 →" Click="Control_Click"/>
    </StackPanel></Border>
+   <TextBlock x:Name="ResultText" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
+   <ProgressBar x:Name="Progress" IsIndeterminate="True" Visibility="Collapsed"/>
   </StackPanel>
  </ScrollViewer>
  <ContentControl x:Name="ControlHost" Visibility="Collapsed" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>

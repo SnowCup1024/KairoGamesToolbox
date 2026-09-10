@@ -502,6 +502,7 @@ finally
     if (Directory.Exists(coverCacheRoot)) Directory.Delete(coverCacheRoot, true);
 }
 
+LauncherInstanceChecks.Run(Check);
 NonSteamChecks.Run(Check);
 ModPackageChecks.Run(Check);
 await ModControlChecks.RunAsync(Check);

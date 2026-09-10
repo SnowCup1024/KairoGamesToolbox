@@ -22,4 +22,3 @@
     <Reference Include="Il2Cppmscorlib"><HintPath>$(TestGameDirectory)/BepInEx/interop/Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 </Project>
-

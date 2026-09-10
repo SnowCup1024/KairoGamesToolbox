@@ -20,7 +20,8 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <Grid Padding="28,4,28,24" Background="{ThemeResource PageBackgroundBrush}">
+    <Grid>
+    <Grid x:Name="LibraryRoot" Padding="28,4,28,24" Background="{ThemeResource PageBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -127,5 +128,7 @@
             IsActive="False"
             HorizontalAlignment="Center"
             VerticalAlignment="Center" />
+    </Grid>
+    <ContentControl x:Name="DetailHost" Visibility="Collapsed" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" />
     </Grid>
 </UserControl>

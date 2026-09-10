@@ -10,7 +10,7 @@ namespace KairosoftGameToolbox.Controls;
 /// <summary>单张游戏卡片：封面缓存 + 名称 + 安装徽标 + 可选游玩记录。</summary>
 public sealed partial class GameCard : UserControl
 {
-    /// <summary>左键单击卡片（请求二级确认弹窗）。</summary>
+    /// <summary>左键单击卡片（进入游戏详情页）。</summary>
     public event EventHandler<KairoGame>? GameClicked;
 
     /// <summary>右键菜单「启动」。</summary>
@@ -114,6 +114,11 @@ public sealed partial class GameCard : UserControl
     }
 
     private void RootBorder_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (Game is { } game) GameClicked?.Invoke(this, game);
+    }
+
+    private void MenuMod_Click(object sender, RoutedEventArgs e)
     {
         if (Game is { } game) GameClicked?.Invoke(this, game);
     }

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')]
-    [string]$Version = '0.1.3',
+    [string]$Version = '0.2.0',
     [switch]$SkipLaunchCheck
 )
 
@@ -93,7 +93,7 @@ function Assert-X64Executable {
 function Test-ApplicationLaunch {
     param([Parameter(Mandatory = $true)][string]$Path)
 
-    $process = Start-Process -FilePath $Path -WorkingDirectory (Split-Path -Parent $Path) -PassThru -WindowStyle Hidden
+    $process = Start-Process -FilePath $Path -WorkingDirectory (Split-Path -Parent $Path) -PassThru -WindowStyle Normal
     try {
         $deadline = [DateTime]::UtcNow.AddSeconds(20)
         while ([DateTime]::UtcNow -lt $deadline) {
@@ -141,7 +141,7 @@ Remove-GeneratedPath -Path $temporaryPackagePath
 Remove-GeneratedPath -Path $packagePath
 
 try {
-    Invoke-DotNet -Arguments @('restore', $solution)
+    Invoke-DotNet -Arguments @('restore', $solution, '-p:Configuration=Release')
     Invoke-DotNet -Arguments @(
         'build', $solution,
         '--configuration', 'Release',

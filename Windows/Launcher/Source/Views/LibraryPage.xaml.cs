@@ -226,9 +226,18 @@ public sealed partial class LibraryPage : UserControl
 
     // ---- 交互 ----
 
-    private async void Card_GameClicked(object sender, KairoGame game)
+    private void Card_GameClicked(object sender, KairoGame game)
     {
-        await ShowLaunchDialogAsync(game);
+        var page = new GameDetailsPage(game);
+        page.BackRequested += (_, _) =>
+        {
+            DetailHost.Content = null;
+            DetailHost.Visibility = Visibility.Collapsed;
+            LibraryRoot.Visibility = Visibility.Visible;
+        };
+        DetailHost.Content = page;
+        LibraryRoot.Visibility = Visibility.Collapsed;
+        DetailHost.Visibility = Visibility.Visible;
     }
 
     private async void Card_LaunchRequested(object sender, KairoGame game)
@@ -236,7 +245,7 @@ public sealed partial class LibraryPage : UserControl
         if (game.IsInstalled)
             await LaunchGameAsync(game);
         else
-            await ShowLaunchDialogAsync(game);
+            Card_GameClicked(sender, game);
     }
 
     private async void Card_SaveDirectoryRequested(object sender, KairoGame game)

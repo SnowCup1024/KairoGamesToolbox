@@ -1,6 +1,6 @@
 # 开罗游戏工具箱
 
-面向 Steam 开罗游戏的 Windows x64 桌面启动器，当前版本为 `0.1.3`。
+面向 Steam 开罗游戏的 Windows x64 桌面启动器，当前版本为 `0.2.0`。
 
 ## 当前功能
 
@@ -11,7 +11,7 @@
 - 可选 Steam Web API 查询拥有状态、游玩时长和最近游玩时间。
 - 支持跟随系统、浅色与深色主题；API Key 使用 Windows DPAPI 加密保存。
 
-“应用 Mod 补丁”入口会显示二级风险提示；当前版本没有可应用的补丁，不会修改游戏文件。
+游戏卡片进入“Mod 与存档修改”详情页，支持本地模组 ZIP 校验与释放。模组独立发布，GitHub 在线下载暂未开放。
 
 ## 开发环境
 
@@ -28,7 +28,7 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 发布打包：
 
 ```powershell
-.\Scripts\BuildRelease.ps1 -Version 0.1.3
+.\Scripts\BuildRelease.ps1 -Version 0.2.0
 ```
 
 发布脚本执行构建、冒烟测试、单文件发布、主窗口启动检查及 ZIP 打包。产物位于 `.Build/Package/`；只有无法检查桌面启动时才使用 `-SkipLaunchCheck`。
@@ -52,6 +52,16 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 每次启动优先读取并验证 Covers 磁盘缓存，命中后不联网。缺失或损坏时才查询 Steam CDN，下载成功后原子写入缓存。下载失败（包括无资源、超时或图片损坏）后，尝试从 Steam 根目录的 `appcache\librarycache\<appid>\library_600x900.jpg` 读取并复制到 Covers；只使用用户设置或注册表自动识别的 Steam 路径，不使用固定盘符。不会修改 Steam 源图片。
 
 封面查询不需要 Steam Web API Key，最多同时下载四款游戏的资源。磁盘写入失败不影响当前显示；所有来源均失败时显示占位图，30 秒后再次刷新可重试。切页复用内存缓存，重新打开应用复用磁盘缓存。
+
+## 0.2.0
+
+- 左键游戏卡片及右键“Mod 与存档修改”进入独立详情页，替代启动弹窗；返回保留游戏库搜索和列表。
+- 详情页提供启动游戏、Steam/非 Steam 目标目录、本地 ZIP 导入与释放、存档目录入口；在线下载和存档编辑暂未开放。
+- 释放前匹配所选 AppID、英文标识、GameAssembly.dll 与元数据 SHA-256；文件不匹配时不安装。已有不同文件拒绝覆盖。
+- 模组保存在实际启动器 EXE 同级 Mods/英文无空格游戏名/Alpha 或 Beta；Stable 在游戏名目录。仓库中的独立 ZIP 不会被打进启动器发布包。
+- 首个 Alpha 仅含加载器和金钱观察插件，进入存档后按 F8 启用日志；没有金钱反加和工具箱实时开关。
+- KairoMods 是独立本地开发目录，不提交；详细模组协议见 [Mods/README.md](Mods/README.md)。
+- 不使用电脑插件，不隐藏窗口启动；本次构建使用 SkipLaunchCheck，界面与真实游戏验证由用户进行。
 
 ## 0.1.3 热补丁 1
 
@@ -84,7 +94,7 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 
 封面缓存后续增加 31 天检查：重新查询资源哈希，相同则保留图片，不同则下载更新；检查失败保留可用缓存。0.1.3 不加入过期检查。
 
-后续版本的 Mod 采用直接修改游戏原文件的补丁形式，具体补丁制作、应用与恢复机制待设计。当前阶段不实现该功能；启动器的其他功能想法另行讨论。
+Mod 路线调整为独立运行时模块：工具箱负责包管理，游戏内模块负责功能。0.2.0 先实现匹配和本地安装；后续开发 GitHub 下载、版本管理以及工具箱与游戏的实时通信。静态资源补丁另行设计。
 
 ## 许可证
 

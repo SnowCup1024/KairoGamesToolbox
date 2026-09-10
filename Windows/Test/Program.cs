@@ -502,6 +502,8 @@ finally
     if (Directory.Exists(coverCacheRoot)) Directory.Delete(coverCacheRoot, true);
 }
 
+ModPackageChecks.Run(Check);
+
 Console.WriteLine(failures == 0 ? "ALL PASS" : $"{failures} FAILED");
 return failures;
 

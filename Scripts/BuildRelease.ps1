@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')]
-    [string]$Version = '0.2.4',
+    [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.([1-9]\d*)$')]
+    [string]$Version = '1.0.1',
     [switch]$SkipLaunchCheck
 )
 
@@ -9,6 +9,8 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
+$releaseInfo = Get-Content -LiteralPath (Join-Path $repositoryRoot 'Windows/Core/Services/ReleaseInfo.cs') -Raw
+if ($releaseInfo -notmatch ('Version = "' + [regex]::Escape($Version) + '"')) { throw 'ReleaseInfo.Version and package version must match.' }
 $windowsRoot = Join-Path $repositoryRoot 'Windows'
 $solution = Join-Path $windowsRoot 'KairosoftGameToolbox.sln'
 $project = Join-Path $windowsRoot 'Launcher\KairosoftGameToolbox.csproj'

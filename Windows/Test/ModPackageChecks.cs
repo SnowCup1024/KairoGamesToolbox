@@ -48,6 +48,18 @@ static class ModPackageChecks
             ModPackageService.Install(imported, dir, 123, "TestGame");
             check("相同模组可以重复安装", true);
             check("安装后可检测模组", ModPackageService.HasInstalledMod(dir));
+            var removable = Target("remove");
+            ModPackageService.Install(imported, removable, 123, "TestGame");
+            File.WriteAllText(Path.Combine(removable, "BepInEx/plugins/other.dll"), "other mod");
+            File.WriteAllText(Path.Combine(removable, "save.dat"), "save");
+            using (var locked = new FileStream(Path.Combine(removable, ".kairomods-install.json"), FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                Reject("卸载记录提交失败会回退", () => ModPackageService.Uninstall(removable, 123, "TestGame"));
+                check("卸载失败恢复插件", File.Exists(Path.Combine(removable, "BepInEx/plugins/test.dll")));
+            }
+            ModPackageService.Uninstall(removable, 123, "TestGame");
+            check("卸载删除受管理文件与记录", !File.Exists(Path.Combine(removable, "BepInEx/plugins/test.dll")) && !ModPackageService.HasInstalledMod(removable));
+            check("卸载保留原游戏、存档和未知插件", File.ReadAllText(Path.Combine(removable, "GameAssembly.dll")) == "code" && File.ReadAllText(Path.Combine(removable, "save.dat")) == "save" && File.Exists(Path.Combine(removable, "BepInEx/plugins/other.dll")));
             var update = Package("update", path: "BepInEx/plugins/new.dll");
             ModPackageService.Install(update, dir, 123, "TestGame", update: true);
             check("更新清理旧清单文件并安装新文件", !File.Exists(Path.Combine(dir, "BepInEx/plugins/test.dll")) && File.Exists(Path.Combine(dir, "BepInEx/plugins/new.dll")));
@@ -79,6 +91,8 @@ static class ModPackageChecks
             Reject("已有不同模组文件拒绝覆盖", () => ModPackageService.Install(package, dir, 123, "TestGame"));
             Reject("更新也拒绝被篡改的已安装文件", () => ModPackageService.Install(package, dir, 123, "TestGame", update: true));
             check("冲突文件内容保留", File.ReadAllText(Path.Combine(dir, "BepInEx/plugins/test.dll")) == "existing");
+            Reject("卸载拒绝删除被修改的文件", () => ModPackageService.Uninstall(dir, 123, "TestGame"));
+            check("卸载预检查失败保留文件和记录", File.ReadAllText(Path.Combine(dir, "BepInEx/plugins/test.dll")) == "existing" && ModPackageService.HasInstalledMod(dir));
             Reject("拒绝 ZIP 路径越界", () => ModPackageService.Read(Package("traversal", extra: "../escape"), 123, "TestGame"));
             Reject("拒绝大小写重复 ZIP 条目", () => ModPackageService.Read(Package("duplicate", extra: "payload/BepInEx/plugins/TEST.dll"), 123, "TestGame"));
             Reject("拒绝修改游戏原文件的模组包", () => ModPackageService.Read(Package("forbidden", path: "GameAssembly.dll"), 123, "TestGame"));

@@ -4,8 +4,8 @@ static class ModFeatureChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("十二个修改项宽屏排列为四列三行", ModFeatures.Columns(12, 1400) == 4);
-        check("十二个修改项窄屏自动减少至两列", ModFeatures.Columns(12, 600) == 2);
+        check("修改项宽屏最多排列为两列", ModFeatures.Columns(12, 1400) == 2);
+        check("修改项窄屏自动减少至一列", ModFeatures.Columns(12, 600) == 1);
         check("窄窗口至少保留一列", ModFeatures.Columns(12, 180) == 1);
         check("单项不会扩展成多个空列", ModFeatures.Columns(1, 1400) == 1);
         check("没有修改项时布局仍合法", ModFeatures.Columns(0, 0) == 1);

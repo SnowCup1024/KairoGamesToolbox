@@ -20,7 +20,8 @@ public sealed class KairoGame
     public uint AppId { get; init; }
 
     /// <summary>启动器界面显示名：简体中文名；没有目录翻译时回退为英文名。</summary>
-    public string Name { get; init; } = "";
+    private readonly string name = "";
+    public string Name { get => Services.L.GameName(AppId, name); init => name = value; }
 
     /// <summary>Steam 英文名，仅用于双语搜索、稳定排序和内部标识。</summary>
     public string EnglishName { get; init; } = "";
@@ -62,13 +63,13 @@ public sealed class KairoGame
 
     /// <summary>面向界面的状态文案；无法确认拥有状态时不得显示为“未拥有”。</summary>
     public string LibraryStatusText
-        => IsInstalled ? "已安装"
+        => Services.L.T(IsInstalled ? "已安装"
             : Ownership switch
             {
                 OwnershipStatus.Owned => "已拥有",
                 OwnershipStatus.NotOwned => "未拥有",
                 _ => "状态未知",
-            };
+            });
 
     /// <summary>卡片封面饱和度：已安装原色，已拥有但未安装低饱和，未拥有（含未知）灰度。</summary>
     public double CoverSaturation

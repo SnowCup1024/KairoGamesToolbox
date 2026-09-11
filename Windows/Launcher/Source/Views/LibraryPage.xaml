@@ -2,7 +2,7 @@
 <UserControl
     x:Class="KairosoftGameToolbox.Views.LibraryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:l="using:KairosoftGameToolbox.Services"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:KairosoftGameToolbox.Models"
@@ -31,7 +31,7 @@
         <Grid Grid.Row="0" ColumnSpacing="16">
             <TextBox
                 x:Name="SearchBox"
-                PlaceholderText="搜索中文、英文、拼音或首字母…"
+                PlaceholderText="{l:Text Key='搜索中文、英文、拼音或首字母…'}"
                 CornerRadius="8"
                 VerticalAlignment="Center"
                 TextChanged="SearchBox_TextChanged" />
@@ -55,7 +55,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock x:Name="InstalledSectionTitle" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center" />
                         <Border Grid.Column="1" Height="1" Background="{ThemeResource CardBorderBrushStatic}" VerticalAlignment="Center" />
-                    <Button Grid.Column="2" Content="添加非 Steam 游戏" Click="AddNonSteam_Click"/>
+                    <Button Grid.Column="2" Content="{l:Text Key='添加非 Steam 游戏'}" Click="AddNonSteam_Click"/>
                     </Grid>
                     <ItemsRepeater x:Name="InstalledRepeater" HorizontalAlignment="Stretch" ItemTemplate="{StaticResource GameCardTemplate}">
                         <ItemsRepeater.Layout>
@@ -110,15 +110,15 @@
             <FontIcon Glyph="&#xE7BA;" FontSize="40" Foreground="{ThemeResource TextSecondaryBrush}" HorizontalAlignment="Center" />
             <TextBlock
                 x:Name="EmptyTitle"
-                Text="未检测到开罗游戏"
+                Text="{l:Text Key='未检测到开罗游戏'}"
                 Foreground="{ThemeResource TextSecondaryBrush}"
                 HorizontalAlignment="Center" />
             <TextBlock
                 x:Name="EmptyDescription"
-                Text="请确认 Steam 已安装并登录"
+                Text="{l:Text Key='请确认 Steam 已安装并登录'}"
                 Foreground="{ThemeResource TextSecondaryBrush}"
                 HorizontalAlignment="Center" />
-            <Button Content="手动刷新" HorizontalAlignment="Center" CornerRadius="8" Click="Refresh_Click" />
+            <Button Content="{l:Text Key='手动刷新'}" HorizontalAlignment="Center" CornerRadius="8" Click="Refresh_Click" />
         </StackPanel>
 
         <ProgressRing

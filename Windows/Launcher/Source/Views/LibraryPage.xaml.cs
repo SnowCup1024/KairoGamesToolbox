@@ -31,6 +31,7 @@ public sealed partial class LibraryPage : UserControl
         InitializeComponent();
         _catalog = new AppIdCatalog(Path.Combine(AppContext.BaseDirectory, "Data", "KairosoftGames.json"));
         Loaded += async (_, _) => await RefreshAsync();
+        Unloaded += (_, _) => { lock (_refreshSync) _refreshCancellation?.Cancel(); };
     }
 
     /// <summary>重新扫描游戏库并重建视图；新请求会取消旧请求，扫描本身串行执行。</summary>
@@ -67,7 +68,7 @@ public sealed partial class LibraryPage : UserControl
         }
         catch (Exception ex)
         {
-            await new ContentDialog { XamlRoot = XamlRoot, Title = "游戏库刷新失败", Content = ex.Message, CloseButtonText = "关闭" }.ShowAsync();
+            await new ContentDialog { XamlRoot = XamlRoot, Title = L.T("游戏库刷新失败"), Content = ex.Message, CloseButtonText = L.T("关闭") }.ShowAsync();
         }
         finally
         {
@@ -222,14 +223,14 @@ public sealed partial class LibraryPage : UserControl
             sections.GetValueOrDefault(GameSectionKind.NotOwnedOrUnknown));
 
         InstalledSection.Visibility = Visibility.Visible;
-        if (!sections.ContainsKey(GameSectionKind.Installed)) InstalledSectionTitle.Text = "已安装 · 0款";
+        if (!sections.ContainsKey(GameSectionKind.Installed)) InstalledSectionTitle.Text = L.T("已安装 · 0款");
         bool empty = filtered.Count == 0;
         GridScroll.Visibility = Visibility.Visible;
         EmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
-        EmptyTitle.Text = _search.Length > 0 ? "没有匹配的游戏" : "未检测到开罗游戏";
+        EmptyTitle.Text = _search.Length > 0 ? L.T("没有匹配的游戏") : L.T("未检测到开罗游戏");
         EmptyDescription.Text = _search.Length > 0
-            ? "请尝试其他搜索关键词"
-            : "请确认 Steam 已安装并登录";
+            ? L.T("请尝试其他搜索关键词")
+            : L.T("请确认 Steam 已安装并登录");
     }
 
     private static void SetSection(
@@ -240,7 +241,7 @@ public sealed partial class LibraryPage : UserControl
     {
         bool visible = section != null;
         sectionRoot.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-        sectionTitle.Text = visible ? $"{section!.Title} · {section.Games.Count}款" : "";
+        sectionTitle.Text = visible ? L.F("{0} · {1}款", L.T(section!.Title), section.Games.Count) : "";
         repeater.ItemsSource = section?.Games ?? Array.Empty<KairoGame>();
     }
 
@@ -282,7 +283,7 @@ public sealed partial class LibraryPage : UserControl
 
         if (!Directory.Exists(saveDir))
         {
-            await ShowSaveDirectoryErrorAsync("未找到该游戏当前 SteamID 的存档目录。");
+            await ShowSaveDirectoryErrorAsync(L.T("未找到该游戏当前 SteamID 的存档目录。"));
             return;
         }
 
@@ -299,7 +300,7 @@ public sealed partial class LibraryPage : UserControl
         catch (Exception ex)
         {
             Debug.WriteLine($"打开存档目录失败: {ex.Message}");
-            await ShowSaveDirectoryErrorAsync("系统无法打开该文件夹，请检查文件管理器设置或路径是否可用。");
+            await ShowSaveDirectoryErrorAsync(L.T("系统无法打开该文件夹，请检查文件管理器设置或路径是否可用。"));
         }
     }
 
@@ -309,9 +310,9 @@ public sealed partial class LibraryPage : UserControl
         {
             XamlRoot = XamlRoot,
             RequestedTheme = ActualTheme,
-            Title = "打开存档目录失败",
+            Title = L.T("打开存档目录失败"),
             Content = message,
-            CloseButtonText = "关闭",
+            CloseButtonText = L.T("关闭"),
         };
         await errorDialog.ShowAsync();
     }
@@ -337,7 +338,7 @@ public sealed partial class LibraryPage : UserControl
         }
         catch (Exception ex)
         {
-            await new ContentDialog { XamlRoot = XamlRoot, Title = "添加非 Steam 游戏未完成", Content = ex.Message, CloseButtonText = "关闭" }.ShowAsync();
+            await new ContentDialog { XamlRoot = XamlRoot, Title = L.T("添加非 Steam 游戏未完成"), Content = ex.Message, CloseButtonText = L.T("关闭") }.ShowAsync();
         }
     }
 

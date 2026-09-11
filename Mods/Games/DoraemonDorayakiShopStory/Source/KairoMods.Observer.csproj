@@ -2,11 +2,13 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>KairoMods.Observer</AssemblyName>
-    <Version>0.0.4</Version>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../../Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />
     <Reference Include="BepInEx.Core">
       <HintPath>$(TestGameDirectory)/BepInEx/core/BepInEx.Core.dll</HintPath>
       <Private>false</Private>

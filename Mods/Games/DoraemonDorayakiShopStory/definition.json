@@ -1,0 +1,148 @@
+{
+  "targets": [
+    {
+      "sha256": "846ACF98B8C2B45D40C83261B20F518D2147309D34BD2EB84458D15D1E64E0F5",
+      "path": "GameAssembly.dll"
+    },
+    {
+      "sha256": "DCD25559FB12C48763CE3E649CC18B7081805007918C1509FB45EBF3028F3461",
+      "path": "KairoGames_Data/il2cpp_data/Metadata/global-metadata.dat"
+    }
+  ],
+  "features": [
+    {
+      "descriptions": {
+        "zh-TW": "將實際消耗轉換為所選倍率的淨增加，正常獲得不變。",
+        "en": "Convert actual consumption into a net gain at the selected multiplier. Normal gains are unchanged.",
+        "ja": "実際の消費量を選択した倍率の純増に変換します。通常の獲得量は変わりません。",
+        "zh-CN": "将实际消耗转换为所选倍率的净增加，正常获得不变。"
+      },
+      "names": {
+        "zh-TW": "金錢反加",
+        "en": "Reverse money spending",
+        "ja": "所持金消費を増加に変換",
+        "zh-CN": "金钱反加"
+      },
+      "id": "moneyReverse",
+      "logNames": {
+        "ja": "所持金",
+        "en": "money",
+        "zh-CN": "金钱",
+        "zh-TW": "金錢"
+      }
+    },
+    {
+      "descriptions": {
+        "zh-TW": "將實際消耗轉換為所選倍率的淨增加，正常獲得不變。",
+        "en": "Convert actual consumption into a net gain at the selected multiplier. Normal gains are unchanged.",
+        "ja": "実際の消費量を選択した倍率の純増に変換します。通常の獲得量は変わりません。",
+        "zh-CN": "将实际消耗转换为所选倍率的净增加，正常获得不变。"
+      },
+      "names": {
+        "zh-TW": "F 點反加",
+        "en": "Reverse F Point spending",
+        "ja": "Fポイント消費を増加に変換",
+        "zh-CN": "F 点反加"
+      },
+      "id": "fPointReverse",
+      "logNames": {
+        "ja": "Fポイント",
+        "en": "F Points",
+        "zh-CN": "F 点",
+        "zh-TW": "F 點"
+      }
+    },
+    {
+      "descriptions": {
+        "zh-TW": "將實際消耗轉換為所選倍率的淨增加，正常獲得不變。",
+        "en": "Convert actual consumption into a net gain at the selected multiplier. Normal gains are unchanged.",
+        "ja": "実際の消費量を選択した倍率の純増に変換します。通常の獲得量は変わりません。",
+        "zh-CN": "将实际消耗转换为所选倍率的净增加，正常获得不变。"
+      },
+      "names": {
+        "zh-TW": "未來幣反加",
+        "en": "Reverse Future Coin spending",
+        "ja": "未来コイン消費を増加に変換",
+        "zh-CN": "未来币反加"
+      },
+      "id": "coinReverse",
+      "logNames": {
+        "ja": "未来コイン",
+        "en": "Future Coins",
+        "zh-CN": "未来币",
+        "zh-TW": "未來幣"
+      }
+    },
+    {
+      "descriptions": {
+        "zh-TW": "將實際消耗轉換為所選倍率的淨增加，正常獲得不變。",
+        "en": "Convert actual consumption into a net gain at the selected multiplier. Normal gains are unchanged.",
+        "ja": "実際の消費量を選択した倍率の純増に変換します。通常の獲得量は変わりません。",
+        "zh-CN": "将实际消耗转换为所选倍率的净增加，正常获得不变。"
+      },
+      "names": {
+        "zh-TW": "訓練點反加",
+        "en": "Reverse training point spending",
+        "ja": "勉強ポイント消費を増加に変換",
+        "zh-CN": "训练点反加"
+      },
+      "id": "trainingReverse",
+      "logNames": {
+        "ja": "勉強ポイント",
+        "en": "training points",
+        "zh-CN": "训练点",
+        "zh-TW": "訓練點"
+      }
+    },
+    {
+      "descriptions": {
+        "zh-TW": "將實際消耗轉換為所選倍率的淨增加，正常獲得不變。",
+        "en": "Convert actual consumption into a net gain at the selected multiplier. Normal gains are unchanged.",
+        "ja": "実際の消費量を選択した倍率の純増に変換します。通常の獲得量は変わりません。",
+        "zh-CN": "将实际消耗转换为所选倍率的净增加，正常获得不变。"
+      },
+      "names": {
+        "zh-TW": "道具反加",
+        "en": "Reverse item consumption",
+        "ja": "アイテム消費を増加に変換",
+        "zh-CN": "道具反加"
+      },
+      "id": "itemReverse",
+      "logNames": {
+        "ja": "アイテム",
+        "en": "items",
+        "zh-CN": "道具",
+        "zh-TW": "道具"
+      }
+    }
+  ],
+  "appId": 2934180,
+  "files": [
+    {
+      "sha256": "9FD247731D533C310558046B9E74D0817F0862E35738FFACA438F908803BA825",
+      "path": "BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll"
+    }
+  ],
+  "development": false,
+  "runtime": {
+    "id": "BepInEx-Unity-IL2CPP-win-x86-788",
+    "sha256": "D5954A5993EC39CD1133603D85BFF93875D30B6411B712CC13DCF03C8E08A4D3",
+    "url": "https://builds.bepinex.dev/projects/bepinex_be/788/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.788%2B5b766a3.zip"
+  },
+  "gameFolder": "DoraemonDorayakiShopStory",
+  "version": "1.0.1",
+  "logTemplates": {
+    "zh-CN.decrease": "减少",
+    "en": "{0}: {1} {3} {2}",
+    "zh-TW.increase": "增加",
+    "ja": "{0}：{2} {3} {1}",
+    "en.increase": "Gained",
+    "en.decrease": "Spent",
+    "zh-CN": "{0}：{1}{2} {3}",
+    "ja.decrease": "減少",
+    "zh-TW": "{0}：{1}{2} {3}",
+    "zh-TW.decrease": "減少",
+    "zh-CN.increase": "增加",
+    "ja.increase": "増加"
+  }
+}

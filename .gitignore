@@ -41,7 +41,12 @@ KairoMods/
 **/.Downloads/
 **/interop/
 
-# Mods contains source only; packages belong in .Build/ModPackages
-/Mods/*
-!/Mods/Source/
+# Game-specific source and explicitly bundled payloads are tracked.
+# Shared runtimes, commercial assemblies and generated packages never are.
 /Mods/**/*.zip
+/Mods/**/BepInEx/core/
+/Mods/**/dotnet/
+/Mods/**/GameAssembly.dll
+/Mods/**/global-metadata.dat
+/Mods/**/KairoGames.exe
+/Mods/**/*.pdb

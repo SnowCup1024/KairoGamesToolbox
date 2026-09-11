@@ -12,6 +12,7 @@ public static class GameSearch
         if (normalizedQuery.Length == 0) return true;
 
         if (IsSubsequence(Normalize($"{game.Name} {game.EnglishName}"), normalizedQuery)) return true;
+        if (L.GameSearchNames(game.AppId).Any(name => IsSubsequence(Normalize(name), normalizedQuery))) return true;
         if (string.IsNullOrWhiteSpace(game.PinyinName)) return false;
 
         // 顺序子序列匹配同时支持全拼、首字母和省略音节，无需重复构造首字母索引。

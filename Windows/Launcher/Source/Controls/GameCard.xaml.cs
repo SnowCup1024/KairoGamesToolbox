@@ -40,12 +40,12 @@ public sealed partial class GameCard : UserControl
         if (game.IsInstalled)
         {
             BadgeDot.Fill = (SolidColorBrush)Application.Current.Resources["InstalledDotBrush"];
-            BadgeText.Text = "已安装";
+            BadgeText.Text = L.T("已安装");
         }
         else if (game.Ownership == OwnershipStatus.Owned)
         {
             BadgeDot.Fill = (SolidColorBrush)Application.Current.Resources["OwnedDotBrush"];
-            BadgeText.Text = "已拥有";
+            BadgeText.Text = L.T("已拥有");
         }
         else
         {
@@ -88,9 +88,9 @@ public sealed partial class GameCard : UserControl
         var parts = new List<string>();
         double hours = stats.PlaytimeForeverMinutes / 60.0;
         if (hours >= 1)
-            parts.Add($"已玩 {hours:0.#} 小时");
+            parts.Add(L.F("已玩 {0:0.#} 小时", hours));
         else if (stats.PlaytimeForeverMinutes > 0)
-            parts.Add($"已玩 {stats.PlaytimeForeverMinutes} 分钟");
+            parts.Add(L.F("已玩 {0} 分钟", stats.PlaytimeForeverMinutes));
 
         if (stats.LastPlayedUnix is { } last)
         {
@@ -99,11 +99,11 @@ public sealed partial class GameCard : UserControl
                 var when = DateTimeOffset.FromUnixTimeSeconds(last);
                 var ago = DateTimeOffset.Now - when;
                 if (ago.TotalMinutes < 60)
-                    parts.Add($"{(int)Math.Max(1, ago.TotalMinutes)} 分钟前游玩");
+                    parts.Add(L.F("{0} 分钟前游玩", (int)Math.Max(1, ago.TotalMinutes)));
                 else if (ago.TotalHours < 24)
-                    parts.Add($"{(int)ago.TotalHours} 小时前游玩");
+                    parts.Add(L.F("{0} 小时前游玩", (int)ago.TotalHours));
                 else
-                    parts.Add($"{(int)ago.TotalDays} 天前游玩");
+                    parts.Add(L.F("{0} 天前游玩", (int)ago.TotalDays));
             }
             catch
             {
@@ -133,7 +133,7 @@ public sealed partial class GameCard : UserControl
         if (sender is not MenuFlyout flyout) return;
         var saveItem = flyout.Items
             .OfType<MenuFlyoutItem>()
-            .FirstOrDefault(item => item.Text == "打开存档目录");
+            .FirstOrDefault(item => item.Text == L.T("打开存档目录"));
         if (saveItem == null) return;
 
         var game = Game;

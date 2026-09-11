@@ -7,7 +7,8 @@ param(
     [uint32]$AppId = 2934180,
     [ValidatePattern('^[A-Za-z0-9]+$')][string]$GameFolder = 'DoraemonDorayakiShopStory',
     [ValidateSet('Alpha','Beta','Stable')][string]$Channel = 'Alpha',
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version = '0.0.3'
+    [ValidatePattern('^\d+\.\d+\.[1-9]\d*$')][string]$Version = '1.0.1',
+    [string]$Description = '仅供离线开发验证的完整模组包。正式启动器使用内置专用模组与独立下载的共享运行组件。'
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -52,7 +53,7 @@ try {
     }
     $manifest = @{
         schemaVersion = 1; appId = $AppId; gameFolder = $GameFolder; version = $Version; channel = $Channel
-        description = 'Alpha 金钱观察模组。进入存档后按 F8 启用观察；仅记录消费和收入，不提供金钱反加或启动器实时开关。首次启动加载器可能需要联网生成互操作文件。'
+        description = $Description
         targets = @($targets); files = @($files.ToArray())
     }
     $writer = [IO.StreamWriter]::new($zip.CreateEntry('manifest.json').Open(), [Text.UTF8Encoding]::new($false))

@@ -18,6 +18,7 @@ public sealed class LauncherSettings
     public string? SteamWebApiKeyProtected { get; set; }
 
     public string ThemePreference { get; set; } = "system";
+    public string Language { get; set; } = "zh-CN";
 }
 
 /// <summary>

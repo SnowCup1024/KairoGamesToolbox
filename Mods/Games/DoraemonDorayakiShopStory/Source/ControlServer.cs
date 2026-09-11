@@ -3,22 +3,20 @@ using System.IO.Pipes;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using KairoMods.Protocol;
 
 namespace KairoMods.Observer;
-
-public sealed record ControlRequest(int Protocol, string Action, bool Enabled);
-public sealed record ControlReply(int Protocol, uint AppId, string Directory, bool Ready, bool Enabled, string? Error);
 
 public sealed class ControlServer
 {
     public static readonly string GameDirectory = Path.GetDirectoryName(Environment.ProcessPath)!;
     private readonly ConcurrentQueue<Pending> queue = new();
-    private sealed record Pending(ControlRequest Request, TaskCompletionSource<ControlReply> Completion, DateTime Deadline);
+    private sealed record Pending(ModControlRequest Request, TaskCompletionSource<ModControlResponse> Completion, DateTime Deadline);
 
     public void Start() => _ = Task.Run(ListenAsync);
 
     // 唯一触碰游戏状态的入口，始终由 Unity Update 调用。
-    public void Pump(Func<ControlRequest, ControlReply> handle)
+    public void Pump(Func<ModControlRequest, ModControlResponse> handle)
     {
         while (queue.TryDequeue(out var pending))
         {
@@ -49,11 +47,11 @@ public sealed class ControlServer
                     data.Add(one[0]);
                 }
                 if (data.Count == 4096) throw new InvalidDataException("Request too long");
-                var request = JsonSerializer.Deserialize<ControlRequest>(data.ToArray()) ?? throw new InvalidDataException("Invalid request");
-                var completion = new TaskCompletionSource<ControlReply>(TaskCreationOptions.RunContinuationsAsynchronously);
+                var request = JsonSerializer.Deserialize<ModControlRequest>(data.ToArray()) ?? throw new InvalidDataException("Invalid request");
+                var completion = new TaskCompletionSource<ModControlResponse>(TaskCreationOptions.RunContinuationsAsynchronously);
                 var expires = DateTime.UtcNow.AddSeconds(2);
                 queue.Enqueue(new Pending(request, completion, expires));
-                ControlReply reply;
+                ModControlResponse reply;
                 try { reply = await completion.Task.WaitAsync(deadline.Token); }
                 catch { completion.TrySetCanceled(); throw; }
                 var response = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(reply) + "\n");

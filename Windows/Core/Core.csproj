@@ -9,5 +9,13 @@
     <NoWarn>$(NoWarn);CA1416</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup><EmbeddedResource Include="LegacyModManifest.json" /></ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LegacyModManifest.json" />
+    <EmbeddedResource Include="../../Mods/Runtime/Notices/*.txt" LogicalName="RuntimeNotice.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Localization.json" LogicalName="Localization.json" />
+    <EmbeddedResource Include="../Launcher/Data/KairosoftGames.json" LogicalName="GameNames.json" />
+    <Compile Include="../../Mods/Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />
+    <EmbeddedResource Include="../../Mods/Games/DoraemonDorayakiShopStory/definition.json" LogicalName="Mods.2934180.definition.json" />
+    <EmbeddedResource Include="../../Mods/Games/DoraemonDorayakiShopStory/Payload/BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll" LogicalName="ModPayload.2934180.BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll" />
+  </ItemGroup>
 </Project>

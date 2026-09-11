@@ -2,6 +2,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
 using KairosoftGameToolbox.Services;
+using KairoMods.Protocol;
 
 static class ModControlChecks
 {
@@ -42,5 +43,29 @@ static class ModControlChecks
         using var cancel = new CancellationTokenSource(TimeSpan.FromMilliseconds(100));
         try { await ModControlClient.SendAsync(123,directory,"status",cancellationToken:cancel.Token); check("离线控制请求可取消",false); }
         catch (OperationCanceledException) { check("离线控制请求可取消",true); }
+        var features = BundledModService.ForGame(2934180)!.Features.ToDictionary(f => f.Id, _ => new FeatureState());
+        var valid = new ModControlResponse(2, 2934180, directory, "session", true, features);
+        async Task RejectV2(string name, ModControlResponse response)
+        {
+            using var server = new NamedPipeServerStream(ModControlClient.PipeName(2934180, directory), PipeDirection.InOut, 1,
+                PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(6));
+            var serving = Task.Run(async () =>
+            {
+                await server.WaitForConnectionAsync(timeout.Token);
+                using var reader = new StreamReader(server, Encoding.UTF8, false, 1024, true);
+                await reader.ReadLineAsync(timeout.Token);
+                await server.WriteAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response) + "\n"), timeout.Token);
+                await server.FlushAsync(timeout.Token);
+            });
+            try { await ModControlClient.SendFeaturesAsync(2934180, directory, cancellationToken: timeout.Token); check(name, false); }
+            catch (InvalidDataException) { check(name, true); }
+            await serving;
+        }
+        await RejectV2("协议2拒绝旧协议响应", valid with { Protocol = 1 });
+        await RejectV2("协议2拒绝其他游戏目录", valid with { Directory = directory + "other" });
+        await RejectV2("协议2拒绝缺少游戏会话", valid with { Session = "" });
+        await RejectV2("协议2拒绝缺少功能状态", valid with { Features = new() });
+        await RejectV2("协议2拒绝非法倍率", valid with { Features = new(features) { ["moneyReverse"] = new(true, 999) } });
     }
 }

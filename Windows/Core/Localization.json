@@ -1,0 +1,727 @@
+{
+  "{0} · {1}款": {
+    "en": "{0} · {1} games",
+    "ja": "{0} · {1}本",
+    "zh-TW": "{0} · {1}款"
+  },
+  "{0} 分钟前游玩": {
+    "en": "Played {0} minutes ago",
+    "ja": "{0}分前にプレイ",
+    "zh-TW": "{0} 分鐘前遊玩"
+  },
+  "{0} 天前游玩": {
+    "en": "Played {0} days ago",
+    "ja": "{0}日前にプレイ",
+    "zh-TW": "{0} 天前遊玩"
+  },
+  "{0} 小时前游玩": {
+    "en": "Played {0} hours ago",
+    "ja": "{0}時間前にプレイ",
+    "zh-TW": "{0} 小時前遊玩"
+  },
+  "{0}失败": {
+    "en": "{0} failed",
+    "ja": "{0}に失敗しました",
+    "zh-TW": "{0}失敗"
+  },
+  "安装 Mod": {
+    "en": "Install Mod",
+    "ja": "Modをインストール",
+    "zh-TW": "安裝 Mod"
+  },
+  "保存并重新扫描": {
+    "en": "Save and rescan",
+    "ja": "保存して再スキャン",
+    "zh-TW": "儲存並重新掃描"
+  },
+  "倍率": {
+    "en": "Multiplier",
+    "ja": "倍率",
+    "zh-TW": "倍率"
+  },
+  "本项目使用 GNU General Public License v3.0（GPL-3.0）发布。你可以查看、修改和再发布符合许可证要求的代码。": {
+    "en": "This project is licensed under GNU General Public License v3.0 (GPL-3.0). You may inspect, modify, and redistribute the code under its terms.",
+    "ja": "本プロジェクトはGNU General Public License v3.0（GPL-3.0）で公開されています。ライセンスに従ってコードを閲覧、変更、再配布できます。",
+    "zh-TW": "本專案使用 GNU General Public License v3.0（GPL-3.0）發佈。你可以查看、修改和再發佈符合授權條款要求的程式碼。"
+  },
+  "操作未完成：": {
+    "en": "Operation failed: ",
+    "ja": "操作を完了できませんでした：",
+    "zh-TW": "操作未完成："
+  },
+  "查看完整许可证": {
+    "en": "View full license",
+    "ja": "ライセンス全文を表示",
+    "zh-TW": "查看完整授權條款"
+  },
+  "此游戏暂未提供修改项。": {
+    "en": "No modifications are available for this game yet.",
+    "ja": "このゲームにはまだ変更機能がありません。",
+    "zh-TW": "此遊戲暫未提供修改項。"
+  },
+  "打开 Steam 商店": {
+    "en": "Open Steam Store",
+    "ja": "Steamストアを開く",
+    "zh-TW": "開啟 Steam 商店"
+  },
+  "打开存档目录": {
+    "en": "Open save folder",
+    "ja": "セーブフォルダーを開く",
+    "zh-TW": "開啟存檔資料夾"
+  },
+  "打开存档目录失败": {
+    "en": "Could not open save folder",
+    "ja": "セーブフォルダーを開けませんでした",
+    "zh-TW": "開啟存檔資料夾失敗"
+  },
+  "打开获取页面": {
+    "en": "Get API key",
+    "ja": "取得ページを開く",
+    "zh-TW": "開啟取得頁面"
+  },
+  "返回游戏库": {
+    "en": "Back to library",
+    "ja": "ライブラリに戻る",
+    "zh-TW": "返回遊戲庫"
+  },
+  "非 Steam · ": {
+    "en": "Non-Steam · ",
+    "ja": "非Steam · ",
+    "zh-TW": "非 Steam · "
+  },
+  "跟随系统": {
+    "en": "Use system setting",
+    "ja": "システム設定に従う",
+    "zh-TW": "跟隨系統"
+  },
+  "更新 Mod": {
+    "en": "Update Mod",
+    "ja": "Modを更新",
+    "zh-TW": "更新 Mod"
+  },
+  "关闭": {
+    "en": "Close",
+    "ja": "閉じる",
+    "zh-TW": "關閉"
+  },
+  "关于": {
+    "en": "About",
+    "ja": "このアプリについて",
+    "zh-TW": "關於"
+  },
+  "将下载通用运行组件并安装内置模组。请先备份存档。删除 Mod 可恢复原游戏启动方式，但不会撤销存档中的修改。": {
+    "en": "Shared runtime components will be downloaded and the bundled mod installed. Back up your saves first. Removing the mod restores normal startup but does not undo changes saved in your game.",
+    "ja": "共通ランタイムをダウンロードし、内蔵Modをインストールします。事前にセーブをバックアップしてください。Modを削除すると通常の起動に戻りますが、セーブ済みの変更は元に戻りません。",
+    "zh-TW": "將下載共用執行元件並安裝內建模組。請先備份存檔。刪除 Mod 可恢復原遊戲啟動方式，但不會撤銷存檔中的修改。"
+  },
+  "开罗游戏工具箱": {
+    "en": "Kairosoft Game Toolbox",
+    "ja": "カイロソフト ゲームツールボックス",
+    "zh-TW": "開羅遊戲工具箱"
+  },
+  "没有匹配的游戏": {
+    "en": "No matching games",
+    "ja": "一致するゲームがありません",
+    "zh-TW": "沒有符合的遊戲"
+  },
+  "模组管理": {
+    "en": "Mod management",
+    "ja": "Mod管理",
+    "zh-TW": "模組管理"
+  },
+  "模组控制": {
+    "en": "Mod controls",
+    "ja": "Mod操作",
+    "zh-TW": "模組控制"
+  },
+  "模组尚未就绪。": {
+    "en": "The mod is not ready.",
+    "ja": "Modの準備ができていません。",
+    "zh-TW": "模組尚未就緒。"
+  },
+  "模组状态": {
+    "en": "Mod status",
+    "ja": "Modの状態",
+    "zh-TW": "模組狀態"
+  },
+  "启动 Steam 游戏": {
+    "en": "Launch Steam game",
+    "ja": "Steamゲームを起動",
+    "zh-TW": "啟動 Steam 遊戲"
+  },
+  "启动失败": {
+    "en": "Launch failed",
+    "ja": "起動に失敗しました",
+    "zh-TW": "啟動失敗"
+  },
+  "启动游戏": {
+    "en": "Launch game",
+    "ja": "ゲームを起動",
+    "zh-TW": "啟動遊戲"
+  },
+  "浅色": {
+    "en": "Light",
+    "ja": "ライト",
+    "zh-TW": "淺色"
+  },
+  "请尝试其他搜索关键词": {
+    "en": "Try another search term.",
+    "ja": "別のキーワードで検索してください。",
+    "zh-TW": "請嘗試其他搜尋關鍵字"
+  },
+  "请确认 Steam 已安装、已登录，并允许启动 Steam 链接。": {
+    "en": "Make sure Steam is installed and signed in, and Steam links are allowed.",
+    "ja": "Steamがインストール済みでログイン中であることと、Steamリンクの起動が許可されていることを確認してください。",
+    "zh-TW": "請確認 Steam 已安裝、已登入，並允許啟動 Steam 連結。"
+  },
+  "请确认 Steam 已安装并登录": {
+    "en": "Make sure Steam is installed and signed in.",
+    "ja": "Steamのインストールとログインを確認してください。",
+    "zh-TW": "請確認 Steam 已安裝並登入"
+  },
+  "请先退出正在运行的开罗游戏。": {
+    "en": "Close running Kairosoft games first.",
+    "ja": "起動中のカイロソフトゲームを終了してください。",
+    "zh-TW": "請先結束正在執行的開羅遊戲。"
+  },
+  "请选择同时包含 Steam.exe 和 steamapps 文件夹的 Steam 安装目录。当前设置未更改。": {
+    "en": "Select a Steam installation folder containing both Steam.exe and steamapps. Your settings have not changed.",
+    "ja": "Steam.exeとsteamappsフォルダーを含むSteamインストール先を選択してください。設定は変更されていません。",
+    "zh-TW": "請選擇同時包含 Steam.exe 和 steamapps 資料夾的 Steam 安裝目錄。目前設定未變更。"
+  },
+  "取消": {
+    "en": "Cancel",
+    "ja": "キャンセル",
+    "zh-TW": "取消"
+  },
+  "删除 Mod": {
+    "en": "Remove Mod",
+    "ja": "Modを削除",
+    "zh-TW": "刪除 Mod"
+  },
+  "删除已识别的模组文件，保留游戏原文件与存档。存档中已经生效的修改不会撤销。": {
+    "en": "Remove recognized mod files while preserving game files and saves. Changes already saved in the game will remain.",
+    "ja": "識別済みのModファイルを削除し、ゲーム本体とセーブを保持します。セーブ済みの変更は元に戻りません。",
+    "zh-TW": "刪除已識別的模組檔案，保留遊戲原始檔案與存檔。存檔中已生效的修改不會撤銷。"
+  },
+  "尚未选择游戏目录": {
+    "en": "No game folder selected",
+    "ja": "ゲームフォルダー未選択",
+    "zh-TW": "尚未選擇遊戲目錄"
+  },
+  "设置": {
+    "en": "Settings",
+    "ja": "設定",
+    "zh-TW": "設定"
+  },
+  "深色": {
+    "en": "Dark",
+    "ja": "ダーク",
+    "zh-TW": "深色"
+  },
+  "使用 Steam 目录": {
+    "en": "Use Steam folder",
+    "ja": "Steamフォルダーを使用",
+    "zh-TW": "使用 Steam 目錄"
+  },
+  "手动输入 API Key": {
+    "en": "Enter API key",
+    "ja": "APIキーを入力",
+    "zh-TW": "手動輸入 API Key"
+  },
+  "手动刷新": {
+    "en": "Refresh",
+    "ja": "更新",
+    "zh-TW": "手動重新整理"
+  },
+  "刷新连接状态": {
+    "en": "Refresh connection",
+    "ja": "接続状態を更新",
+    "zh-TW": "重新整理連線狀態"
+  },
+  "搜索中文、英文、拼音或首字母…": {
+    "en": "Search titles, pinyin, or initials…",
+    "ja": "ゲーム名・ピンイン・頭文字で検索…",
+    "zh-TW": "搜尋遊戲名稱、拼音或首字母…"
+  },
+  "所选目录属于其他游戏：": {
+    "en": "The selected folder belongs to another game: ",
+    "ja": "選択したフォルダーは別のゲームです：",
+    "zh-TW": "所選目錄屬於其他遊戲："
+  },
+  "添加非 Steam 游戏": {
+    "en": "Add non-Steam game",
+    "ja": "非Steamゲームを追加",
+    "zh-TW": "新增非 Steam 遊戲"
+  },
+  "添加非 Steam 游戏未完成": {
+    "en": "Could not add non-Steam game",
+    "ja": "非Steamゲームを追加できませんでした",
+    "zh-TW": "新增非 Steam 遊戲未完成"
+  },
+  "未安装 Mod": {
+    "en": "Mod not installed",
+    "ja": "Mod未インストール",
+    "zh-TW": "未安裝 Mod"
+  },
+  "未检测到开罗游戏": {
+    "en": "No Kairosoft games found",
+    "ja": "カイロソフトのゲームが見つかりません",
+    "zh-TW": "未偵測到開羅遊戲"
+  },
+  "未连接": {
+    "en": "Disconnected",
+    "ja": "未接続",
+    "zh-TW": "未連線"
+  },
+  "未收到确认，请重新连接核对。": {
+    "en": "No confirmation received. Reconnect to check the state.",
+    "ja": "応答を確認できません。再接続して状態を確認してください。",
+    "zh-TW": "未收到確認，請重新連線核對。"
+  },
+  "未找到该游戏当前 SteamID 的存档目录。": {
+    "en": "No save folder found for this game's current SteamID.",
+    "ja": "現在のSteamIDに対応するセーブフォルダーが見つかりません。",
+    "zh-TW": "找不到該遊戲目前 SteamID 的存檔資料夾。"
+  },
+  "我已知晓并确认": {
+    "en": "I understand and confirm",
+    "ja": "理解して確認しました",
+    "zh-TW": "我已知悉並確認"
+  },
+  "系统未返回启动进程。": {
+    "en": "The system did not return a launch process.",
+    "ja": "システムから起動プロセスが返されませんでした。",
+    "zh-TW": "系統未傳回啟動程序。"
+  },
+  "系统无法打开该文件夹，请检查文件管理器设置或路径是否可用。": {
+    "en": "The system could not open this folder. Check the path and file manager settings.",
+    "ja": "フォルダーを開けませんでした。パスとファイル管理の設定を確認してください。",
+    "zh-TW": "系統無法開啟該資料夾，請檢查檔案管理員設定或路徑是否可用。"
+  },
+  "许可证": {
+    "en": "License",
+    "ja": "ライセンス",
+    "zh-TW": "授權條款"
+  },
+  "许可证全文暂不可用。": {
+    "en": "The full license text is unavailable.",
+    "ja": "ライセンス全文を表示できません。",
+    "zh-TW": "授權條款全文暫時無法使用。"
+  },
+  "选择非 Steam 游戏目录": {
+    "en": "Select non-Steam game folder",
+    "ja": "非Steamゲームフォルダーを選択",
+    "zh-TW": "選擇非 Steam 遊戲目錄"
+  },
+  "选择游戏目录": {
+    "en": "Select game folder",
+    "ja": "ゲームフォルダーを選択",
+    "zh-TW": "選擇遊戲目錄"
+  },
+  "移除非 Steam 游戏": {
+    "en": "Remove non-Steam game",
+    "ja": "非Steamゲームを登録解除",
+    "zh-TW": "移除非 Steam 遊戲"
+  },
+  "已安装": {
+    "en": "Installed",
+    "ja": "インストール済み",
+    "zh-TW": "已安裝"
+  },
+  "已安装 · 0款": {
+    "en": "Installed · 0 games",
+    "ja": "インストール済み · 0本",
+    "zh-TW": "已安裝 · 0款"
+  },
+  "已安装 Mod": {
+    "en": "Mod installed",
+    "ja": "Modインストール済み",
+    "zh-TW": "已安裝 Mod"
+  },
+  "已连接": {
+    "en": "Connected",
+    "ja": "接続済み",
+    "zh-TW": "已連線"
+  },
+  "已玩 {0:0.#} 小时": {
+    "en": "Played {0:0.#} hours",
+    "ja": "プレイ時間 {0:0.#}時間",
+    "zh-TW": "已玩 {0:0.#} 小時"
+  },
+  "已玩 {0} 分钟": {
+    "en": "Played {0} minutes",
+    "ja": "プレイ時間 {0}分",
+    "zh-TW": "已玩 {0} 分鐘"
+  },
+  "已拥有": {
+    "en": "Owned",
+    "ja": "所有済み",
+    "zh-TW": "已擁有"
+  },
+  "用户界面": {
+    "en": "Interface",
+    "ja": "ユーザーインターフェース",
+    "zh-TW": "使用者介面"
+  },
+  "游戏库": {
+    "en": "Library",
+    "ja": "ライブラリ",
+    "zh-TW": "遊戲庫"
+  },
+  "游戏库刷新失败": {
+    "en": "Library refresh failed",
+    "ja": "ライブラリを更新できませんでした",
+    "zh-TW": "遊戲庫重新整理失敗"
+  },
+  "游戏目录": {
+    "en": "Game folder",
+    "ja": "ゲームフォルダー",
+    "zh-TW": "遊戲目錄"
+  },
+  "游戏目录不可用。": {
+    "en": "The game folder is unavailable.",
+    "ja": "ゲームフォルダーを利用できません。",
+    "zh-TW": "遊戲目錄無法使用。"
+  },
+  "游戏目录已不可用。": {
+    "en": "The game folder is no longer available.",
+    "ja": "ゲームフォルダーが利用できなくなりました。",
+    "zh-TW": "遊戲目錄已無法使用。"
+  },
+  "游戏目录与模组状态": {
+    "en": "Game folder and mod status",
+    "ja": "ゲームフォルダーとModの状態",
+    "zh-TW": "遊戲目錄與模組狀態"
+  },
+  "语言": {
+    "en": "Language",
+    "ja": "言語",
+    "zh-TW": "語言"
+  },
+  "运行日志": {
+    "en": "Runtime log",
+    "ja": "実行ログ",
+    "zh-TW": "執行日誌"
+  },
+  "在 Steam 网页中登录并获取 API Key。保存后查询拥有状态、游玩时长与最近游玩时间；清空并保存即可关闭。SteamID 自动获取，网络或配置不可用不影响启动游戏。": {
+    "en": "Sign in on Steam's website to obtain an API key. Saving it enables ownership, playtime, and last-played queries. Clear and save to disable. SteamID is detected automatically. Missing network access or configuration does not prevent launching games.",
+    "ja": "SteamのウェブサイトにログインしてAPIキーを取得してください。保存すると所有状態、プレイ時間、最終プレイ日時を取得します。空欄で保存すると無効になります。SteamIDは自動取得され、ネットワークや設定が利用できなくてもゲームは起動できます。",
+    "zh-TW": "在 Steam 網頁登入並取得 API Key。儲存後查詢擁有狀態、遊玩時數與最近遊玩時間；清空並儲存即可關閉。SteamID 自動取得，網路或設定無法使用不影響啟動遊戲。"
+  },
+  "主题": {
+    "en": "Theme",
+    "ja": "テーマ",
+    "zh-TW": "主題"
+  },
+  "自动检测，也可手动修改": {
+    "en": "Detected automatically; editable",
+    "ja": "自動検出・手動変更可能",
+    "zh-TW": "自動偵測，也可手動修改"
+  },
+  "自动填写已安装的 Steam 或已保存的非 Steam 目录，也可以重新选择。": {
+    "en": "Uses the installed Steam folder or saved non-Steam folder. You can select another folder.",
+    "ja": "インストール済みのSteamフォルダーまたは保存済みの非Steamフォルダーを使用します。再選択も可能です。",
+    "zh-TW": "自動填入已安裝的 Steam 或已儲存的非 Steam 目錄，也可以重新選擇。"
+  },
+  "Mod 已安装，请启动游戏并打开模组控制页。": {
+    "en": "Mod installed. Launch the game and open Mod controls.",
+    "ja": "Modをインストールしました。ゲームを起動し、Mod操作ページを開いてください。",
+    "zh-TW": "Mod 已安裝，請啟動遊戲並開啟模組控制頁。"
+  },
+  "Mod 已删除。": {
+    "en": "Mod removed.",
+    "ja": "Modを削除しました。",
+    "zh-TW": "Mod 已刪除。"
+  },
+  "Mod 与存档修改": {
+    "en": "Mods and save modifications",
+    "ja": "Modとセーブの変更",
+    "zh-TW": "Mod 與存檔修改"
+  },
+  "Steam 安装路径": {
+    "en": "Steam installation path",
+    "ja": "Steamのインストール先",
+    "zh-TW": "Steam 安裝路徑"
+  },
+  "Steam 路径无效": {
+    "en": "Invalid Steam path",
+    "ja": "Steamのパスが無効です",
+    "zh-TW": "Steam 路徑無效"
+  },
+  "Steam 相关": {
+    "en": "Steam",
+    "ja": "Steam設定",
+    "zh-TW": "Steam 相關"
+  },
+  "Steam 游玩记录（可选）": {
+    "en": "Steam play history (optional)",
+    "ja": "Steamプレイ履歴（任意）",
+    "zh-TW": "Steam 遊玩記錄（選填）"
+  },
+  "未安装": {
+    "en": "Not installed",
+    "ja": "未インストール",
+    "zh-TW": "未安裝"
+  },
+  "未拥有": {
+    "en": "Not owned",
+    "ja": "未所有",
+    "zh-TW": "未擁有"
+  },
+  "状态未知": {
+    "en": "Unknown status",
+    "ja": "状態不明",
+    "zh-TW": "狀態未知"
+  },
+  "未拥有或状态未知": {
+    "en": "Not owned or unknown",
+    "ja": "未所有または状態不明",
+    "zh-TW": "未擁有或狀態未知"
+  },
+  "已安装 · 非 Steam": {
+    "en": "Installed · Non-Steam",
+    "ja": "インストール済み · 非Steam",
+    "zh-TW": "已安裝 · 非 Steam"
+  },
+  "管理 Steam 与非 Steam 开罗游戏，提供内置游戏模组、共享运行组件下载与实时控制。": {
+    "en": "Manage Steam and non-Steam Kairosoft games with bundled game mods, shared runtime downloads, and live controls.",
+    "ja": "Steam・非Steamのカイロソフトゲームを管理し、内蔵Mod、共通ランタイムのダウンロード、リアルタイム操作を提供します。",
+    "zh-TW": "管理 Steam 與非 Steam 開羅遊戲，提供內建遊戲模組、共用執行元件下載與即時控制。"
+  },
+  "此游戏暂未提供模组。": {
+    "zh-TW": "此遊戲暫未提供模組。",
+    "en": "No mod is available for this game yet.",
+    "ja": "このゲームのModはまだありません。"
+  },
+  "游戏或版本与模组不匹配：": {
+    "zh-TW": "遊戲或版本與模組不相符：",
+    "en": "Game or version does not match the mod: ",
+    "ja": "ゲームまたはバージョンがModと一致しません："
+  },
+  "运行组件校验失败。": {
+    "zh-TW": "執行元件驗證失敗。",
+    "en": "Runtime verification failed.",
+    "ja": "ランタイムの検証に失敗しました。"
+  },
+  "模组连接已断开。": {
+    "zh-TW": "模組連線已中斷。",
+    "en": "The mod disconnected.",
+    "ja": "Modとの接続が切断されました。"
+  },
+  "模组响应过长。": {
+    "zh-TW": "模組回應過長。",
+    "en": "The mod response is too long.",
+    "ja": "Modの応答が長すぎます。"
+  },
+  "模组响应无效。": {
+    "zh-TW": "模組回應無效。",
+    "en": "Invalid mod response.",
+    "ja": "Modの応答が無効です。"
+  },
+  "响应来自不匹配的游戏或协议。": {
+    "zh-TW": "回應來自不相符的遊戲或通訊協定。",
+    "en": "The response does not match the game or protocol.",
+    "ja": "応答のゲームまたはプロトコルが一致しません。"
+  },
+  "未知模组命令。": {
+    "zh-TW": "未知模組指令。",
+    "en": "Unknown mod command.",
+    "ja": "不明なModコマンドです。"
+  },
+  "游戏缺少英文目录名。": {
+    "zh-TW": "遊戲缺少英文目錄名稱。",
+    "en": "Missing English game folder name.",
+    "ja": "英語のゲームフォルダー名がありません。"
+  },
+  "模组包含非法路径。": {
+    "zh-TW": "模組包含不合法路徑。",
+    "en": "The mod contains an invalid path.",
+    "ja": "Modに無効なパスが含まれています。"
+  },
+  "模组路径超出目标目录。": {
+    "zh-TW": "模組路徑超出目標目錄。",
+    "en": "A mod path escapes the target folder.",
+    "ja": "Modのパスが対象フォルダーの外を指しています。"
+  },
+  "目标路径包含链接或重解析点，无法安全释放。": {
+    "zh-TW": "目標路徑包含連結或重新剖析點，無法安全安裝。",
+    "en": "The target contains a link or reparse point. Installation was refused.",
+    "ja": "対象にリンクまたは再解析ポイントが含まれるため、インストールできません。"
+  },
+  "模组超过文件数量或解压大小限制。": {
+    "zh-TW": "模組超過檔案數量或解壓縮大小限制。",
+    "en": "The mod exceeds file-count or extraction-size limits.",
+    "ja": "Modのファイル数または展開サイズが上限を超えています。"
+  },
+  "ZIP 存在重复路径。": {
+    "zh-TW": "ZIP 存在重複路徑。",
+    "en": "The ZIP contains duplicate paths.",
+    "ja": "ZIP内に重複パスがあります。"
+  },
+  "缺少 manifest.json；请选择工具箱格式的模组 ZIP。": {
+    "zh-TW": "缺少 manifest.json；請選擇工具箱格式的模組 ZIP。",
+    "en": "Missing manifest.json. Use a toolbox mod package.",
+    "ja": "manifest.jsonがありません。ツールボックス形式のModパッケージを使用してください。"
+  },
+  "模组清单过大。": {
+    "zh-TW": "模組清單過大。",
+    "en": "The mod manifest is too large.",
+    "ja": "Modマニフェストが大きすぎます。"
+  },
+  "模组清单无效。": {
+    "zh-TW": "模組清單無效。",
+    "en": "Invalid mod manifest.",
+    "ja": "Modマニフェストが無効です。"
+  },
+  "模组与当前选中的游戏不匹配。": {
+    "zh-TW": "模組與目前選擇的遊戲不相符。",
+    "en": "The mod does not match the selected game.",
+    "ja": "Modが選択中のゲームと一致しません。"
+  },
+  "模组版本或发布阶段无效。": {
+    "zh-TW": "模組版本或發佈階段無效。",
+    "en": "Invalid mod version or channel.",
+    "ja": "Modのバージョンまたは公開段階が無効です。"
+  },
+  "缺少游戏代码与元数据指纹。": {
+    "zh-TW": "缺少遊戲程式碼與中繼資料指紋。",
+    "en": "Game code and metadata hashes are missing.",
+    "ja": "ゲームコードとメタデータのハッシュがありません。"
+  },
+  "文件指纹格式无效。": {
+    "zh-TW": "檔案指紋格式無效。",
+    "en": "Invalid file hash format.",
+    "ja": "ファイルハッシュの形式が無効です。"
+  },
+  "模组包含不允许释放的文件或重复文件。": {
+    "zh-TW": "模組包含不允許安裝的檔案或重複檔案。",
+    "en": "The mod contains prohibited or duplicate files.",
+    "ja": "Modに許可されていないファイルまたは重複ファイルが含まれています。"
+  },
+  "模组文件缺失。": {
+    "zh-TW": "模組檔案遺失。",
+    "en": "A mod file is missing.",
+    "ja": "Modファイルがありません。"
+  },
+  "模组文件校验失败：": {
+    "zh-TW": "模組檔案驗證失敗：",
+    "en": "Mod file verification failed: ",
+    "ja": "Modファイルの検証に失敗しました："
+  },
+  "ZIP 含未声明文件。": {
+    "zh-TW": "ZIP 含未宣告檔案。",
+    "en": "The ZIP contains undeclared files.",
+    "ja": "ZIPに未宣言のファイルがあります。"
+  },
+  "ZIP 过大。": {
+    "zh-TW": "ZIP 過大。",
+    "en": "The ZIP is too large.",
+    "ja": "ZIPが大きすぎます。"
+  },
+  "同版本模组包已存在且内容不同，请先移走旧包。": {
+    "zh-TW": "同版本模組套件已存在且內容不同，請先移走舊套件。",
+    "en": "A different package with the same version already exists. Move it first.",
+    "ja": "同じバージョンの異なるパッケージが存在します。先に移動してください。"
+  },
+  "无法识别已安装的模组。": {
+    "zh-TW": "無法識別已安裝的模組。",
+    "en": "The installed mod could not be identified.",
+    "ja": "インストール済みModを識別できません。"
+  },
+  "模组文件已被修改，未删除任何文件：": {
+    "zh-TW": "模組檔案已被修改，未刪除任何檔案：",
+    "en": "A mod file was changed. No files were deleted: ",
+    "ja": "Modファイルが変更されています。削除は行っていません："
+  },
+  "卸载期间文件发生变化。": {
+    "zh-TW": "移除期間檔案發生變更。",
+    "en": "A file changed during removal.",
+    "ja": "削除中にファイルが変更されました。"
+  },
+  "卸载恢复未完成，备份保留在：": {
+    "zh-TW": "移除復原未完成，備份保留在：",
+    "en": "Removal rollback was incomplete. Backups remain at: ",
+    "ja": "削除の復元が完了していません。バックアップ先："
+  },
+  "安装记录过大。": {
+    "zh-TW": "安裝記錄過大。",
+    "en": "The installation record is too large.",
+    "ja": "インストール記録が大きすぎます。"
+  },
+  "安装记录与当前游戏不匹配。": {
+    "zh-TW": "安裝記錄與目前遊戲不相符。",
+    "en": "The installation record does not match this game.",
+    "ja": "インストール記録がこのゲームと一致しません。"
+  },
+  "旧安装记录包含无效文件。": {
+    "zh-TW": "舊安裝記錄包含無效檔案。",
+    "en": "The previous installation record contains invalid files.",
+    "ja": "以前のインストール記録に無効なファイルがあります。"
+  },
+  "目标目录缺少 KairoGames.exe。": {
+    "zh-TW": "目標目錄缺少 KairoGames.exe。",
+    "en": "The target folder is missing KairoGames.exe.",
+    "ja": "対象フォルダーにKairoGames.exeがありません。"
+  },
+  "游戏或版本不匹配，未释放任何文件：": {
+    "zh-TW": "遊戲或版本不相符，未安裝任何檔案：",
+    "en": "Game or version mismatch. No files were installed: ",
+    "ja": "ゲームまたはバージョンが一致しません。インストールは行っていません："
+  },
+  "无法识别旧模组，未覆盖任何文件。": {
+    "zh-TW": "無法識別舊模組，未覆寫任何檔案。",
+    "en": "The previous mod is unknown. No files were overwritten.",
+    "ja": "以前のModを識別できません。上書きは行っていません。"
+  },
+  "目标文件位置存在目录：": {
+    "zh-TW": "目標檔案位置存在目錄：",
+    "en": "A folder exists at the target file path: ",
+    "ja": "対象ファイルの場所にフォルダーがあります："
+  },
+  "未知或被修改的模组文件，拒绝覆盖：": {
+    "zh-TW": "未知或被修改的模組檔案，拒絕覆寫：",
+    "en": "Refusing to overwrite an unknown or modified mod file: ",
+    "ja": "不明または変更済みのModファイルは上書きできません："
+  },
+  "安装期间文件发生变化。": {
+    "zh-TW": "安裝期間檔案發生變更。",
+    "en": "A file changed during installation.",
+    "ja": "インストール中にファイルが変更されました。"
+  },
+  "自动恢复未完成，备份保留在：": {
+    "zh-TW": "自動復原未完成，備份保留在：",
+    "en": "Automatic rollback was incomplete. Backups remain at: ",
+    "ja": "自動復元が完了していません。バックアップ先："
+  },
+  "非 Steam 游戏库记录无效，请检查 non-steam-games.json。": {
+    "zh-TW": "非 Steam 遊戲庫記錄無效，請檢查 non-steam-games.json。",
+    "en": "Invalid non-Steam library record. Check non-steam-games.json.",
+    "ja": "非Steamライブラリの記録が無効です。non-steam-games.jsonを確認してください。"
+  },
+  "目录中未找到 KairoGames.exe。": {
+    "zh-TW": "目錄中找不到 KairoGames.exe。",
+    "en": "KairoGames.exe was not found in this folder.",
+    "ja": "フォルダー内にKairoGames.exeが見つかりません。"
+  },
+  "缺少 KairoGames_Data/app.info，无法确认游戏身份。": {
+    "zh-TW": "缺少 KairoGames_Data/app.info，無法確認遊戲身分。",
+    "en": "Missing KairoGames_Data/app.info. The game cannot be identified.",
+    "ja": "KairoGames_Data/app.infoがないため、ゲームを識別できません。"
+  },
+  "所选目录不是可识别的开罗游戏。": {
+    "zh-TW": "所選目錄不是可識別的開羅遊戲。",
+    "en": "The selected folder is not a recognized Kairosoft game.",
+    "ja": "選択したフォルダーは識別可能なカイロソフトゲームではありません。"
+  },
+  "游戏名称与 AppID 不一致。": {
+    "zh-TW": "遊戲名稱與 AppID 不一致。",
+    "en": "The game name and AppID do not match.",
+    "ja": "ゲーム名とAppIDが一致しません。"
+  },
+  "暂未收录此游戏的身份标识：{0}。未添加；请提供 app.info 以补充识别。": {
+    "zh-TW": "尚未收錄此遊戲的身分標識：{0}。未新增；請提供 app.info 以補充識別。",
+    "en": "Unknown game identity: {0}. Not added. Provide app.info to add recognition.",
+    "ja": "未登録のゲーム識別情報：{0}。追加していません。識別対応のためapp.infoを提供してください。"
+  }
+}

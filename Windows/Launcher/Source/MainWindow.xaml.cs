@@ -16,7 +16,7 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Title = "开罗游戏工具箱";
+        Title = L.T("开罗游戏工具箱");
 
         // 自绘标题栏 + Mica（跟随设置的浅色/深色主题）
         ExtendsContentIntoTitleBar = true;
@@ -43,6 +43,7 @@ public sealed partial class MainWindow : Window
         NavView.SelectedItem = LibraryNavItem;
         SettingsPage.SettingsChanged += (_, _) => _ = LibraryPage.RefreshAsync();
         SettingsPage.ThemeChanged += (_, preference) => ApplyTheme(preference);
+        SettingsPage.LanguageChanged += (_, _) => ApplyLanguage();
 
         ApplyTheme(SettingsService.Instance.Current.ThemePreference);
     }
@@ -68,5 +69,21 @@ public sealed partial class MainWindow : Window
             "light" => ElementTheme.Light,
             _ => ElementTheme.Default
         };
+    }
+
+    private void ApplyLanguage()
+    {
+        LibraryPage.SetPageActive(false);
+        PageHost.Children.Clear();
+        LibraryPage = new LibraryPage { Visibility = Visibility.Collapsed };
+        SettingsPage = new SettingsPage();
+        AboutPage = new AboutPage { Visibility = Visibility.Collapsed };
+        PageHost.Children.Add(LibraryPage); PageHost.Children.Add(SettingsPage); PageHost.Children.Add(AboutPage);
+        SettingsPage.SettingsChanged += (_, _) => _ = LibraryPage.RefreshAsync();
+        SettingsPage.ThemeChanged += (_, preference) => ApplyTheme(preference);
+        SettingsPage.LanguageChanged += (_, _) => ApplyLanguage();
+        Title = L.T("开罗游戏工具箱"); AppTitle.Text = Title;
+        foreach (var item in NavView.MenuItems.OfType<NavigationViewItem>())
+            item.Content = item.Tag?.ToString() switch { "library" => L.T("游戏库"), "settings" => L.T("设置"), _ => L.T("关于") };
     }
 }

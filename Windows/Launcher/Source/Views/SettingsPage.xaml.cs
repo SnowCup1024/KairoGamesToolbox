@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 using KairosoftGameToolbox.Services;
 using Microsoft.UI.Xaml;
@@ -17,6 +17,7 @@ public sealed partial class SettingsPage : UserControl
 
     /// <summary>主题变化 → 主窗切换 RequestedTheme。</summary>
     public event EventHandler<string>? ThemeChanged;
+    public event EventHandler? LanguageChanged;
 
     private bool _loading;
     private string? _apiKeyValue;
@@ -42,6 +43,7 @@ public sealed partial class SettingsPage : UserControl
         try
         {
             var s = SettingsService.Instance.Current;
+            LanguageCombo.SelectedIndex = Array.IndexOf(L.Languages, L.Language);
             SteamPathBox.Text = s.SteamPathOverride ?? new SteamLibraryService().DetectSteamPath(null) ?? "";
             _apiKeyValue = s.SteamWebApiKey;
             _apiKeyDirty = false;
@@ -53,7 +55,7 @@ public sealed partial class SettingsPage : UserControl
                 "dark" => 2,
                 _ => 0
             };
-            VersionText.Text = $"开罗游戏工具箱 v{Assembly.GetExecutingAssembly().GetName().Version?.ToString(3)} · GPL-3.0";
+            VersionText.Text = L.T("开罗游戏工具箱") + " " + ReleaseInfo.DisplayVersion + " · GPL-3.0";
         }
         finally
         {
@@ -75,9 +77,9 @@ public sealed partial class SettingsPage : UserControl
                 {
                     XamlRoot = XamlRoot,
                     RequestedTheme = ActualTheme,
-                    Title = "Steam 路径无效",
-                    Content = "请选择同时包含 Steam.exe 和 steamapps 文件夹的 Steam 安装目录。当前设置未更改。",
-                    CloseButtonText = "关闭",
+                    Title = L.T("Steam 路径无效"),
+                    Content = L.T("请选择同时包含 Steam.exe 和 steamapps 文件夹的 Steam 安装目录。当前设置未更改。"),
+                    CloseButtonText = L.T("关闭"),
                 }.ShowAsync();
                 return;
             }
@@ -171,6 +173,13 @@ public sealed partial class SettingsPage : UserControl
         s.ThemePreference = SettingsService.IsValidThemePreference(preference) ? preference : "system";
         SettingsService.Instance.Save();
         ThemeChanged?.Invoke(this, s.ThemePreference);
+    }
+
+    private void Language_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || LanguageCombo.SelectedIndex < 0) return;
+        SettingsService.Instance.Current.Language = L.Languages[LanguageCombo.SelectedIndex];
+        if (SettingsService.Instance.Save()) LanguageChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void SetApiKeyMasked()

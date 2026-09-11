@@ -507,6 +507,7 @@ ModFeatureChecks.Run(Check);
 NonSteamChecks.Run(Check);
 ModPackageChecks.Run(Check);
 await ModControlChecks.RunAsync(Check);
+BetaChecks.Run(Check);
 
 Console.WriteLine(failures == 0 ? "ALL PASS" : $"{failures} FAILED");
 return failures;

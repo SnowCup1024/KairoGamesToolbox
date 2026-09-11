@@ -1,3 +1,4 @@
+using KairosoftGameToolbox.Services;
 using System.Reflection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,8 +22,7 @@ public sealed partial class AboutPage : UserControl
 
     private void LoadAboutInfo()
     {
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "未知";
-        VersionText.Text = $"版本 v{version} · GPL-3.0";
+        VersionText.Text = Services.ReleaseInfo.DisplayVersion + " · GPL-3.0";
     }
 
     private static string ReadBundledText(string relativePath)
@@ -41,7 +41,7 @@ public sealed partial class AboutPage : UserControl
     private async void ViewLicense_Click(object sender, RoutedEventArgs e)
     {
         var text = ReadBundledText(LicenseFileName);
-        await ShowFullTextAsync("GNU General Public License v3.0", text, "许可证全文暂不可用。");
+        await ShowFullTextAsync("GNU General Public License v3.0", text, L.T("许可证全文暂不可用。"));
     }
 
     private async Task ShowFullTextAsync(string title, string text, string fallback)
@@ -65,7 +65,7 @@ public sealed partial class AboutPage : UserControl
             RequestedTheme = ActualTheme,
             Title = title,
             Content = viewer,
-            CloseButtonText = "关闭",
+            CloseButtonText = L.T("关闭"),
         };
         await dialog.ShowAsync();
     }

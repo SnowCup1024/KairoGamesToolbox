@@ -15,6 +15,7 @@ public sealed partial class AboutPage : UserControl
     public AboutPage()
     {
         InitializeComponent();
+        Services.PageMotion.Constrain(PageScroll, PageBody);
         Loaded += (_, _) => LoadAboutInfo();
     }
 

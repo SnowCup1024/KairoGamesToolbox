@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:KairosoftGameToolbox.Models"
     xmlns:controls="using:KairosoftGameToolbox.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
 
     <UserControl.Resources>
         <DataTemplate x:Key="GameCardTemplate" x:DataType="models:KairoGame">
@@ -21,7 +21,7 @@
     </UserControl.Resources>
 
     <Grid>
-    <Grid x:Name="LibraryRoot" Padding="28,24,28,24" Background="{ThemeResource PageBackgroundBrush}">
+    <Grid x:Name="LibraryRoot" Padding="28,24,28,24" Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -53,7 +53,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="InstalledSectionTitle" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock x:Name="InstalledSectionTitle" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center" />
                         <Border Grid.Column="1" Height="1" Background="{ThemeResource CardBorderBrushStatic}" VerticalAlignment="Center" />
                     <Button Grid.Column="2" Content="添加非 Steam 游戏" Click="AddNonSteam_Click"/>
                     </Grid>
@@ -71,7 +71,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="NotInstalledSectionTitle" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock x:Name="NotInstalledSectionTitle" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center" />
                         <Border Grid.Column="1" Height="1" Background="{ThemeResource CardBorderBrushStatic}" VerticalAlignment="Center" />
                     </Grid>
                     <ItemsRepeater x:Name="NotInstalledRepeater" HorizontalAlignment="Stretch" ItemTemplate="{StaticResource GameCardTemplate}">
@@ -87,7 +87,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="NotOwnedSectionTitle" FontSize="21" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock x:Name="NotOwnedSectionTitle" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center" />
                         <Border Grid.Column="1" Height="1" Background="{ThemeResource CardBorderBrushStatic}" VerticalAlignment="Center" />
                     </Grid>
                     <ItemsRepeater x:Name="NotOwnedRepeater" HorizontalAlignment="Stretch" ItemTemplate="{StaticResource GameCardTemplate}">

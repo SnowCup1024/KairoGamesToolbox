@@ -259,6 +259,12 @@ public sealed partial class LibraryPage : UserControl
         DetailHost.Content = page;
         LibraryRoot.Visibility = Visibility.Collapsed;
         DetailHost.Visibility = Visibility.Visible;
+        PageMotion.Enter(DetailHost);
+    }
+
+    public void SetPageActive(bool active)
+    {
+        if (DetailHost.Content is GameDetailsPage details) details.SetPageActive(active);
     }
 
     private async void Card_LaunchRequested(object sender, KairoGame game)

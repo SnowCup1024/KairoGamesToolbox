@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Title="开罗游戏工具箱">
 
-    <Grid x:Name="RootGrid" Background="{ThemeResource PageBackgroundBrush}">
+    <Grid x:Name="RootGrid" Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
@@ -31,7 +31,7 @@
             IsSettingsVisible="False"
             OpenPaneLength="190"
             CompactPaneLength="48"
-            Background="{ThemeResource PageBackgroundBrush}"
+            Background="Transparent" HorizontalContentAlignment="Stretch"
             SelectionChanged="NavView_SelectionChanged">
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Name="LibraryNavItem" Content="游戏库" Tag="library">
@@ -51,7 +51,7 @@
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <Grid x:Name="PageHost" Background="{ThemeResource PageBackgroundBrush}">
+            <Grid x:Name="PageHost" Background="Transparent">
                 <views:LibraryPage x:Name="LibraryPage" />
                 <views:SettingsPage x:Name="SettingsPage" Visibility="Collapsed" />
                 <views:AboutPage x:Name="AboutPage" Visibility="Collapsed" />

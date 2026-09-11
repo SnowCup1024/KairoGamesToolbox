@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')]
-    [string]$Version = '0.2.3',
+    [string]$Version = '0.2.4',
     [switch]$SkipLaunchCheck
 )
 

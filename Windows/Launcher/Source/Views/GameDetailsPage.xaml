@@ -1,59 +1,59 @@
 <UserControl x:Class="KairosoftGameToolbox.Views.GameDetailsPage"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
- xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <UserControl.Resources>
-  <Style x:Key="SectionCard" TargetType="Border">
-   <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
-   <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
-   <Setter Property="BorderThickness" Value="1" />
-   <Setter Property="CornerRadius" Value="16" />
-   <Setter Property="Padding" Value="24" />
-  </Style>
- </UserControl.Resources>
- <Grid>
- <ScrollViewer x:Name="DetailsScroll" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
-  <StackPanel x:Name="PageBody" Margin="28,8,28,28" Spacing="18" MaxWidth="1050" HorizontalAlignment="Stretch">
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+ <ScrollViewer x:Name="DetailsScroll" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" SizeChanged="DetailsScroll_SizeChanged">
+  <StackPanel x:Name="PageBody" Margin="28,20,28,28" Spacing="20" HorizontalAlignment="Center">
    <Button x:Name="BackButton" Click="Back_Click" Style="{StaticResource SubtleButtonStyle}"><StackPanel Orientation="Horizontal" Spacing="10"><SymbolIcon Symbol="Back"/><TextBlock Text="返回游戏库"/></StackPanel></Button>
    <Border Style="{StaticResource SectionCard}">
-    <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-     <Border CornerRadius="10" Background="{ThemeResource CoverGradientBrush}" Height="180"><Image x:Name="Cover" Stretch="UniformToFill"/></Border>
+    <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+     <Border CornerRadius="10" Background="{ThemeResource CoverGradientBrush}" Height="150"><Image x:Name="Cover" Stretch="UniformToFill"/></Border>
      <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
-      <TextBlock Text="MOD 与存档修改" FontSize="12" Foreground="{ThemeResource AccentBrush}"/>
-      <TextBlock x:Name="GameTitle" FontSize="28" FontWeight="SemiBold" TextWrapping="Wrap"/>
-      <TextBlock x:Name="GameStatus" Foreground="{ThemeResource TextSecondaryBrush}" TextWrapping="Wrap"/>
+      <TextBlock Text="MOD 与存档修改" Style="{StaticResource LabelStyle}" Foreground="{ThemeResource AccentBrush}"/>
+      <TextBlock x:Name="GameTitle" Style="{StaticResource PageTitleStyle}"/>
+      <TextBlock x:Name="GameStatus" Foreground="{ThemeResource TextSecondaryBrush}"/>
       <Button x:Name="LaunchButton" Content="启动游戏" Style="{StaticResource AccentButtonStyle}" Click="Launch_Click"/>
      </StackPanel>
-
     </Grid>
    </Border>
    <Border Style="{StaticResource SectionCard}">
     <StackPanel Spacing="12">
-     <TextBlock Text="01  ·  游戏目录" FontSize="20" FontWeight="SemiBold"/>
-     <TextBlock Text="Steam 安装目录会自动填入。非 Steam 版本请选择直接包含 KairoGames.exe 的文件夹。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
+     <TextBlock Text="01  ·  游戏目录" Style="{StaticResource SectionTitleStyle}"/>
+     <TextBlock Text="自动填写已安装的 Steam 或已保存的非 Steam 目录，也可以重新选择。" Foreground="{ThemeResource TextSecondaryBrush}"/>
      <TextBlock x:Name="TargetText" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
-     <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择非 Steam 游戏目录" Click="Folder_Click"/><Button x:Name="SteamButton" Content="使用 Steam 目录" Click="Steam_Click"/></StackPanel>
+     <StackPanel x:Name="DirectoryButtons" Orientation="Horizontal" Spacing="12"><Button Content="选择非 Steam 游戏目录" Click="Folder_Click"/><Button x:Name="SteamButton" Content="使用 Steam 目录" Click="Steam_Click"/></StackPanel>
     </StackPanel>
    </Border>
    <Border x:Name="ModSection" Style="{StaticResource SectionCard}">
     <StackPanel Spacing="12">
-     <TextBlock Text="02  ·  模组文件" FontSize="20" FontWeight="SemiBold"/>
-     <TextBlock Text="模组独立于启动器发布。选择 ZIP 后自动归档；释放前校验游戏及版本，不支持的目标不会写入。" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
+     <TextBlock Text="02  ·  模组文件" Style="{StaticResource SectionTitleStyle}"/>
+     <TextBlock Text="选择 ZIP 后自动归档；释放前校验游戏及版本，不支持的目标不会写入。" Foreground="{ThemeResource TextSecondaryBrush}"/>
      <Button Content="下载最新 Mod 并选择 · 尚未开放" IsEnabled="False"/>
-     <StackPanel Orientation="Horizontal" Spacing="12"><Button Content="选择本地 Mod ZIP" Click="Package_Click"/></StackPanel>
+     <Button Content="选择本地 Mod ZIP" Click="Package_Click"/>
      <TextBlock x:Name="PackageText" Text="尚未选择模组" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
-     <TextBlock x:Name="PackageDescription" TextWrapping="Wrap" Foreground="{ThemeResource TextSecondaryBrush}"/>
+     <TextBlock x:Name="PackageDescription" Foreground="{ThemeResource TextSecondaryBrush}"/>
      <Button x:Name="InstallButton" Content="校验并释放 Mod" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Click="Install_Click"/>
-     <TextBlock x:Name="InstalledModText" TextWrapping="Wrap"/>
+     <TextBlock x:Name="InstalledModText" Foreground="{ThemeResource TextSecondaryBrush}"/>
     </StackPanel>
    </Border>
-   <Border x:Name="ControlSection" Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
-    <TextBlock Text="03  ·  模组控制" FontSize="20" FontWeight="SemiBold"/>
-    <Button Content="进入修改页面 →" Click="Control_Click"/>
-   </StackPanel></Border>
+   <Border x:Name="ControlSection" Style="{StaticResource SectionCard}">
+    <StackPanel Spacing="16">
+     <Grid ColumnSpacing="16" RowSpacing="12">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <TextBlock Text="03  ·  模组控制" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center"/>
+      <StackPanel x:Name="ConnectionHeader" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+       <TextBlock x:Name="ConnectionStatus" Text="未安装 Mod" Foreground="{ThemeResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+       <Button x:Name="RefreshControlButton" Width="32" Height="32" Padding="0" BorderThickness="0" Style="{StaticResource SubtleButtonStyle}" ToolTipService.ToolTip="刷新连接状态" AutomationProperties.Name="刷新连接状态" IsEnabled="False" Click="RefreshControl_Click"><FontIcon Glyph="&#xE72C;" FontSize="16"/></Button>
+      </StackPanel>
+     </Grid>
+     <Grid x:Name="FeatureGrid" ColumnSpacing="12" RowSpacing="12" HorizontalAlignment="Stretch"/>
+     <TextBlock x:Name="FeatureEmpty" Text="此游戏暂未提供修改项。" Foreground="{ThemeResource TextSecondaryBrush}"/>
+     <TextBlock x:Name="ControlFeedback" TextWrapping="Wrap"/>
+    </StackPanel>
+   </Border>
    <TextBlock x:Name="ResultText" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>
    <ProgressBar x:Name="Progress" IsIndeterminate="True" Visibility="Collapsed"/>
   </StackPanel>
  </ScrollViewer>
- <ContentControl x:Name="ControlHost" Visibility="Collapsed" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
- </Grid>
 </UserControl>

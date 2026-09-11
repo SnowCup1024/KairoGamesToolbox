@@ -1,60 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<UserControl
-    x:Class="KairosoftGameToolbox.Views.SettingsPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="{ThemeResource PageBackgroundBrush}">
-        <StackPanel MaxWidth="680" HorizontalAlignment="Left" Spacing="24" Margin="28,20,28,32">
-            <TextBlock Text="设置" FontSize="32" FontWeight="SemiBold" />
-
-            <StackPanel Spacing="12">
-                <TextBlock Text="用户界面" FontSize="24" FontWeight="SemiBold" />
-                <ComboBox x:Name="ThemeCombo" Header="主题" SelectionChanged="Theme_SelectionChanged">
-                    <ComboBoxItem Content="跟随系统" Tag="system" />
-                    <ComboBoxItem Content="浅色" Tag="light" />
-                    <ComboBoxItem Content="深色" Tag="dark" />
-                </ComboBox>
-            </StackPanel>
-
-            <StackPanel Spacing="12">
-                <TextBlock Text="Steam 相关" FontSize="24" FontWeight="SemiBold" />
-                <TextBox
-                    x:Name="SteamPathBox"
-                    Header="Steam 安装路径"
-                    PlaceholderText="首次打开时自动检测；手动修改后点击保存并重新扫描" />
-                <Button Content="保存并重新扫描" HorizontalAlignment="Left" CornerRadius="8" Style="{StaticResource AccentButtonStyle}" Click="SaveAndRescan_Click" />
-
-                <StackPanel Spacing="10" Margin="0,8,0,0">
-                    <TextBlock Text="Steam 游玩记录（可选）" FontSize="16" FontWeight="SemiBold" />
-                <TextBox
-                    x:Name="ApiKeyBox"
-                    Header="Steam Web API Key"
-                    PlaceholderText="请手动输入，可从 steamcommunity.com/dev/apikey 获取"
-                    GotFocus="ApiKeyBox_GotFocus"
-                    LostFocus="ApiKeyBox_LostFocus"
-                    TextChanged="ApiKeyBox_TextChanged" />
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button x:Name="SaveApiKeyButton" LostFocus="ApiKeyBox_LostFocus" Content="保存并重新扫描" CornerRadius="8" Style="{StaticResource AccentButtonStyle}" Click="SaveApiKeyAndRescan_Click" />
-                    <Button Content="打开获取页面" CornerRadius="8" Click="OpenApiKeyPage_Click" />
-                </StackPanel>
-                <TextBlock
-                    FontSize="12"
-                    Foreground="{ThemeResource TextSecondaryBrush}"
-                    TextWrapping="Wrap"
-                    Text="Steam 不提供由启动器自动申请 API Key 的接口，需要在浏览器中登录后手动获取。保存 API Key 后会查询拥有状态、游玩时长和最近游玩时间；清空 API Key 并保存即可关闭这些查询。SteamID 自动获取，无需手动输入。网络不可用或未配置时显示为未知，不影响启动游戏。" />
-                </StackPanel>
-            </StackPanel>
-
-            <!-- 版本 / 许可证 -->
-            <TextBlock
-                x:Name="VersionText"
-                Margin="0,12,0,0"
-                FontSize="12"
-                Foreground="{ThemeResource TextSecondaryBrush}" />
-        </StackPanel>
-    </ScrollViewer>
+<UserControl x:Class="KairosoftGameToolbox.Views.SettingsPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+ <ScrollViewer x:Name="PageScroll" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
+  <StackPanel x:Name="PageBody" HorizontalAlignment="Center" Spacing="20" Margin="28,20,28,32">
+   <TextBlock Text="设置" Style="{StaticResource PageTitleStyle}"/>
+   <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
+    <TextBlock Text="用户界面" Style="{StaticResource SectionTitleStyle}"/>
+    <TextBlock Text="主题" Style="{StaticResource LabelStyle}"/>
+    <ComboBox x:Name="ThemeCombo" AutomationProperties.Name="主题" SelectionChanged="Theme_SelectionChanged">
+     <ComboBoxItem Content="跟随系统" Tag="system"/>
+     <ComboBoxItem Content="浅色" Tag="light"/>
+     <ComboBoxItem Content="深色" Tag="dark"/>
+    </ComboBox>
+   </StackPanel></Border>
+   <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
+    <TextBlock Text="Steam 相关" Style="{StaticResource SectionTitleStyle}"/>
+    <TextBlock Text="Steam 安装路径" Style="{StaticResource LabelStyle}"/>
+    <TextBox x:Name="SteamPathBox" AutomationProperties.Name="Steam 安装路径" PlaceholderText="自动检测，也可手动修改"/>
+    <Button Content="保存并重新扫描" Style="{StaticResource AccentButtonStyle}" Click="SaveAndRescan_Click"/>
+   </StackPanel></Border>
+   <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
+    <TextBlock Text="Steam 游玩记录（可选）" Style="{StaticResource SectionTitleStyle}"/>
+    <TextBlock Text="Steam Web API Key" Style="{StaticResource LabelStyle}"/>
+    <TextBox x:Name="ApiKeyBox" AutomationProperties.Name="Steam Web API Key" PlaceholderText="手动输入 API Key"
+     GotFocus="ApiKeyBox_GotFocus" LostFocus="ApiKeyBox_LostFocus" TextChanged="ApiKeyBox_TextChanged"/>
+    <StackPanel x:Name="ApiButtons" Orientation="Horizontal" Spacing="12">
+     <Button x:Name="SaveApiKeyButton" LostFocus="ApiKeyBox_LostFocus" Content="保存并重新扫描" Style="{StaticResource AccentButtonStyle}" Click="SaveApiKeyAndRescan_Click"/>
+     <Button Content="打开获取页面" Click="OpenApiKeyPage_Click"/>
+    </StackPanel>
+    <TextBlock Foreground="{ThemeResource TextSecondaryBrush}" Text="在 Steam 网页中登录并获取 API Key。保存后查询拥有状态、游玩时长与最近游玩时间；清空并保存即可关闭。SteamID 自动获取，网络或配置不可用不影响启动游戏。"/>
+   </StackPanel></Border>
+   <TextBlock x:Name="VersionText" FontSize="12" Foreground="{ThemeResource TextSecondaryBrush}"/>
+  </StackPanel>
+ </ScrollViewer>
 </UserControl>

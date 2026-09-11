@@ -21,7 +21,8 @@ public sealed partial class MainWindow : Window
         // 自绘标题栏 + Mica（跟随设置的浅色/深色主题）
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
-        SystemBackdrop = new MicaBackdrop();
+        SystemBackdrop = Microsoft.UI.Composition.SystemBackdrops.DesktopAcrylicController.IsSupported()
+            ? new DesktopAcrylicBackdrop() : new MicaBackdrop();
 
         // 默认尺寸 1280×860，按工作区收缩并居中
         var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary);
@@ -54,6 +55,8 @@ public sealed partial class MainWindow : Window
         LibraryPage.Visibility = library ? Visibility.Visible : Visibility.Collapsed;
         SettingsPage.Visibility = settings ? Visibility.Visible : Visibility.Collapsed;
         AboutPage.Visibility = tag == "about" ? Visibility.Visible : Visibility.Collapsed;
+        LibraryPage.SetPageActive(library);
+        PageMotion.Enter(library ? LibraryPage : settings ? SettingsPage : AboutPage);
         if (library) _ = LibraryPage.RefreshAsync(); // 回到库页自动重扫，联网封面复用内存缓存
     }
 

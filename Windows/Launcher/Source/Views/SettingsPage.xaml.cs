@@ -26,6 +26,8 @@ public sealed partial class SettingsPage : UserControl
     public SettingsPage()
     {
         InitializeComponent();
+        PageMotion.Constrain(PageScroll, PageBody);
+        PageBody.SizeChanged += (_, _) => ApiButtons.Orientation = PageBody.ActualWidth < 500 ? Orientation.Vertical : Orientation.Horizontal;
         Loaded += (_, _) => LoadFromSettings();
         Unloaded += (_, _) => RestoreApiKey();
         RegisterPropertyChangedCallback(VisibilityProperty, (_, _) =>

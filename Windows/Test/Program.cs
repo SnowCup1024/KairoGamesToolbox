@@ -503,6 +503,7 @@ finally
 }
 
 LauncherInstanceChecks.Run(Check);
+ModFeatureChecks.Run(Check);
 NonSteamChecks.Run(Check);
 ModPackageChecks.Run(Check);
 await ModControlChecks.RunAsync(Check);

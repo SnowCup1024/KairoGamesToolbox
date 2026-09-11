@@ -27,28 +27,18 @@ public sealed partial class GameDetailsPage : UserControl
         target = game.NonSteamDirectory ?? game.InstallDir;
         nonSteam = game.NonSteamDirectory != null;
         SteamButton.IsEnabled = game.IsInstalled && !game.IsNonSteam;
+        InitializeControls();
         UpdateTarget();
         Loaded += async (_, _) => Cover.Source = await CoverService.Default.LoadCoverImageAsync(game.AppId, 1);
     }
 
-    private void Control_Click(object sender, RoutedEventArgs e)
+    private void DetailsScroll_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (busy) return;
-        if (string.IsNullOrWhiteSpace(target))
-        {
-            ResultText.Text = "请先选择此游戏的安装目录，再进入修改页面。";
-            return;
-        }
-        var page = new ModControlPage(game, target);
-        page.BackRequested += (_, _) =>
-        {
-            ControlHost.Content = null;
-            ControlHost.Visibility = Visibility.Collapsed;
-            DetailsScroll.Visibility = Visibility.Visible;
-        };
-        ControlHost.Content = page;
-        ControlHost.Visibility = Visibility.Visible;
-        DetailsScroll.Visibility = Visibility.Collapsed;
+        PageBody.Width = Math.Max(0, Math.Min(1050, e.NewSize.Width - 56));
+        DirectoryButtons.Orientation = PageBody.Width < 500 ? Orientation.Vertical : Orientation.Horizontal;
+        Grid.SetColumn(ConnectionHeader, PageBody.Width < 500 ? 0 : 1);
+        Grid.SetRow(ConnectionHeader, PageBody.Width < 500 ? 1 : 0);
+        ConnectionHeader.HorizontalAlignment = PageBody.Width < 500 ? HorizontalAlignment.Left : HorizontalAlignment.Right;
     }
 
     private void UpdateTarget()
@@ -63,6 +53,7 @@ public sealed partial class GameDetailsPage : UserControl
         InstallButton.Content = installed ? "更新 Mod" : "校验并释放 Mod";
         InstalledModText.Text = installed ? "检测到已安装的模组；更新前会检查原安装清单和文件。" : "尚未检测到已安装的模组";
         ResultText.Text = "";
+        RestartControls();
     }
 
     private void Back_Click(object sender, RoutedEventArgs e) { if (!busy) BackRequested?.Invoke(this, EventArgs.Empty); }

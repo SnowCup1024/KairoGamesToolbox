@@ -1,0 +1,136 @@
+{
+  "appId": 2488340,
+  "gameFolder": "DreamTownIsland",
+  "version": "1.0.4",
+  "development": false,
+  "runtime": {
+    "id": "BepInEx-Unity-IL2CPP-win-x86-788",
+    "sha256": "D5954A5993EC39CD1133603D85BFF93875D30B6411B712CC13DCF03C8E08A4D3",
+    "url": "https://builds.bepinex.dev/projects/bepinex_be/788/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.788%2B5b766a3.zip"
+  },
+  "targets": [
+    {
+      "path": "GameAssembly.dll",
+      "sha256": "EF5880580DC953A70E90D2432AE2267A8D7CE11296A215C3650D6DE38F92533B"
+    },
+    {
+      "path": "KairoGames_Data/il2cpp_data/Metadata/global-metadata.dat",
+      "sha256": "C8B61CA879BD2AF9664167DD9F480ADCC0283E815053A1D12C57CE3CF5101B49"
+    }
+  ],
+  "files": [
+    {
+      "path": "BepInEx/plugins/KairoMods.DreamTownIsland/KairoMods.DreamTownIsland.dll",
+      "sha256": "E102B7C7AD05E823E7F039A854D2A0A962162CB79CF6C154EB84E20F18E9C381"
+    }
+  ],
+  "features": [
+    {
+      "id": "moneyReverse",
+      "names": {
+        "zh-CN": "金钱反加",
+        "zh-TW": "金錢反加",
+        "en": "Reverse money spending",
+        "ja": "資金消費を増加に変換"
+      },
+      "logNames": {
+        "zh-CN": "金钱",
+        "zh-TW": "金錢",
+        "en": "money",
+        "ja": "資金"
+      },
+      "descriptions": {
+        "zh-CN": "实际扣款后按倍率净增加，正常收入不变；保留游戏上限和购买条件。",
+        "zh-TW": "實際扣款後按倍率淨增加，正常收入不變；保留遊戲上限和購買條件。",
+        "en": "Turn actual spending into a multiplied net gain. Normal income, game caps and purchase requirements remain unchanged.",
+        "ja": "実際の消費を倍率に応じた純増に変換します。通常の収入、所持上限、購入条件は変わりません。"
+      }
+    },
+    {
+      "id": "pointReverse",
+      "names": {
+        "en": "Reverse point spending",
+        "zh-TW": "點數反加",
+        "ja": "ポイント消費を増加に変換",
+        "zh-CN": "点数反加"
+      },
+      "logNames": {
+        "en": "points",
+        "zh-TW": "點數",
+        "ja": "ポイント",
+        "zh-CN": "点数"
+      },
+      "descriptions": {
+        "en": "One switch and multiplier for food, hospitality, entertainment and culture points. Only the consumed point type gains; normal income is unchanged.",
+        "zh-TW": "統一控制餐飲、服務、娛樂、文化四種點數的反加倍率，僅補回實際消耗的對應點數，正常獲得不變。",
+        "ja": "飲食・サービス・娯楽・文化ポイントの倍率を一括設定します。消費した種類だけを増加させ、通常の獲得量は変えません。",
+        "zh-CN": "统一控制餐饮、服务、娱乐、文化四种点数的反加倍率，仅补回实际消耗的对应点数，正常获得不变。"
+      }
+    },
+    {
+      "id": "buildingReverse",
+      "names": {
+        "zh-CN": "建筑数量反加",
+        "zh-TW": "建築數量反加",
+        "en": "Reverse building stock consumption",
+        "ja": "建築在庫消費を増加に変換"
+      },
+      "logNames": {
+        "zh-CN": "建筑可放置数量",
+        "zh-TW": "建築可放置數量",
+        "en": "building stock",
+        "ja": "建築在庫"
+      },
+      "descriptions": {
+        "zh-CN": "消耗某建筑的可放置数量后按倍率净增加。不会解锁建筑，零库存、地形与建造条件仍由游戏判断。",
+        "zh-TW": "消耗某建築的可放置數量後按倍率淨增加。不會解鎖建築，零庫存、地形與建造條件仍由遊戲判斷。",
+        "en": "Turn consumed building stock into a multiplied net gain for that building. Does not unlock buildings or bypass zero stock, terrain or construction requirements.",
+        "ja": "消費した建築在庫を、その建物の倍率に応じた純増に変換します。未解放の建物、在庫ゼロ、地形や建築条件は変更しません。"
+      }
+    },
+    {
+      "id": "itemReverse",
+      "names": {
+        "en": "Reverse item consumption",
+        "zh-TW": "道具反加",
+        "ja": "アイテム消費を増加に変換",
+        "zh-CN": "道具反加"
+      },
+      "logNames": {
+        "en": "items",
+        "zh-TW": "道具",
+        "ja": "アイテム",
+        "zh-CN": "道具"
+      },
+      "descriptions": {
+        "en": "Turn actual item consumption into a multiplied net gain for that item. Normal gains, stock caps and use requirements are unchanged.",
+        "zh-TW": "將實際消耗的道具按倍率淨增加，正常獲得不變。只補回對應道具，保留庫存上限和使用條件。",
+        "ja": "実際に消費したアイテムを倍率に応じた純増に変換します。通常の獲得量、在庫上限、使用条件は変わりません。",
+        "zh-CN": "将实际消耗的道具按倍率净增加，正常获得不变。只补回对应道具，保留库存上限和使用条件。"
+      }
+    }
+  ],
+  "logTemplates": {
+    "zh-CN": "{0}：{1}{2} {3}",
+    "zh-TW": "{0}：{1}{2} {3}",
+    "en": "{0}: {1} {3} {2}",
+    "ja": "{0}：{2} {3} {1}",
+    "zh-CN.increase": "增加",
+    "zh-CN.decrease": "减少",
+    "zh-TW.increase": "增加",
+    "zh-TW.decrease": "減少",
+    "en.increase": "Gained",
+    "en.decrease": "Spent",
+    "ja.increase": "増加",
+    "ja.decrease": "減少",
+    "zh-CN.unchanged": "未扣除",
+    "zh-TW.unchanged": "未扣除",
+    "en.unchanged": "Unchanged",
+    "ja.unchanged": "消費なし"
+  },
+  "multiplierSteps": [
+    0,
+    1,
+    20
+  ]
+}

@@ -16,10 +16,11 @@
      </StackPanel>
     </Grid>
    </Border>
-   <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
-    <ToggleButton x:Name="ManageTab" Content="{l:Text Key='游戏目录与模组状态'}" IsChecked="True" HorizontalAlignment="Stretch" Click="ManageTab_Click"/>
-    <ToggleButton x:Name="ControlTab" Grid.Column="1" Content="{l:Text Key='模组控制'}" HorizontalAlignment="Stretch" Click="ControlTab_Click"/>
-   </Grid>
+   <Border Padding="4" CornerRadius="12" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" HorizontalAlignment="Left">
+   <Grid ColumnSpacing="4"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <ToggleButton x:Name="ManageTab" Content="{l:Text Key='游戏目录与模组状态'}" IsChecked="True" Padding="18,10" CornerRadius="8" BorderThickness="0" Click="ManageTab_Click"/>
+    <ToggleButton x:Name="ControlTab" Grid.Column="1" Content="{l:Text Key='模组控制'}" Padding="18,10" CornerRadius="8" BorderThickness="0" Click="ControlTab_Click"/>
+   </Grid></Border>
    <StackPanel x:Name="ManagePane" Spacing="20">
     <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
      <TextBlock Text="{l:Text Key='游戏目录'}" Style="{StaticResource SectionTitleStyle}"/>
@@ -57,7 +58,11 @@
     <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
      <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
       <TextBlock Text="{l:Text Key='运行日志'}" Style="{StaticResource SectionTitleStyle}"/>
-      <Button Grid.Column="1" Content="{l:Text Key='复制全部日志'}" Click="CopyLogs_Click"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+       <ToggleSwitch x:Name="AutoRefreshLogs" IsOn="True" OnContent="" OffContent="" MinWidth="0" VerticalAlignment="Center" ToolTipService.ToolTip="{l:Text Key='自动刷新日志'}" AutomationProperties.Name="{l:Text Key='自动刷新日志'}"/>
+       <Button Width="32" Height="32" Padding="0" Style="{StaticResource SubtleButtonStyle}" Click="ClearLogs_Click" ToolTipService.ToolTip="{l:Text Key='清空日志'}" AutomationProperties.Name="{l:Text Key='清空日志'}"><FontIcon Glyph="&#xE74D;" FontSize="16"/></Button>
+       <Button Content="{l:Text Key='复制全部日志'}" Click="CopyLogs_Click"/>
+      </StackPanel>
      </Grid>
      <ScrollViewer x:Name="LogScroll" Height="300" HorizontalScrollBarVisibility="Disabled">
       <RichTextBlock x:Name="LogLines" FontFamily="Cascadia Mono, Consolas" FontSize="12" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>

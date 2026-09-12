@@ -1,4 +1,11 @@
 {
+  "自动刷新日志": { "en": "Auto-refresh logs", "ja": "ログを自動更新", "zh-TW": "自動重新整理日誌" },
+  "清空日志": { "en": "Clear logs", "ja": "ログをクリア", "zh-TW": "清空日誌" },
+  "当前模组用于开发观察，尚未提供游戏修改项。": {
+    "en": "This mod is for development observation. Gameplay features are not available yet.",
+    "ja": "現在のModは開発用の観測版です。ゲームの変更機能はまだありません。",
+    "zh-TW": "目前模組用於開發觀察，尚未提供遊戲修改項。"
+  },
   "{0} · {1}款": {
     "en": "{0} · {1} games",
     "ja": "{0} · {1}本",

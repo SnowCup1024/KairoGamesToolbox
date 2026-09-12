@@ -7,7 +7,7 @@ namespace KairosoftGameToolbox.Services;
 public sealed record RuntimePackage(string Id, string Url, string Sha256);
 public sealed record GameModDefinition(uint AppId, string GameFolder, string Version, bool Development,
     RuntimePackage Runtime, List<ModFile> Targets, List<ModFile> Files, List<GameModFeature> Features,
-    Dictionary<string, string> LogTemplates);
+    Dictionary<string, string> LogTemplates, int[]? MultiplierSteps = null);
 public sealed record GameModFeature(string Id, Dictionary<string, string> Names, Dictionary<string, string> Descriptions,
     Dictionary<string, string>? LogNames = null);
 

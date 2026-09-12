@@ -1,0 +1,41 @@
+{
+  "hooks": [
+    { "type": "main.AppData", "method": "AddMoney", "parameters": ["System.Int64", "System.Boolean"], "reader": "GetMoney", "resource": "townMoney" },
+    { "type": "main.AppData", "method": "SetMoney", "parameters": ["System.Int64"], "reader": "GetMoney", "resource": "townMoney" },
+    { "type": "game.Point", "method": "AddValue", "parameters": ["System.Int32"], "reader": "get_value_", "resource": "point" },
+    { "type": "game.Point", "method": "AddMonthlyValue", "parameters": ["System.Int32"], "reader": "get_monthlyValue_", "resource": "monthlyPoint" },
+    { "type": "game.Item", "method": "AddHaveNum", "parameters": ["System.Int32"], "reader": "get_haveNum_", "resource": "itemStock" },
+    { "type": "game.Item", "method": "SetHaveNum", "parameters": ["System.Int32"], "reader": "get_haveNum_", "resource": "itemStock" },
+    { "type": "game.Item", "method": "Use", "parameters": ["game.Citizen", "System.Int32"], "returns": "System.Boolean", "reader": "get_haveNum_", "resource": "itemUse" },
+    { "type": "game.ChipModel", "method": "AddHaveNum", "parameters": ["System.Int32"], "reader": "get_haveNum_", "resource": "buildingStock" },
+    { "type": "game.ChipModel", "method": "SetHaveNum", "parameters": ["System.Int32"], "reader": "get_haveNum_", "resource": "buildingStock" },
+    { "type": "game.ChipModel", "method": "AddExp", "parameters": ["System.Int32"], "reader": "get_exp_", "resource": "buildingExp" },
+    { "type": "game.ChipModel", "method": "RankUp", "parameters": [], "resource": "buildingRank" },
+    { "type": "game.Citizen", "method": "AddMoney", "parameters": ["System.Int32"], "reader": "get_money_", "resource": "citizenMoney" },
+    { "type": "game.Citizen", "method": "AddHobbyExp", "parameters": ["System.Int32"], "reader": "get_hobbyExp_", "resource": "hobbyExp" },
+    { "type": "game.Citizen", "method": "AddHappiness", "parameters": ["System.Int32"], "reader": "get_happiness_", "resource": "happiness" },
+    { "type": "game.Citizen", "method": "AddTmpHappiness", "parameters": ["System.Int32"], "reader": "get_tmpHappiness_", "resource": "temporaryHappiness" },
+    { "type": "game.Citizen", "method": "AddParamValue", "parameters": ["data.CitizenParamData+ID", "System.Int32"], "resource": "citizenParameter" },
+    { "type": "game.Citizen", "method": "AddParamValue", "parameters": ["data.CitizenParamData+ID", "System.Int32", "System.Boolean", "System.Int32"], "resource": "citizenParameter" },
+    { "type": "game.Citizen", "method": "AddProduct", "parameters": ["data.ProductData", "System.Int32"], "resource": "citizenProduct" },
+    { "type": "game.Owner+StockPrice", "method": "AddHaveStockNum", "parameters": ["System.Int32"], "reader": "get_haveStockNum_", "resource": "shares" },
+    { "type": "game.Owner", "method": "AddPartnership", "parameters": ["System.Int32"], "reader": "get_partnership_", "resource": "partnership" },
+    { "type": "game.Fever", "method": "AddValue", "parameters": ["System.Int32"], "reader": "get_value_", "resource": "fever" },
+    { "type": "game.Fever", "method": "StartFever", "parameters": ["game.Fever+TriggerType"], "resource": "feverStart" },
+    { "type": "game.Trophy", "method": "AddHaveNum", "parameters": ["System.Int32"], "reader": "get_haveNum_", "resource": "trophy" },
+    { "type": "game.Event", "method": "AddExeNum", "parameters": [], "reader": "get_execNum_", "resource": "eventExecuted" },
+    { "type": "game.Map", "method": "ExecuteMonthlyEvent", "parameters": [], "static": true, "resource": "monthlyEvent" },
+    { "type": "game.Map", "method": "ExecuteYearlyEvent", "parameters": [], "static": true, "resource": "yearlyEvent" },
+    { "type": "game.Map", "method": "FinishConstruct", "parameters": ["System.Int32", "System.Int32"], "resource": "construction" },
+    { "type": "game.Map", "method": "AddNewCitizen", "parameters": ["game.Map+Building", "game.Citizen"], "resource": "newCitizen" },
+    { "type": "game.Mission", "method": "StartMission", "parameters": [], "resource": "mission" },
+    { "type": "game.TownRevitalization", "method": "StartWorking", "parameters": [], "resource": "townWork" }
+  ],
+  "samples": [
+    { "list": "pointList_", "type": "game.Point", "fields": ["value_", "monthlyValue_"] },
+    { "list": "itemList_", "type": "game.Item", "fields": ["haveNum_", "isFind_"] },
+    { "list": "chipModelList_", "type": "game.ChipModel", "fields": ["haveNum_", "exp_", "rankExp_", "buildCount_", "visitPrice_", "totalSales_", "isFind_"] },
+    { "list": "ownerList_", "type": "game.Owner", "fields": ["partnership_", "monthlySales_", "dealCount_", "dealSatisfaction_"] },
+    { "list": "eventList_", "type": "game.Event", "fields": ["execNum_", "count_"] }
+  ]
+}

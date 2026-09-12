@@ -29,10 +29,13 @@ public sealed partial class GameDetailsPage
     private bool sendingFeatures;
     private string? gameSession;
     private ModLogReader? logReader;
-    private readonly int[] multipliers = { 1, 2, 5, 20 };
+    private int[] multipliers = { 1, 2, 5, 20 };
 
     private void InitializeControls()
     {
+        multipliers = BundledModService.ForGame(game.AppId)?.MultiplierSteps ?? multipliers;
+        if (BundledModService.ForGame(game.AppId) is { Development: true, Features.Count: 0 })
+            FeatureEmpty.Text = L.T("当前模组用于开发观察，尚未提供游戏修改项。");
         foreach (var feature in ModFeatures.ForGame(game.AppId))
         {
             var label = new TextBlock { Text = feature.Name, VerticalAlignment = VerticalAlignment.Center };
@@ -40,8 +43,8 @@ public sealed partial class GameDetailsPage
             var toggle = new ToggleSwitch { OnContent = "", OffContent = "", MinWidth = 0, IsEnabled = false, VerticalAlignment = VerticalAlignment.Center };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(toggle, feature.Name);
             var value = new TextBlock { Text = "1x", Width = 28, VerticalAlignment = VerticalAlignment.Center };
-            var slider = new Slider { Minimum = 0, Maximum = 3, StepFrequency = 1, TickFrequency = 1,
-                IsEnabled = false, IsThumbToolTipEnabled = false, VerticalAlignment = VerticalAlignment.Center };
+            var slider = new Slider { Minimum = 0, Maximum = multipliers.Length - 1, StepFrequency = 1, TickFrequency = 1,
+                Value = Array.IndexOf(multipliers, 1), IsEnabled = false, IsThumbToolTipEnabled = false, VerticalAlignment = VerticalAlignment.Center };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(slider, feature.Name + " " + L.T("倍率"));
             var panel = new Grid { ColumnSpacing = 8 };
             panel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -57,7 +60,7 @@ public sealed partial class GameDetailsPage
             toggle.Toggled += (_, _) => { if (!updatingSwitch) QueueFeatures(); };
             slider.ValueChanged += (_, _) =>
             {
-                value.Text = multipliers[Math.Clamp((int)Math.Round(slider.Value), 0, 3)] + "x";
+                value.Text = multipliers[Math.Clamp((int)Math.Round(slider.Value), 0, multipliers.Length - 1)] + "x";
                 if (!updatingSwitch) QueueFeatures();
             };
             slider.AddHandler(UIElement.PointerPressedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => draggingSliders.Add(slider)), true);
@@ -176,7 +179,7 @@ public sealed partial class GameDetailsPage
     {
         if (!connected) { UpdateControlUi(); return; }
         pendingFeatures = featureControls.ToDictionary(pair => pair.Key, pair =>
-            new FeatureState(pair.Value.Toggle.IsOn, multipliers[Math.Clamp((int)Math.Round(pair.Value.Multiplier.Value), 0, 3)]));
+            new FeatureState(pair.Value.Toggle.IsOn, multipliers[Math.Clamp((int)Math.Round(pair.Value.Multiplier.Value), 0, multipliers.Length - 1)]));
         editRevision++;
         featureDebounce.Stop(); featureDebounce.Start();
     }
@@ -233,6 +236,10 @@ public sealed partial class GameDetailsPage
             }
             token.ThrowIfCancellationRequested();
             connected = true; confirmed = new(reply.Features);
+            if (gameSession != null && gameSession != reply.Session)
+            {
+                LogLines.Blocks.Clear(); logReader?.Reset();
+            }
             gameSession = reply.Session;
             ModSessionCache.Set(game.AppId, directory, confirmed); ControlFeedback.Text = "";
         }
@@ -254,13 +261,20 @@ public sealed partial class GameDetailsPage
             .Select(p => string.Concat(p.Inlines.OfType<Run>().Select(run => run.Text)))));
         Clipboard.SetContent(content);
     }
+    private void ClearLogs_Click(object sender, RoutedEventArgs e)
+    {
+        try { logReader?.SkipToEnd(); LogLines.Blocks.Clear(); }
+        catch (IOException) { }
+    }
     private void ReadLogs()
     {
-        if (!controlVisible || !pageActive || !CanConnect() || logReader == null) return;
+        if (!controlVisible || !pageActive || !AutoRefreshLogs.IsOn || !CanConnect() || logReader == null) return;
         try
         {
             bool atEnd = LogScroll.ScrollableHeight - LogScroll.VerticalOffset < 24;
-            foreach (var line in logReader.Read())
+            var lines = logReader.Read();
+            if (logReader.WasReset) LogLines.Blocks.Clear();
+            foreach (var line in lines)
             {
                 var formatted = ModLogReader.Format(line, BundledModService.ForGame(game.AppId)!, L.Language);
                 var paragraph = new Paragraph();

@@ -8,7 +8,7 @@ static class BetaChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("本版对外 v1.0 Beta 3，内部 1.0.3", ReleaseInfo.DisplayVersion == "v1.0 Beta 3" && Version.Parse(ReleaseInfo.Version).Build > 0);
+        check("本版对外 v1.0 Beta 4，内部 1.0.4", ReleaseInfo.DisplayVersion == "v1.0 Beta 4" && ReleaseInfo.Version == "1.0.4");
         check("正式版显示 Release 并隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3 Release");
         check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta 4");
         bool rejectedZero = false;
@@ -82,6 +82,14 @@ static class BetaChecks
             check("日志合并未完成中文行", reader.Read().Single() == "半行结束");
             File.WriteAllText(path, "new\n", new UTF8Encoding(false));
             check("日志截断后重新读取", reader.Read().Single() == "new");
+            File.WriteAllText(path, "replacement-longer-than-previous-file\n", new UTF8Encoding(false));
+            check("日志重写后超过旧长度仍识别新会话", reader.Read().Single() == "replacement-longer-than-previous-file" && reader.WasReset);
+            reader.SkipToEnd();
+            check("清空后不重读旧日志", reader.Read().Count == 0);
+            File.AppendAllText(path, "next\n", new UTF8Encoding(false));
+            check("清空后新日志继续追加", reader.Read().Single() == "next" && !reader.WasReset);
+            reader.Reset();
+            check("游戏会话重置允许重新读取当前日志", reader.Read().Count == 2 && reader.WasReset);
             string line = "[Info] ResourceResult | time=2026-09-12T01:00:00+08:00 | id=1 | resource=moneyReverse | before=100 | after=150 | delta=50";
             check("资源日志按游戏规则只翻译最终增量", ModLogReader.Format(line, definition, "zh-CN").Text.EndsWith("增加金钱 50"));
             check("开发模式保留原始日志", ModLogReader.Format(line, definition with { Development = true }, "zh-CN").Text == line);

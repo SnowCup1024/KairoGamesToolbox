@@ -1,0 +1,83 @@
+{
+  "controllerType": "KairoMods.DreamTownIsland.GameControl",
+  "hooks": [
+    {
+      "type": "main.AppData",
+      "method": "AddMoney",
+      "parameters": [
+        "System.Int64",
+        "System.Boolean"
+      ],
+      "reader": "GetMoney",
+      "maximum": "MONEY_MAX"
+    },
+    {
+      "type": "game.Point",
+      "method": "AddValue",
+      "parameters": [
+        "System.Int32"
+      ],
+      "reader": "get_value_",
+      "maximum": "VALUE_MAX"
+    },
+    {
+      "type": "game.ChipModel",
+      "method": "AddHaveNum",
+      "parameters": [
+        "System.Int32"
+      ],
+      "reader": "get_haveNum_",
+      "maximum": "HAVE_NUM_MAX"
+    },
+    {
+      "type": "game.Item",
+      "method": "AddHaveNum",
+      "parameters": [
+        "System.Int32"
+      ],
+      "reader": "get_haveNum_",
+      "maximum": "HAVE_NUM_MAX"
+    },
+    {
+      "type": "game.Item",
+      "method": "Use",
+      "parameters": [
+        "game.Citizen",
+        "System.Int32"
+      ],
+      "returns": "System.Boolean",
+      "reader": "get_haveNum_"
+    },
+    {
+      "type": "main.AppData",
+      "method": "SetMoney",
+      "parameters": [
+        "System.Int64"
+      ],
+      "reader": "GetMoney",
+      "maximum": "MONEY_MAX"
+    },
+    {
+      "type": "main.AppData",
+      "method": "LoadGame",
+      "parameters": [
+        "System.Int32",
+        "Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray`1<System.Byte>"
+      ]
+    },
+    {
+      "type": "main.AppData",
+      "method": "NewGame",
+      "parameters": [
+        "System.Int32",
+        "System.Boolean"
+      ]
+    },
+    {
+      "type": "main.AppData",
+      "method": "Init",
+      "parameters": []
+    }
+  ],
+  "samples": []
+}

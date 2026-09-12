@@ -1,8 +1,16 @@
 # 开罗游戏工具箱
 
-Windows x64 启动器，当前版本 **v1.0 Beta 3**（内部版本 1.0.3）。管理 Steam 与非 Steam 开罗游戏，提供游戏专用 Mod 的安装、更新、删除与实时控制。
+Windows x64 启动器，当前开发版本 **v1.0 Beta 4**（内部版本 1.0.4）。管理 Steam 与非 Steam 开罗游戏，提供游戏专用 Mod 的安装、更新、删除与实时控制。
 
 界面支持简体中文、繁体中文、英文、日文。内置 63 款游戏目录、Steam 译名资料及拼音搜索索引。语言在「设置 → 用户界面」中切换，即时重建页面；主题继续支持跟随系统、浅色和深色。
+
+## v1.0 Beta 4：创造都市岛物语与模组工作流
+
+- Dream Town Island（创造都市岛物语，AppID `2488340`）提供金钱、点数、建筑数量、道具四项控制；四种点数共用一个开关。倍率为 **0x 不扣款、1x 等额反加、20x 二十倍反加**，关闭开关恢复正常消耗。资金不足、解锁和游戏上限仍由游戏判断。
+- 点数、建筑和道具已由维护者实测确认。最新金钱修订增加直接写入余额的入口，并排除新游戏、读档和新存档首次赋值；维护者于 2026-09-13 确认本轮所有修改完全正常，包含金钱修订、三档倍率与启动器调整。详情见 [开发记录](Mods/Games/DreamTownIsland/DEVELOPMENT.md)。
+- 正常模式按游戏定义翻译资源最终结果，开发模式保留原文。运行日志新增清空、自动刷新开关；游戏 Session 改变或日志文件重写时清除旧内容。清空只影响显示，不删除磁盘日志；关闭刷新期间游戏继续记录，恢复后增量读取。最多保留 500 行。
+- 游戏目录／模组控制改为紧凑分段切换。倍率档位来自游戏定义；旧哆啦A梦载荷及其 1／2／5／20 档保持兼容，不依赖已删除的测试游戏重新编译。
+- 最终构建位于 `.Build/Publish/v1.0-Beta-4/KairosoftGameToolbox.exe`，ZIP 位于 `.Build/Package/`。Beta 不创建 GitHub Release。
 
 ## v1.0 Beta 3
 
@@ -97,6 +105,7 @@ Steam API Key 是可选项，仅用于拥有状态、游玩时长及最近游玩
 | `Mods/Games/DoraemonDorayakiShopStory/Payload` | 允许提交的自有专用模组 DLL |
 | `Mods/Games/DoraemonDorayakiShopStory/definition.json` | 游戏指纹、运行组件、四语言功能与日志规则 |
 | `Mods/Shared` | 启动器与模组共同使用的协议源码 |
+| `Mods/Games/DreamTownIsland` | 四项反加验收版、观察源码参考、专用定义、自有 DLL 与阶段证据 |
 | `Mods/Runtime/Notices` | 共享组件许可声明，无运行组件二进制 |
 | `Mods/ControlTests`、`Mods/MetadataInspect` | 协议／倍率测试及只读元数据工具 |
 | `.TestGames` | 本地合法游戏测试副本、BepInEx 与 interop；绝不提交 |
@@ -114,10 +123,10 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 .\Scripts\TestLocalization.ps1
 .\Scripts\TestBundledRuntime.ps1
-.\Scripts\BuildRelease.ps1 -Version 1.0.3 -SkipLaunchCheck
+.\Scripts\BuildRelease.ps1 -Version 1.0.4 -SkipLaunchCheck
 ```
 
-普通启动器构建使用已提交的专用 DLL，不需要商业游戏。修改模组源码后执行：
+普通启动器构建使用仓库专用 DLL，不需要商业游戏。以下脚本仅适用于哆啦A梦；旧测试游戏已删除，需另行提供该游戏匹配的依赖才能重编，不能传入 Dream Town Island 目录：
 
 ```powershell
 .\Scripts\UpdateBundledMod.ps1 -TestGameDirectory .\.TestGames
@@ -125,7 +134,9 @@ dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 
 该脚本编译插件、检查 11 个实际目标签名、核对游戏指纹、更新自有 DLL 及清单，不启动或部署游戏。游戏版本变化时必须人工检查兼容性，不自动更新目标指纹。
 
-发布输出：`.Build/Publish/v1.0-Beta-3/KairosoftGameToolbox.exe` 与 `.Build/Package/KairosoftGameToolbox-v1.0-Beta-3-win-x64.zip`。ZIP 只有一个 EXE，专用 DLL 内嵌其中，共享运行组件不内嵌。
+Dream Town Island 使用 `Scripts/BuildGameMod.ps1 -GameFolder DreamTownIsland -GameDirectory <目录> -RuntimeDirectory <已校验运行组件解压目录>`，具体步骤见该游戏开发记录。
+
+发布输出：`.Build/Publish/v1.0-Beta-4/KairosoftGameToolbox.exe` 与 `.Build/Package/KairosoftGameToolbox-v1.0-Beta-4-win-x64.zip`。ZIP 只有一个 EXE，专用 DLL 内嵌其中，共享运行组件不内嵌。
 
 本轮不使用 computer use，不自动启动游戏。`-SkipLaunchCheck` 表示窗口和游戏内效果由使用者手动验证；自动测试与静态签名检查不能证明 IL2CPP 钩子运行稳定。历史观察版偶发无响应尚无确定根因，本版取消全局数值轮询与热键并限制日志队列，仍需实际过夜、训练、赠送和重连测试。
 

@@ -16,6 +16,8 @@
     <EmbeddedResource Include="../Launcher/Data/KairosoftGames.json" LogicalName="GameNames.json" />
     <Compile Include="../../Mods/Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />
     <EmbeddedResource Include="../../Mods/Games/DoraemonDorayakiShopStory/definition.json" LogicalName="Mods.2934180.definition.json" />
+    <EmbeddedResource Include="../../Mods/Games/DreamTownIsland/definition.json" LogicalName="Mods.2488340.definition.json" />
+    <EmbeddedResource Include="../../Mods/Games/DreamTownIsland/Payload/BepInEx/plugins/KairoMods.DreamTownIsland/KairoMods.DreamTownIsland.dll" LogicalName="ModPayload.2488340.BepInEx/plugins/KairoMods.DreamTownIsland/KairoMods.DreamTownIsland.dll" />
     <EmbeddedResource Include="../../Mods/Games/DoraemonDorayakiShopStory/Payload/BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll" LogicalName="ModPayload.2934180.BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll" />
   </ItemGroup>
 </Project>

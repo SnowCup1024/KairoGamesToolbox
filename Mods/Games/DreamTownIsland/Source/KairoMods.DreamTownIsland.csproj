@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>1.0.4</Version>
+    <RuntimeDirectory Condition="'$(RuntimeDirectory)' == ''">$(MSBuildThisFileDirectory)../../../../.Build/Dependencies/BepInEx-IL2CPP-x86-788</RuntimeDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="control.json" LogicalName="ControlPlan.json" />
+    <!-- Keep the previous probe as development reference, outside the functional payload. -->
+    <Compile Remove="GameObservation.cs;ObservationPlan.cs;ObservationLog.cs;LoadProbeServer.cs" />
+    <Compile Include="../../../Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />
+    <Reference Include="BepInEx.Core"><HintPath>$(RuntimeDirectory)/BepInEx/core/BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP"><HintPath>$(RuntimeDirectory)/BepInEx/core/BepInEx.Unity.IL2CPP.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(RuntimeDirectory)/BepInEx/core/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2CppInterop.Runtime"><HintPath>$(RuntimeDirectory)/BepInEx/core/Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameDirectory)/BepInEx/interop/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Il2Cppmscorlib"><HintPath>$(GameDirectory)/BepInEx/interop/Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

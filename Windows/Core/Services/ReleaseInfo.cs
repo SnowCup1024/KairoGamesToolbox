@@ -2,7 +2,7 @@ namespace KairosoftGameToolbox.Services;
 
 public static class ReleaseInfo
 {
-    public const string Version = "1.0.3";
+    public const string Version = "1.0.4";
     public const bool IsBeta = true;
     public static string DisplayVersion => FormatDisplay(Version, IsBeta);
 

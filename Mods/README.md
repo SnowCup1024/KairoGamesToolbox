@@ -2,7 +2,7 @@
 
 当前专用模组：哆啦A梦的铜锣烧店物语，v1.0 Beta-2（内部 1.0.2），Steam AppID `2934180`。目录规则和发布规则以根目录 [CONTRIBUTING.md](../CONTRIBUTING.md) 为准。
 
-启动器已升级为 v1.0 Beta 3；本轮仅修改启动器版本和打包，专用模组仍为上述版本，不重新编译或变更安装指纹。
+启动器为 v1.0 Beta 4，Dream Town Island（AppID `2488340`）专用模组 1.0.4 / control-3 提供金钱、点数、建筑数量、道具四项控制。维护者于 2026-09-13 确认四项控制、金钱修订、三档倍率和本轮启动器修改全部正常。证据见 [开发记录](Games/DreamTownIsland/DEVELOPMENT.md)。
 
 ## 文件边界
 
@@ -22,7 +22,7 @@
 {"Protocol":2,"Action":"status","Features":null}
 ```
 
-`set` 必须携带全部五项状态，名称与倍率均验证通过才整体替换。`FeatureState` 包含 `Enabled` 和 `Multiplier`，倍率只允许 1、2、5、20。响应包含 Protocol、AppId、Directory、Session、Ready、Features、Error；Session 是本次游戏进程的唯一标识。旧观察版协议 1 不作为可控制的新版模组使用。
+`set` 必须携带目标游戏定义的全部功能状态，名称与倍率均验证通过才整体替换。哆啦A梦为五项，Dream Town Island 为四项；旧的零功能探针和六项控制版需通过新启动器更新。`FeatureState` 包含 `Enabled` 和 `Multiplier`，共享协议兼容 0、1、2、5、20，具体游戏通过定义的 `multiplierSteps` 和插件设置校验限制档位。Dream Town Island 为 0、1、20；既有哆啦A梦载荷保持 1、2、5、20，不向旧插件发送新增 0 档。响应包含 Protocol、AppId、Directory、Session、Ready、Features、Error；Session 是本次游戏进程的唯一标识。旧观察版协议 1 不作为可控制的新版模组使用。
 
 `Ready` 表示可接收设置，不代表已加载存档。模组先启动控制服务，读取原生 AppData 的 instance_ 字段，等实际单例非空后再安装钩子，不能通过启动器命令强制初始化游戏静态构造函数。安装失败后报告错误并要求重启，不重复安装部分钩子。无 F8／F9 或其他独立控制热键。
 
@@ -42,13 +42,13 @@
 
 同线程、同资源及同对象的嵌套入口只由最外层结算，避免赠送调用 SubStock 时重复补回；补回触发的 Add 方法不再被重复记录。Harmony finalizer 必须释放嵌套状态并保留原异常。void 与 long 方法使用不同 postfix，void 方法禁止声明 `__result`。仅发生反加时更新 long 返回结果。
 
-本版不读取全局标量快照，不遍历角色或道具集合；只在实际入口执行时读取对应余额。反加尚需游戏内逐项验证，尤其 F 点和未来币的实际扣除场景。不要用编译成功代替真实游戏验证。
+本版不读取全局标量快照，不遍历角色或道具集合；只在实际入口执行时读取对应余额。哆啦A梦五项反加已有维护者实测确认；后续改动仍需针对受影响的消费场景验证，不用编译成功代替实际游戏验证。
 
 ## 日志
 
 模组记录最终 `ResourceResult`，包含时间、事件编号、资源 ID、before、after、delta。日志队列最多 1000 条，每帧最多输出 20 条；超限报告丢弃数量。补回引起的嵌套 Add 不重复作为玩家收入展示。
 
-启动器增量读取 `BepInEx/LogOutput.log`，每秒最多读取 64KiB，等待完整 UTF-8 行并识别文件截断，界面最多 500 行。识别到的资源结果按 `definition.json` 的 `LogTemplates` 与功能 `LogNames` 翻译，例如“增加金钱 150”；其他诊断保留原文，不能伪装成成功事件。`Development=true` 时所有日志保留原文。
+启动器增量读取 `BepInEx/LogOutput.log`，每秒最多读取 64KiB，等待完整 UTF-8 行并识别文件截断，界面最多 500 行。文件被截断或重写、游戏 Session 更新时清除旧显示；手动清空推进读取游标，不删除磁盘日志。自动刷新开关暂停／恢复增量读取。识别到的资源结果按 `definition.json` 的 `LogTemplates` 与功能 `LogNames` 翻译，例如“增加金钱 150”；其他诊断保留原文，不能伪装成成功事件。`Development=true` 时所有日志保留原文。
 
 不通过嵌入外部控制台窗口实现日志界面。插件移除控制台日志监听器、分离 BepInEx 控制台并保存关闭设置，保留磁盘日志。首次旧配置可能在插件加载前短暂显示控制台，游戏窗口不隐藏。
 

@@ -24,8 +24,18 @@ static class ModFeatureChecks
             File.WriteAllText(plugin, "synthetic");
             check("存在游戏与模组文件时允许尝试连接", ModFeatures.CanConnect(2934180, root));
             check("其他游戏不能误用当前模组控制", !ModFeatures.CanConnect(2191490, root));
+            check("新游戏不会误用哆啦A梦插件文件", !ModFeatures.CanConnect(2488340, root));
             File.Delete(plugin);
             check("删除模组后再次禁止连接", !ModFeatures.CanConnect(2934180, root));
+            var probe = BundledModService.ForGame(2488340)!;
+            check("都市岛验收版提供四项修改且点数已合并", !probe.Development && probe.MultiplierSteps!.SequenceEqual(new[] { 0, 1, 20 }) && probe.Features.Count == 4 && probe.Features.Count(f => f.Id == "pointReverse") == 1);
+            var probeFile = Path.Combine(root, probe.Files.Single().Path);
+            Directory.CreateDirectory(Path.GetDirectoryName(probeFile)!);
+            File.WriteAllText(probeFile, "synthetic");
+            check("按新游戏定义定位插件并连接", ModFeatures.CanConnect(2488340, root));
+            check("探针不允许旧游戏误连接", !ModFeatures.CanConnect(2934180, root));
+            using var payload = typeof(BundledModService).Assembly.GetManifestResourceStream("ModPayload.2488340." + probe.Files.Single().Path);
+            check("新游戏内嵌插件指纹匹配", payload != null && Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(payload)) == probe.Files.Single().Sha256);
         }
         finally { Directory.Delete(root, true); }
     }

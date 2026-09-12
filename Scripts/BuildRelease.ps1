@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.([1-9]\d*)$')]
-    [string]$Version = '1.0.1',
+    [string]$Version = '1.0.2',
     [switch]$SkipLaunchCheck
 )
 
@@ -11,6 +11,11 @@ Set-StrictMode -Version Latest
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $releaseInfo = Get-Content -LiteralPath (Join-Path $repositoryRoot 'Windows/Core/Services/ReleaseInfo.cs') -Raw
 if ($releaseInfo -notmatch ('Version = "' + [regex]::Escape($Version) + '"')) { throw 'ReleaseInfo.Version and package version must match.' }
+$number = [Version]::Parse($Version)
+$isBeta = $releaseInfo -match 'IsBeta = true'
+$displayVersion = "v$($number.Major).$($number.Minor)"
+if ($isBeta) { $displayVersion += " Beta-$($number.Build)" }
+$artifactVersion = $displayVersion.Replace(' ', '-')
 $windowsRoot = Join-Path $repositoryRoot 'Windows'
 $solution = Join-Path $windowsRoot 'KairosoftGameToolbox.sln'
 $project = Join-Path $windowsRoot 'Launcher\KairosoftGameToolbox.csproj'
@@ -18,8 +23,8 @@ $testProject = Join-Path $windowsRoot 'Test\LauncherSmokeTest.csproj'
 $buildRoot = Join-Path $repositoryRoot '.Build'
 $publishRoot = Join-Path $buildRoot 'Publish'
 $packageRoot = Join-Path $buildRoot 'Package'
-$releaseName = "KairosoftGameToolbox-v$Version-win-x64"
-$publishDirectory = Join-Path $publishRoot "v$Version"
+$releaseName = "KairosoftGameToolbox-$artifactVersion-win-x64"
+$publishDirectory = Join-Path $publishRoot $artifactVersion
 $stagingDirectory = Join-Path $publishRoot ".$releaseName-$PID"
 $packagePath = Join-Path $packageRoot "$releaseName.zip"
 $temporaryPackagePath = Join-Path $packageRoot ".$releaseName-$PID.zip"

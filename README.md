@@ -1,10 +1,21 @@
 # 开罗游戏工具箱
 
-Windows x64 启动器，当前版本 **v1.0.1 (Beta)**。管理 Steam 与非 Steam 开罗游戏，提供游戏专用 Mod 的安装、更新、删除与实时控制。
+Windows x64 启动器，当前版本 **v1.0 Beta-2**（内部版本 1.0.2）。管理 Steam 与非 Steam 开罗游戏，提供游戏专用 Mod 的安装、更新、删除与实时控制。
 
 界面支持简体中文、繁体中文、英文、日文。内置 63 款游戏目录、Steam 译名资料及拼音搜索索引。语言在「设置 → 用户界面」中切换，即时重建页面；主题继续支持跟随系统、浅色和深色。
 
-## v1.0.1 (Beta)
+## v1.0 Beta-2
+
+五项反加和前一轮修复已由用户手动验证通过；本轮继续调整控件对齐和手动刷新，不发布 GitHub Release。
+
+- 修复钩子等待条件导致全部控制未生效：观察实际 AppData 单例，不再要求所有原生类型标志同时初始化；就绪／等待／失败均有日志。
+- 每项文字、开关与滑动条同一行；拖动结束后合并发送，避免来回跳动与禁用。
+- 安装状态检查版本与文件指纹，完整的最新 Mod 禁止重复更新。
+- 日志支持跨行选择与复制全部；API Key 掩码改为占位显示，点击／键盘进入时清空重填。
+- 当前语言最长标签作为统一列宽，开关与倍率条纵向对齐，空间不足时切换单列。
+- 手动刷新立即显示连接中，等待正在进行的检查后执行；失败有提示，总等待上限 6 秒，自动检查仍为 15 秒。
+- 对外显示 v1.0 Beta-2，内部版本保持 1.0.2。
+
 
 - 游戏详情分为「游戏目录与模组状态」「模组控制」两个页签。
 - 非 Steam 路径旁可移除库记录，不删除游戏文件。
@@ -20,7 +31,7 @@ Windows x64 启动器，当前版本 **v1.0.1 (Beta)**。管理 Steam 与非 Ste
 1. 启动工具箱。Steam 路径会自动检测，也可在设置中填写并验证。
 2. 非 Steam 游戏点击「添加非 Steam 游戏」，选择直接包含 `KairoGames.exe` 的目录。依据 `KairoGames_Data/app.info` 与游戏目录识别身份，不以文件夹名猜测。
 3. 进入游戏详情，在「游戏目录与模组状态」点击「安装 Mod」。首次安装需要联网下载共享运行组件；游戏代码及元数据指纹不匹配时拒绝安装。
-4. 启动游戏，打开「模组控制」。连接后即可设置开关，无需按热键或确认进入存档。模组内部等待游戏类型自然初始化后才安装游戏钩子，设置可以提前选择。
+4. 启动游戏，打开「模组控制」。连接后即可设置开关，无需按热键或确认进入存档。模组内部等待游戏 AppData 单例创建后才安装游戏钩子，设置可以提前选择。
 5. 退出游戏后可更新或删除 Mod。安装、更新和删除均保留游戏原文件；更新与删除只处理已识别、指纹匹配的受管理文件。
 
 反加按**实际扣除量**计算。例如实际扣除 10，选择 5x，最终相对于扣款前净增加 50。正常收入不放大；购买资格仍由游戏判断。训练点作用于发生消费的角色，道具作用于对应库存。所有选项默认关闭，模组不提供独立热键。
@@ -79,7 +90,7 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 .\Scripts\TestLocalization.ps1
 .\Scripts\TestBundledRuntime.ps1
-.\Scripts\BuildRelease.ps1 -Version 1.0.1 -SkipLaunchCheck
+.\Scripts\BuildRelease.ps1 -Version 1.0.2 -SkipLaunchCheck
 ```
 
 普通启动器构建使用已提交的专用 DLL，不需要商业游戏。修改模组源码后执行：
@@ -90,12 +101,14 @@ dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 
 该脚本编译插件、检查 11 个实际目标签名、核对游戏指纹、更新自有 DLL 及清单，不启动或部署游戏。游戏版本变化时必须人工检查兼容性，不自动更新目标指纹。
 
-发布输出：`.Build/Publish/v1.0.1/KairosoftGameToolbox.exe` 与 `.Build/Package/KairosoftGameToolbox-v1.0.1-win-x64.zip`。ZIP 只有一个 EXE，专用 DLL 内嵌其中，共享运行组件不内嵌。
+发布输出：`.Build/Publish/v1.0-Beta-2/KairosoftGameToolbox.exe` 与 `.Build/Package/KairosoftGameToolbox-v1.0-Beta-2-win-x64.zip`。ZIP 只有一个 EXE，专用 DLL 内嵌其中，共享运行组件不内嵌。
 
 本轮不使用 computer use，不自动启动游戏。`-SkipLaunchCheck` 表示窗口和游戏内效果由使用者手动验证；自动测试与静态签名检查不能证明 IL2CPP 钩子运行稳定。历史观察版偶发无响应尚无确定根因，本版取消全局数值轮询与热键并限制日志队列，仍需实际过夜、训练、赠送和重连测试。
 
 ## 版本与贡献
 
-`v0.0.1`—`v0.2.4` 是早期测试阶段。新版本采用 `vx.y.z`，`z` 必须大于零。Beta 在普通界面显示 `v1.0.1 (Beta)`，Git／标签等技术位置使用 `v1.0.1`；Beta 不创建 GitHub Release，也不标记为 GitHub prerelease。一般发行版两处显示相同，例如 `v1.0.20`。
+自 v1.0.1 起进行的版本号规范调整，是为本版本 v1.0 Beta-2 做准备。本次确认的内外版本映射为最终规范，无意外不再修改；后续变更须有明确理由并获得维护者确认，禁止随版本迭代自行更换规则。
+
+`v0.0.1`—`v0.2.4` 是早期测试阶段。对外：测试版 `v2.3 Beta-z`，正式版 `v2.3`；内部：测试版 `2.3.z`，正式版使用最后一次测试的 z 加 1，例如 Beta-4 为 `2.3.4`，随后正式版为 `2.3.5`。z 不允许为 0。Beta 不创建 GitHub Releases，正式版以 GitHub Releases 发布为准。文件名中的空格替换为连字符。
 
 完整规范、技术约束、测试与提交规则见 [CONTRIBUTING.md](CONTRIBUTING.md)，模组协议见 [Mods/README.md](Mods/README.md)。项目采用 [GPL-3.0](LICENSE)；第三方组件保留各自许可。

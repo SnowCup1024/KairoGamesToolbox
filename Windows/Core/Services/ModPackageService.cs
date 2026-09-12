@@ -158,6 +158,25 @@ public static class ModPackageService
     public static bool HasInstalledMod(string root) => File.Exists(Path.Combine(root, ReceiptName))
         || File.Exists(Path.Combine(root, "BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll"));
 
+    public static bool IsCurrent(string root, GameModDefinition definition)
+    {
+        try
+        {
+            if (!File.Exists(SafePath(root, ReceiptName))) return false;
+            var receipt = Previous(root, definition.AppId, definition.GameFolder);
+            if (receipt == null || receipt.Version != definition.Version) return false;
+            var files = receipt.Files.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
+            if (!files.ContainsKey("winhttp.dll") || !files.ContainsKey("BepInEx/core/BepInEx.Unity.IL2CPP.dll")) return false;
+            if (definition.Files.Any(f => !files.TryGetValue(f.Path, out var installed)
+                || !installed.Sha256.Equals(f.Sha256, StringComparison.OrdinalIgnoreCase))) return false;
+            return receipt.Files.All(f => File.Exists(SafePath(root, f.Path)) && Matches(SafePath(root, f.Path), f.Sha256));
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or JsonException or ArgumentException or NullReferenceException)
+        {
+            return false;
+        }
+    }
+
     private static ModManifest? Previous(string root, uint appId, string folder)
     {
         var receipt = SafePath(root, ReceiptName);

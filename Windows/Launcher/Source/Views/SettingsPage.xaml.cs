@@ -27,6 +27,8 @@ public sealed partial class SettingsPage : UserControl
     public SettingsPage()
     {
         InitializeComponent();
+        ApiKeyBox.AddHandler(UIElement.PointerPressedEvent,
+            new Microsoft.UI.Xaml.Input.PointerEventHandler(ApiKeyBox_PointerPressed), true);
         PageMotion.Constrain(PageScroll, PageBody);
         PageBody.SizeChanged += (_, _) => ApiButtons.Orientation = PageBody.ActualWidth < 500 ? Orientation.Vertical : Orientation.Horizontal;
         Loaded += (_, _) => LoadFromSettings();
@@ -48,7 +50,8 @@ public sealed partial class SettingsPage : UserControl
             _apiKeyValue = s.SteamWebApiKey;
             _apiKeyDirty = false;
             _apiKeyMasked = !string.IsNullOrWhiteSpace(_apiKeyValue);
-            ApiKeyBox.Text = _apiKeyMasked ? MaskApiKey(_apiKeyValue!) : "";
+            ApiKeyBox.Text = "";
+            ApiKeyBox.PlaceholderText = _apiKeyMasked ? MaskApiKey(_apiKeyValue!) : L.T("手动输入 API Key");
             ThemeCombo.SelectedIndex = s.ThemePreference switch
             {
                 "light" => 1,
@@ -125,11 +128,15 @@ public sealed partial class SettingsPage : UserControl
         }
     }
 
+    private void ApiKeyBox_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        => ApiKeyBox_GotFocus(sender, e);
+
     private void ApiKeyBox_GotFocus(object sender, RoutedEventArgs e)
     {
         if (_loading || !_apiKeyMasked) return;
         _loading = true;
         ApiKeyBox.Text = "";
+        ApiKeyBox.PlaceholderText = L.T("手动输入 API Key");
         ApiKeyBox.SelectAll();
         _loading = false;
         _apiKeyMasked = false;
@@ -143,10 +150,20 @@ public sealed partial class SettingsPage : UserControl
         DispatcherQueue.TryEnqueue(() =>
         {
             var focused = Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(XamlRoot);
-            if (ReferenceEquals(focused, SaveApiKeyButton) || ReferenceEquals(focused, ApiKeyBox))
+            if (IsWithin(focused as DependencyObject, SaveApiKeyButton) || IsWithin(focused as DependencyObject, ApiKeyBox))
                 return;
             RestoreApiKey();
         });
+    }
+
+    private static bool IsWithin(DependencyObject? child, DependencyObject ancestor)
+    {
+        while (child != null)
+        {
+            if (ReferenceEquals(child, ancestor)) return true;
+            child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(child);
+        }
+        return false;
     }
 
     private void RestoreApiKey()
@@ -158,7 +175,7 @@ public sealed partial class SettingsPage : UserControl
 
     private void ApiKeyBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (!_loading)
+        if (!_loading && !_apiKeyMasked)
         {
             _apiKeyDirty = true;
             _apiKeyMasked = false;
@@ -186,7 +203,8 @@ public sealed partial class SettingsPage : UserControl
     {
         _loading = true;
         _apiKeyMasked = !string.IsNullOrWhiteSpace(_apiKeyValue);
-        ApiKeyBox.Text = _apiKeyMasked ? MaskApiKey(_apiKeyValue!) : "";
+        ApiKeyBox.Text = "";
+            ApiKeyBox.PlaceholderText = _apiKeyMasked ? MaskApiKey(_apiKeyValue!) : L.T("手动输入 API Key");
         _loading = false;
     }
 

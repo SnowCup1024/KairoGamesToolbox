@@ -723,5 +723,25 @@
     "zh-TW": "尚未收錄此遊戲的身分標識：{0}。未新增；請提供 app.info 以補充識別。",
     "en": "Unknown game identity: {0}. Not added. Provide app.info to add recognition.",
     "ja": "未登録のゲーム識別情報：{0}。追加していません。識別対応のためapp.infoを提供してください。"
+  },
+  "已安装最新 Mod": {
+    "zh-TW": "已安裝最新 Mod",
+    "en": "Latest Mod installed",
+    "ja": "最新の Mod がインストールされています"
+  },
+  "复制全部日志": {
+    "zh-TW": "複製全部日誌",
+    "en": "Copy all logs",
+    "ja": "ログをすべてコピー"
+  },
+  "正在连接…": {
+    "zh-TW": "正在連線…",
+    "en": "Connecting…",
+    "ja": "接続中…"
+  },
+  "连接失败，请确认游戏已启动且 Mod 已加载，再重试。": {
+    "zh-TW": "連線失敗，請確認遊戲已啟動且 Mod 已載入，再重試。",
+    "en": "Connection failed. Make sure the game is running with the Mod loaded, then retry.",
+    "ja": "接続に失敗しました。ゲームが起動し、Mod が読み込まれていることを確認して再試行してください。"
   }
 }

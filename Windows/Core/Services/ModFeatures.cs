@@ -10,5 +10,5 @@ public static class ModFeatures
     public static bool CanConnect(uint appId, string? directory) => ForGame(appId).Count > 0
         && GameFolderService.ContainsExecutable(directory) && ModPackageService.HasInstalledMod(directory!)
         && File.Exists(Path.Combine(directory!, "BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll"));
-    public static int Columns(int count, double width) => count > 1 && double.IsFinite(width) && width >= 640 ? 2 : 1;
+    public static int Columns(int count, double width) => count > 1 && double.IsFinite(width) && width >= 880 ? 2 : 1;
 }

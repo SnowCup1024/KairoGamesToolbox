@@ -119,7 +119,7 @@
   "appId": 2934180,
   "files": [
     {
-      "sha256": "9FD247731D533C310558046B9E74D0817F0862E35738FFACA438F908803BA825",
+      "sha256": "E29FA92666164EA4C3382C5612B40C4BB2D8574FFB8F622307A0A6FCF95C00FF",
       "path": "BepInEx/plugins/KairoMods.Observer/KairoMods.Observer.dll"
     }
   ],
@@ -130,7 +130,7 @@
     "url": "https://builds.bepinex.dev/projects/bepinex_be/788/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.788%2B5b766a3.zip"
   },
   "gameFolder": "DoraemonDorayakiShopStory",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "logTemplates": {
     "zh-CN.decrease": "减少",
     "en": "{0}: {1} {3} {2}",

@@ -51,13 +51,16 @@ internal sealed class GameObservation
 
     public static unsafe bool NativeTypesReady()
     {
-        // Read native metadata flags, without running the generated managed .cctor.
-        foreach (var (ns, name) in new[] { ("", "S"), ("ui", "AppData"), ("data", "Character"), ("data", "ItemData") })
-        {
-            var pointer = IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", ns, name);
-            if (pointer == IntPtr.Zero || !UnityVersionHandler.Wrap((Il2CppClass*)pointer).InitializedAndNoError) return false;
-        }
-        return true;
+        // S is a static forwarding facade: it need not be initialized by native gameplay.
+        // Requiring its metadata flags (and every optional resource type) blocked all hooks.
+        // Observe the game's existing singleton without invoking its generated .cctor.
+        var app = IL2CPP.GetIl2CppClass("Assembly-CSharp.dll", "ui", "AppData");
+        if (app == IntPtr.Zero) return false;
+        var field = IL2CPP.GetIl2CppField(app, "instance_");
+        if (field == IntPtr.Zero) return false;
+        IntPtr instance = IntPtr.Zero;
+        IL2CPP.il2cpp_field_static_get_value(field, &instance);
+        return instance != IntPtr.Zero;
     }
 
     public void Install()

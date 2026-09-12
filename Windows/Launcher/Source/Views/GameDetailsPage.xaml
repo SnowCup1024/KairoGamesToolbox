@@ -55,8 +55,13 @@
      <TextBlock x:Name="ControlFeedback"/>
     </StackPanel></Border>
     <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
-     <TextBlock Text="{l:Text Key='运行日志'}" Style="{StaticResource SectionTitleStyle}"/>
-     <ScrollViewer x:Name="LogScroll" Height="300" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="LogLines" Spacing="4"/></ScrollViewer>
+     <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <TextBlock Text="{l:Text Key='运行日志'}" Style="{StaticResource SectionTitleStyle}"/>
+      <Button Grid.Column="1" Content="{l:Text Key='复制全部日志'}" Click="CopyLogs_Click"/>
+     </Grid>
+     <ScrollViewer x:Name="LogScroll" Height="300" HorizontalScrollBarVisibility="Disabled">
+      <RichTextBlock x:Name="LogLines" FontFamily="Cascadia Mono, Consolas" FontSize="12" IsTextSelectionEnabled="True" TextWrapping="Wrap"/>
+     </ScrollViewer>
     </StackPanel></Border>
    </StackPanel>
    <TextBlock x:Name="ResultText" TextWrapping="Wrap" IsTextSelectionEnabled="True"/>

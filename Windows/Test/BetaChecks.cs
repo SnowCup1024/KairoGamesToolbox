@@ -8,7 +8,12 @@ static class BetaChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("Beta 显示版本带括号，数值版本不带后缀", ReleaseInfo.DisplayVersion == "v1.0.1 (Beta)" && Version.Parse(ReleaseInfo.Version).Build > 0);
+        check("本版对外 v1.0 Beta-2，内部 1.0.2", ReleaseInfo.DisplayVersion == "v1.0 Beta-2" && Version.Parse(ReleaseInfo.Version).Build > 0);
+        check("正式版隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3");
+        check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta-4");
+        bool rejectedZero = false;
+        try { ReleaseInfo.FormatDisplay("2.3.0", true); } catch (ArgumentException) { rejectedZero = true; }
+        check("版本序号不允许零", rejectedZero);
         var definition = BundledModService.ForGame(2934180)!;
         check("五项功能定义来自游戏模组", definition.Features.Select(f => f.Id).ToHashSet().SetEquals(new[] { "moneyReverse", "fPointReverse", "coinReverse", "trainingReverse", "itemReverse" }));
         var searchable = new KairosoftGameToolbox.Models.KairoGame { AppId = 2934180, EnglishName = "Doraemon Dorayaki Shop Story" };
@@ -32,6 +37,34 @@ static class BetaChecks
         string root = Path.Combine(Path.GetTempPath(), "KairoBeta-" + Guid.NewGuid()); Directory.CreateDirectory(root);
         try
         {
+            check("无安装记录不判断为最新", !ModPackageService.IsCurrent(root, definition));
+            var files = new List<ModFile>();
+            foreach (var file in definition.Files)
+            {
+                string destination = Path.Combine(root, file.Path);
+                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                using var input = typeof(L).Assembly.GetManifestResourceStream("ModPayload.2934180." + file.Path)!;
+                using (var output = File.Create(destination)) input.CopyTo(output);
+                files.Add(file);
+            }
+            foreach (var name in new[] { "winhttp.dll", "BepInEx/core/BepInEx.Unity.IL2CPP.dll" })
+            {
+                string destination = Path.Combine(root, name); Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                File.WriteAllText(destination, "synthetic runtime");
+                files.Add(new(name, Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(destination)))));
+            }
+            var receipt = new ModManifest(1, definition.AppId, definition.GameFolder, definition.Version, "Beta", "test", definition.Targets, files);
+            string receiptPath = Path.Combine(root, ".kairomods-install.json");
+            File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt));
+            check("当前版本且所有管理文件完整时为最新", ModPackageService.IsCurrent(root, definition));
+            File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt with { Version = "1.0.1" }));
+            check("旧版安装记录允许更新", !ModPackageService.IsCurrent(root, definition));
+            File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt));
+            File.AppendAllText(Path.Combine(root, definition.Files[0].Path), "modified");
+            check("篡改专用 DLL 后不能声称最新完整", !ModPackageService.IsCurrent(root, definition));
+            check("跨游戏安装记录不能声称最新", !ModPackageService.IsCurrent(root, definition with { AppId = 1 }));
+            File.WriteAllText(receiptPath, "invalid json");
+            check("损坏安装记录不导致状态检测崩溃", !ModPackageService.IsCurrent(root, definition));
             var library = new NonSteamLibraryService(Path.Combine(root, "library.json")); library.Save(1, root); library.Remove(1);
             check("移除非 Steam 只删除库记录，目录仍存在", library.Load().Count == 0 && Directory.Exists(root));
             var states = definition.Features.ToDictionary(f => f.Id, _ => new FeatureState()); states["moneyReverse"] = new(true, 5);

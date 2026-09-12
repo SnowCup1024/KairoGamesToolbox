@@ -1,8 +1,10 @@
 # 模组开发与协议
 
-当前专用模组：哆啦A梦的铜锣烧店物语，v1.0.1 (Beta)，Steam AppID `2934180`。目录规则和发布规则以根目录 [CONTRIBUTING.md](../CONTRIBUTING.md) 为准。
+当前专用模组：哆啦A梦的铜锣烧店物语，v1.0 Beta-2（内部 1.0.2），Steam AppID `2934180`。目录规则和发布规则以根目录 [CONTRIBUTING.md](../CONTRIBUTING.md) 为准。
 
 ## 文件边界
+
+自 v1.0.1 起进行的版本号规范调整，是为本版本 v1.0 Beta-2 做准备。本次确认的内外版本映射为最终规范，无意外不再修改；后续变更须有明确理由并获得维护者确认，禁止随版本迭代自行更换规则。
 
 `Games/<英文无空格游戏名>/Source` 保存源码；`Payload` 仅保存已审核的自有 DLL；`definition.json` 保存版本、开发标记、游戏指纹、运行组件地址／SHA256、专用文件清单、四语言功能与日志规则。共有协议放在 `Shared`。商业游戏、生成的 interop、BepInEx core、dotnet 和完整 ZIP 不提交。
 
@@ -20,7 +22,7 @@
 
 `set` 必须携带全部五项状态，名称与倍率均验证通过才整体替换。`FeatureState` 包含 `Enabled` 和 `Multiplier`，倍率只允许 1、2、5、20。响应包含 Protocol、AppId、Directory、Session、Ready、Features、Error；Session 是本次游戏进程的唯一标识。旧观察版协议 1 不作为可控制的新版模组使用。
 
-`Ready` 表示可接收设置，不代表已加载存档。模组先启动控制服务，等待原生游戏类型自然初始化后再安装钩子，不能通过启动器命令强制初始化游戏静态构造函数。安装失败后报告错误并要求重启，不重复安装部分钩子。无 F8／F9 或其他独立控制热键。
+`Ready` 表示可接收设置，不代表已加载存档。模组先启动控制服务，读取原生 AppData 的 instance_ 字段，等实际单例非空后再安装钩子，不能通过启动器命令强制初始化游戏静态构造函数。安装失败后报告错误并要求重启，不重复安装部分钩子。无 F8／F9 或其他独立控制热键。
 
 仅在模组控制页可见且检测到目标插件时查询，连接前后均为 15 秒；手动刷新也遵循安装检查。页面离开取消请求，旧响应不得更新新页面。状态只在启动器进程内按游戏目录缓存，重连或游戏 Session 改变时恢复；新启动器首次连接发送默认全关闭设置。
 
@@ -58,3 +60,11 @@ dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 本地 `.TestGames` 需提供 BepInEx core 与匹配的已生成 interop，用于编译及只读签名校验。`BuildObserver.ps1` 只构建，明确传入 `-Deploy` 才会向测试游戏复制 DLL，且必须先关闭游戏；正式安装优先通过启动器执行。`MetadataInspect` 只读取元数据，不执行商业游戏程序集。
 
 共享运行组件来源为 [BepInEx 官方构建站](https://builds.bepinex.dev/projects/bepinex_be)。当前固定 Windows x86 IL2CPP 788 包，SHA256 为 `D5954A5993EC39CD1133603D85BFF93875D30B6411B712CC13DCF03C8E08A4D3`。许可文本来自 BepInEx 对应提交及 .NET runtime v6.0.7，位于 `Runtime/Notices`，随安装复制到 `licenses/KairoMods`。
+
+## v1.0 Beta-2 初始化修复
+
+v1.0.1 的四类型 InitializedAndNoError 联合门槛可能因静态转发门面 S 或可选类型尚未初始化而阻止所有钩子安装，表现为只有启动日志而没有 Mod hooks ready。现在在 Unity Update 中读取原生 AppData.instance_，不调用托管游戏单例 getter，不在 Load 中强制初始化。单例存在后安装一次钩子，等待／就绪／异常均写入日志。此修改仍需实际游戏验证，未宣称解决此前偶发无响应。
+
+UIElementsModule 的预加载 Warning 在此前成功的观察与反加日志中也出现；保留原始诊断，不凭此警告判断游戏钩子已失败或修复成功。
+
+用户已确认五项反加实际效果全部正常，前一轮其余修复也已手动通过。本轮仅调整启动器布局、刷新与版本展示，模组源码和已验证载荷不再变更。

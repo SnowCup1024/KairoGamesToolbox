@@ -4,7 +4,7 @@ using KairoMods.Protocol;
 
 namespace KairoMods.Observer;
 
-[BepInPlugin("snowcup.kairomods.observer", "KairoMods.Doraemon", "1.0.1")]
+[BepInPlugin("snowcup.kairomods.observer", "KairoMods.Doraemon", "1.0.2")]
 public sealed class ObserverPlugin : BasePlugin
 {
     private GameObservation observation = null!;
@@ -13,6 +13,7 @@ public sealed class ObserverPlugin : BasePlugin
     private bool attempted;
     private long nextCheck;
     private string? setupError;
+    private bool waitingLogged;
 
     public override void Load()
     {
@@ -34,7 +35,7 @@ public sealed class ObserverPlugin : BasePlugin
         ActivationListener.Pump = Pump;
         AddComponent<ActivationListener>();
         server.Start();
-        Log.LogInfo("KairoMods 1.0.1 | launcher control only | all features OFF | no hotkeys");
+        Log.LogInfo("KairoMods 1.0.2 | launcher control only | all features OFF | no hotkeys");
     }
 
     private void Pump()
@@ -50,6 +51,11 @@ public sealed class ObserverPlugin : BasePlugin
                 {
                     attempted = true;
                     observation.Install();
+                }
+                else if (!waitingLogged)
+                {
+                    waitingLogged = true;
+                    Log.LogInfo("Mod hooks waiting | AppData singleton not created yet | settings accepted, gameplay hooks pending");
                 }
             }
             catch (Exception ex)

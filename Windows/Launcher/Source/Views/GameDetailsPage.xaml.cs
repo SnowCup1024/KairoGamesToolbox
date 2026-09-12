@@ -13,6 +13,7 @@ public sealed partial class GameDetailsPage : UserControl
     private string? target;
     private bool nonSteam;
     private bool busy;
+    private long statusRevision;
     private string FolderName => ModPackageService.GameFolder(game.EnglishName);
     public event EventHandler? BackRequested;
 
@@ -43,7 +44,7 @@ public sealed partial class GameDetailsPage : UserControl
     private void UpdateTarget()
     {
         TargetText.Text = string.IsNullOrWhiteSpace(target) ? L.T("尚未选择游戏目录") : (nonSteam ? L.T("非 Steam · ") : "Steam · ") + target;
-        InstallButton.IsEnabled = BundledModService.ForGame(game.AppId) != null && GameFolderService.ContainsExecutable(target);
+        InstallButton.IsEnabled = false;
         LaunchButton.Content = nonSteam || game.IsInstalled ? L.T("启动游戏") : L.T("打开 Steam 商店");
         var selected = GameFolderService.ContainsExecutable(target);
         GameStatus.Text = $"{(selected && nonSteam ? L.T("已安装 · 非 Steam") : game.LibraryStatusText)} · AppID {game.AppId}";
@@ -55,6 +56,18 @@ public sealed partial class GameDetailsPage : UserControl
         InstalledModText.Text = installed ? L.T("已安装 Mod") : L.T("未安装 Mod");
         ResultText.Text = "";
         RestartControls();
+        _ = RefreshInstalledVersionAsync(++statusRevision, target, installed);
+    }
+
+    private async Task RefreshInstalledVersionAsync(long revision, string? directory, bool installed)
+    {
+        var definition = BundledModService.ForGame(game.AppId);
+        bool latest = installed && definition != null && directory != null
+            && await Task.Run(() => ModPackageService.IsCurrent(directory, definition));
+        if (revision != statusRevision || target != directory) return;
+        InstalledModText.Text = L.T(latest ? "已安装最新 Mod" : installed ? "已安装 Mod" : "未安装 Mod");
+        if (latest) InstalledModText.Text += " · " + ReleaseInfo.FormatDisplay(definition!.Version, ReleaseInfo.IsBeta);
+        InstallButton.IsEnabled = !latest && definition != null && GameFolderService.ContainsExecutable(directory);
     }
 
     private void Back_Click(object sender, RoutedEventArgs e) { if (!busy) BackRequested?.Invoke(this, EventArgs.Empty); }

@@ -6,11 +6,11 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>KairosoftGameToolbox</RootNamespace>
     <AssemblyName>KairosoftGameToolbox</AssemblyName>
-    <!-- v1.0.2：非 Steam 版本 Mod 补丁入口，许可证 GPL-3.0（见仓库根目录 LICENSE） -->
-    <Version>1.0.2</Version>
-    <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
-    <InformationalVersion>1.0.2</InformationalVersion>
+    <!-- v1.0.3：非 Steam 版本 Mod 补丁入口，许可证 GPL-3.0（见仓库根目录 LICENSE） -->
+    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.3</AssemblyVersion>
+    <FileVersion>1.0.3</FileVersion>
+    <InformationalVersion>1.0.3</InformationalVersion>
     <Product>开罗游戏工具箱</Product>
     <ApplicationManifest>Source\app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
@@ -34,6 +34,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <SelfContained>true</SelfContained>
     <PublishSingleFile>true</PublishSingleFile>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <EnableMsixTooling>true</EnableMsixTooling>
     <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>

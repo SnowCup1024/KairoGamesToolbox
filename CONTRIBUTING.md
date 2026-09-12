@@ -4,16 +4,16 @@
 
 ## 版本与发布（必须遵守）
 
-自 v1.0.1 起进行的版本号规范调整，是为本版本 v1.0 Beta-2 做准备。本次确认的内外版本映射为最终规范，无意外不再修改；后续变更须有明确理由并获得维护者确认，禁止随版本迭代自行更换规则。
+自 v1.0.1 起进行的版本号规范调整，是为 v1.0 Beta-2 做准备；v1.0 Beta 3 经维护者确认，为正式版对外名称补充 Release 后缀，并将测试版名称改为 Beta 空格序号，内部编号规则不变。此次内外版本映射为最终规范，无意外不再修改；后续变更须有明确理由并获得维护者确认，禁止随版本迭代自行更换规则。
 
 - `v0.0.1`—`v0.2.4` 为早期测试阶段，保留历史，不重写旧版本语义。
 - x 为重大阶段，y 为一般发布阶段，z 为阶段内测试迭代序号；z 从 1 开始，不允许为 0。
-- 对外版本：测试版 `v2.3 Beta-z`，正式版 `v2.3`。不使用三段数字作为用户可见版本，也不添加 `(Beta)`。
-- 内部版本：测试 Beta-z 对应 `2.3.z`；该阶段正式版使用最后一次测试序号加 1，例如 Beta-4 为 `2.3.4`，随后正式版为 `2.3.5`。正式版的加 1 是升级实际内部版本，不是显示时临时加 1。
-- 本版对外 **v1.0 Beta-2**，内部 **1.0.2**。程序集、模组清单、兼容性与文件版本比较使用内部数字；启动器、文档、发布说明使用对外版本。
-- 文件／目录名将对外版本中的空格换成连字符，例如 `v1.0-Beta-2`；正式版使用 `v2.3`。发布脚本 `-Version` 参数仍为内部三段版本。
+- 对外版本：测试版 `v2.3 Beta z`，正式版 `v2.3 Release`。默认展示不使用三段数字，也不添加 `(Beta)`；关于与设置页点击版本号可切换显示内部 `v2.3.z`，再次点击恢复。版本旁不拼接许可证，许可信息保留在关于页独立卡片中。
+- 内部版本：测试 Beta z 对应 `2.3.z`；该阶段正式版使用最后一次测试序号加 1，例如 Beta 4 为 `2.3.4`，随后正式版为 `2.3.5`。正式版的加 1 是升级实际内部版本，不是显示时临时加 1。
+- 本版启动器对外 **v1.0 Beta 3**，内部 **1.0.3**；未修改的专用模组仍为内部 1.0.2。程序集、模组清单、兼容性与文件版本比较使用内部数字；启动器、文档、发布说明使用对外版本。
+- 文件／目录名将对外版本中的空格换成连字符，例如 `v1.0-Beta-3`；正式版使用 `v2.3-Release`。发布脚本 `-Version` 参数仍为内部三段版本。
 - `ReleaseInfo.Version` 与 `ReleaseInfo.IsBeta` 是版本事实来源；用户可见版本由 `ReleaseInfo.DisplayVersion`／`FormatDisplay` 统一生成。正式发布时修改内部版本并设置 `IsBeta=false`。
-- Beta 不创建 GitHub Release／prerelease；正式版以 GitHub Releases 发布为准。本次允许提交并在全部检查通过后一次推送，不发布 Release。
+- Beta 不创建 GitHub Release／prerelease；正式版以 GitHub Releases 发布为准。本次已获授权：完成构建与检查后提交，最终一次推送；不发布 Release。
 
 ## 仓库与技术分层
 
@@ -23,6 +23,7 @@
 - 游戏插件目标 .NET 6，使用匹配 BepInEx 运行时。不要仅为语言语法升级插件目标框架。
 - `.NET SDK` 由 `global.json` 固定主版本及补丁滚动。生成文件统一受 `Directory.Build.props` 管理，落入 `.Build`。
 - C# 使用四空格缩进、file-scoped namespace、独立行大括号、PascalCase 类型／方法、camelCase 参数／局部变量，保留 nullable 注解。
+- Release 启用 `EnableCompressionInSingleFile=true`，项目文件与发布命令保持一致；继续自包含 .NET／WinUI，不删除运行库。IL 裁剪当前关闭：先处理反射／JSON 警告并验证实际发布产物，才能启用；禁止隐藏裁剪警告代替兼容性处理。包体优化必须分别记录 EXE 和 ZIP 大小，不能将 EXE 收益当作下载收益。
 - 不进行无关格式化、大范围重命名或依赖升级。新增依赖需说明用途和发布体积影响。
 
 ## 文件、游戏与 Git 边界
@@ -83,7 +84,7 @@
 
 ## 清理与测试、审查、提交
 
-本次构建前清空根目录 `.Build`，移除已废弃的 `.Docs`；长期规范保留在 README、CONTRIBUTING 与 Mods/README。删除前校验绝对目标路径及重解析点，禁止影响 `.TestGames` 或存档。
+生成物仅在根目录 `.Build`，已废弃的 `.Docs` 不再使用；长期规范保留在 README、CONTRIBUTING 与 Mods/README。删除前校验绝对目标路径及重解析点，禁止影响 `.TestGames` 或存档。
 
 ```powershell
 dotnet build Windows/KairosoftGameToolbox.sln --configuration Debug
@@ -92,7 +93,7 @@ dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 .\Scripts\TestLocalization.ps1
 .\Scripts\TestBundledRuntime.ps1
 .\Scripts\UpdateBundledMod.ps1 -TestGameDirectory .\.TestGames
-.\Scripts\BuildRelease.ps1 -Version 1.0.2 -SkipLaunchCheck
+.\Scripts\BuildRelease.ps1 -Version 1.0.3 -SkipLaunchCheck
 git diff --check
 ```
 

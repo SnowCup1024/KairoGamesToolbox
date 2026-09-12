@@ -1,10 +1,17 @@
 # 开罗游戏工具箱
 
-Windows x64 启动器，当前版本 **v1.0 Beta-2**（内部版本 1.0.2）。管理 Steam 与非 Steam 开罗游戏，提供游戏专用 Mod 的安装、更新、删除与实时控制。
+Windows x64 启动器，当前版本 **v1.0 Beta 3**（内部版本 1.0.3）。管理 Steam 与非 Steam 开罗游戏，提供游戏专用 Mod 的安装、更新、删除与实时控制。
 
 界面支持简体中文、繁体中文、英文、日文。内置 63 款游戏目录、Steam 译名资料及拼音搜索索引。语言在「设置 → 用户界面」中切换，即时重建页面；主题继续支持跟随系统、浅色和深色。
 
-## v1.0 Beta-2
+## v1.0 Beta 3
+
+- 正式版对外名称增加 `Release` 后缀；测试版显示为 `v1.0 Beta 3`。关于和设置页点击版本号切换为 `v1.0.3`，再次点击恢复，不再附带许可证文字。
+- 启动器启用单文件压缩，继续内置自身运行组件；游戏用共享组件仍按需下载。
+- 本次未修改专用模组（内部版本保持 1.0.2），无需为启动器升级重新安装 Mod。
+- 完成构建与检查后提交并推送，不创建 GitHub Release。
+
+## v1.0 Beta-2 修复记录
 
 五项反加和前一轮修复已由用户手动验证通过；本轮继续调整控件对齐和手动刷新，不发布 GitHub Release。
 
@@ -39,6 +46,23 @@ Windows x64 启动器，当前版本 **v1.0 Beta-2**（内部版本 1.0.2）。�
 删除 Mod 恢复原游戏的启动方式，**不会撤销已经写进存档的金钱、道具等变化**。请使用备份存档测试。运行时生成的日志、配置、互操作缓存以及不属于安装清单的文件会保留，避免误删其他内容。
 
 启动器关闭不会强制关闭游戏或撤销正在游戏内生效的设置。退出游戏后模组内存状态消失；新启动器进程不读取上一进程的开关记录。
+
+## 启动器包体研究（Beta 3）
+
+联网下载的是游戏侧共享组件；启动器自身仍自包含 .NET 与 WinUI，保证没有预装这些运行库也能使用单个 EXE。发布输入中，`Microsoft.Windows.SDK.NET.dll` 约 26.34 MB、`Microsoft.ui.xaml.dll` 约 15.09 MB、`System.Private.CoreLib.dll` 约 13.17 MB；自有模组 DLL 仅 32 KB，并不是大包的主要来源。
+
+同一 Windows x64 环境实测（MB 为十进制）：
+
+| 构建 | EXE | ZIP |
+| --- | ---: | ---: |
+| Beta 2，无单文件压缩 | 161.47 MB | 62.25 MB |
+| Beta 3，启用单文件压缩 | 66.61 MB | 60.94 MB |
+
+EXE 减少约 58.7%，ZIP 减少约 2.1%。单文件内部使用压缩后，外层 ZIP 的额外压缩空间有限；这不意味着安装缓存或内存占用同比减少。首次解包会增加解压工作，启动速度仍需手动确认。使用 .NET 官方 `EnableCompressionInSingleFile`，保留全部运行依赖和原有单文件自解压设置，未开启 IL 裁剪。
+
+也试验了 `PublishTrimmed=true`、`TrimMode=partial` 配合压缩，EXE 约 34.42 MB；但有 IL2026 警告涉及反射 JSON 的配置、安装清单和管道通信，因此它只是研究结果，不作为交付包。下一步若要显著降低 ZIP，需要先迁移 JSON 源生成并验证裁剪后的实际发布产物，或另行设计需要安装／下载启动器运行库的轻量分发方式；后者改变单 EXE 即用体验，并且只是把运行组件转移到首次下载，不会消除它们。
+
+参考：[.NET 单文件压缩及启动开销](https://learn.microsoft.com/en-us/dotnet/core/deploying/single-file/overview)、[.NET 裁剪与兼容性](https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trim-self-contained)。本次 183 项启动器检查和本地化检查通过；未自动运行图形界面，不将普通测试通过当作裁剪安全证明。
 
 ## 模组与共享组件
 
@@ -90,7 +114,7 @@ dotnet run --project Windows/Test/LauncherSmokeTest.csproj
 dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 .\Scripts\TestLocalization.ps1
 .\Scripts\TestBundledRuntime.ps1
-.\Scripts\BuildRelease.ps1 -Version 1.0.2 -SkipLaunchCheck
+.\Scripts\BuildRelease.ps1 -Version 1.0.3 -SkipLaunchCheck
 ```
 
 普通启动器构建使用已提交的专用 DLL，不需要商业游戏。修改模组源码后执行：
@@ -101,14 +125,14 @@ dotnet run --project Mods/ControlTests/ControlTests.csproj -c Release
 
 该脚本编译插件、检查 11 个实际目标签名、核对游戏指纹、更新自有 DLL 及清单，不启动或部署游戏。游戏版本变化时必须人工检查兼容性，不自动更新目标指纹。
 
-发布输出：`.Build/Publish/v1.0-Beta-2/KairosoftGameToolbox.exe` 与 `.Build/Package/KairosoftGameToolbox-v1.0-Beta-2-win-x64.zip`。ZIP 只有一个 EXE，专用 DLL 内嵌其中，共享运行组件不内嵌。
+发布输出：`.Build/Publish/v1.0-Beta-3/KairosoftGameToolbox.exe` 与 `.Build/Package/KairosoftGameToolbox-v1.0-Beta-3-win-x64.zip`。ZIP 只有一个 EXE，专用 DLL 内嵌其中，共享运行组件不内嵌。
 
 本轮不使用 computer use，不自动启动游戏。`-SkipLaunchCheck` 表示窗口和游戏内效果由使用者手动验证；自动测试与静态签名检查不能证明 IL2CPP 钩子运行稳定。历史观察版偶发无响应尚无确定根因，本版取消全局数值轮询与热键并限制日志队列，仍需实际过夜、训练、赠送和重连测试。
 
 ## 版本与贡献
 
-自 v1.0.1 起进行的版本号规范调整，是为本版本 v1.0 Beta-2 做准备。本次确认的内外版本映射为最终规范，无意外不再修改；后续变更须有明确理由并获得维护者确认，禁止随版本迭代自行更换规则。
+自 v1.0.1 起进行的版本号规范调整，是为 v1.0 Beta-2 做准备；v1.0 Beta 3 经维护者确认，为正式版对外名称补充 Release 后缀，并将测试版名称改为 Beta 空格序号，内部编号规则不变。此次内外版本映射为最终规范，无意外不再修改；后续变更须有明确理由并获得维护者确认，禁止随版本迭代自行更换规则。
 
-`v0.0.1`—`v0.2.4` 是早期测试阶段。对外：测试版 `v2.3 Beta-z`，正式版 `v2.3`；内部：测试版 `2.3.z`，正式版使用最后一次测试的 z 加 1，例如 Beta-4 为 `2.3.4`，随后正式版为 `2.3.5`。z 不允许为 0。Beta 不创建 GitHub Releases，正式版以 GitHub Releases 发布为准。文件名中的空格替换为连字符。
+`v0.0.1`—`v0.2.4` 是早期测试阶段。对外：测试版 `v2.3 Beta z`，正式版 `v2.3 Release`；内部：测试版 `2.3.z`，正式版使用最后一次测试的 z 加 1，例如 Beta 4 为 `2.3.4`，随后正式版为 `2.3.5`。z 不允许为 0。Beta 不创建 GitHub Releases，正式版以 GitHub Releases 发布为准。文件名中的空格替换为连字符。
 
 完整规范、技术约束、测试与提交规则见 [CONTRIBUTING.md](CONTRIBUTING.md)，模组协议见 [Mods/README.md](Mods/README.md)。项目采用 [GPL-3.0](LICENSE)；第三方组件保留各自许可。

@@ -8,9 +8,9 @@ static class BetaChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("本版对外 v1.0 Beta-2，内部 1.0.2", ReleaseInfo.DisplayVersion == "v1.0 Beta-2" && Version.Parse(ReleaseInfo.Version).Build > 0);
-        check("正式版隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3");
-        check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta-4");
+        check("本版对外 v1.0 Beta 3，内部 1.0.3", ReleaseInfo.DisplayVersion == "v1.0 Beta 3" && Version.Parse(ReleaseInfo.Version).Build > 0);
+        check("正式版显示 Release 并隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3 Release");
+        check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta 4");
         bool rejectedZero = false;
         try { ReleaseInfo.FormatDisplay("2.3.0", true); } catch (ArgumentException) { rejectedZero = true; }
         check("版本序号不允许零", rejectedZero);

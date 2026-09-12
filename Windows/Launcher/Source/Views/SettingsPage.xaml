@@ -34,7 +34,7 @@
     </StackPanel>
     <TextBlock Foreground="{ThemeResource TextSecondaryBrush}" Text="{l:Text Key='在 Steam 网页中登录并获取 API Key。保存后查询拥有状态、游玩时长与最近游玩时间；清空并保存即可关闭。SteamID 自动获取，网络或配置不可用不影响启动游戏。'}"/>
    </StackPanel></Border>
-   <TextBlock x:Name="VersionText" FontSize="12" Foreground="{ThemeResource TextSecondaryBrush}"/>
+   <Button x:Name="VersionText" Click="VersionText_Click" HorizontalAlignment="Left" Background="Transparent" BorderThickness="0" Padding="0" Foreground="{ThemeResource TextSecondaryBrush}"/>
   </StackPanel>
  </ScrollViewer>
 </UserControl>

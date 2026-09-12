@@ -24,6 +24,14 @@ public sealed partial class SettingsPage : UserControl
     private bool _apiKeyDirty;
     private bool _apiKeyMasked;
 
+    private bool _showInternalVersion;
+
+    private void VersionText_Click(object sender, RoutedEventArgs e)
+    {
+        _showInternalVersion = !_showInternalVersion;
+        VersionText.Content = _showInternalVersion ? "v" + ReleaseInfo.Version : ReleaseInfo.DisplayVersion;
+    }
+
     public SettingsPage()
     {
         InitializeComponent();
@@ -58,7 +66,7 @@ public sealed partial class SettingsPage : UserControl
                 "dark" => 2,
                 _ => 0
             };
-            VersionText.Text = L.T("开罗游戏工具箱") + " " + ReleaseInfo.DisplayVersion + " · GPL-3.0";
+            VersionText.Content = _showInternalVersion ? "v" + ReleaseInfo.Version : ReleaseInfo.DisplayVersion;
         }
         finally
         {

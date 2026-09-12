@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.([1-9]\d*)$')]
-    [string]$Version = '1.0.2',
+    [string]$Version = '1.0.3',
     [switch]$SkipLaunchCheck
 )
 
@@ -14,7 +14,7 @@ if ($releaseInfo -notmatch ('Version = "' + [regex]::Escape($Version) + '"')) { 
 $number = [Version]::Parse($Version)
 $isBeta = $releaseInfo -match 'IsBeta = true'
 $displayVersion = "v$($number.Major).$($number.Minor)"
-if ($isBeta) { $displayVersion += " Beta-$($number.Build)" }
+if ($isBeta) { $displayVersion += " Beta $($number.Build)" } else { $displayVersion += " Release" }
 $artifactVersion = $displayVersion.Replace(' ', '-')
 $windowsRoot = Join-Path $repositoryRoot 'Windows'
 $solution = Join-Path $windowsRoot 'KairosoftGameToolbox.sln'
@@ -170,6 +170,7 @@ try {
         '-p:Platform=x64',
         '-p:WindowsAppSDKSelfContained=true',
         '-p:PublishSingleFile=true',
+        '-p:EnableCompressionInSingleFile=true',
         '-p:EnableMsixTooling=true',
         '-p:IncludeAllContentForSelfExtract=true',
         '-p:IncludeNativeLibrariesForSelfExtract=true',

@@ -13,6 +13,14 @@ public sealed partial class AboutPage : UserControl
 {
     private const string LicenseFileName = "LICENSE";
 
+    private bool _showInternalVersion;
+
+    private void VersionText_Click(object sender, RoutedEventArgs e)
+    {
+        _showInternalVersion = !_showInternalVersion;
+        VersionText.Content = _showInternalVersion ? "v" + ReleaseInfo.Version : ReleaseInfo.DisplayVersion;
+    }
+
     public AboutPage()
     {
         InitializeComponent();
@@ -22,7 +30,7 @@ public sealed partial class AboutPage : UserControl
 
     private void LoadAboutInfo()
     {
-        VersionText.Text = Services.ReleaseInfo.DisplayVersion + " · GPL-3.0";
+        VersionText.Content = _showInternalVersion ? "v" + ReleaseInfo.Version : ReleaseInfo.DisplayVersion;
     }
 
     private static string ReadBundledText(string relativePath)

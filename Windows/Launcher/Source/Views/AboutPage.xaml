@@ -7,7 +7,7 @@
    <TextBlock Text="{l:Text Key='关于'}" Style="{StaticResource PageTitleStyle}"/>
    <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
     <TextBlock Text="{l:Text Key='开罗游戏工具箱'}" Style="{StaticResource SectionTitleStyle}"/>
-    <TextBlock x:Name="VersionText" Foreground="{ThemeResource TextSecondaryBrush}"/>
+    <Button x:Name="VersionText" Click="VersionText_Click" HorizontalAlignment="Left" Background="Transparent" BorderThickness="0" Padding="0" Foreground="{ThemeResource TextSecondaryBrush}"/>
     <TextBlock Text="{l:Text Key='管理 Steam 与非 Steam 开罗游戏，提供内置游戏模组、共享运行组件下载与实时控制。'}"/>
    </StackPanel></Border>
    <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">

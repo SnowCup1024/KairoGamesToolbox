@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace KairosoftGameToolbox.Services;
 
 public sealed record RuntimePackage(string Id, string Url, string Sha256);
-public sealed record GameModDefinition(uint AppId, string GameFolder, string Version, bool Development,
+public sealed record GameModDefinition(uint AppId, string GameFolder, string ReleaseDate, bool Development,
     RuntimePackage Runtime, List<ModFile> Targets, List<ModFile> Files, List<GameModFeature> Features,
     Dictionary<string, string> LogTemplates, int[]? MultiplierSteps = null);
 public sealed record GameModFeature(string Id, Dictionary<string, string> Names, Dictionary<string, string> Descriptions,
@@ -19,8 +19,12 @@ public static class BundledModService
     private static List<GameModDefinition> Load()
     {
         var assembly = typeof(BundledModService).Assembly;
-        return assembly.GetManifestResourceNames().Where(n => n.StartsWith("Mods.") && n.EndsWith("definition.json"))
+        var definitions = assembly.GetManifestResourceNames().Where(n => n.StartsWith("Mods.") && n.EndsWith("definition.json"))
             .Select(n => { using var input = assembly.GetManifestResourceStream(n)!; return JsonSerializer.Deserialize<GameModDefinition>(input, JsonOptions)!; }).ToList();
+        if (definitions.Any(d => !ModPackageService.ValidReleaseDate(d.ReleaseDate)
+            || d.MultiplierSteps == null || !d.MultiplierSteps.SequenceEqual(new[] { 0, 1, 50 })))
+            throw new InvalidDataException("Invalid mod release date or multiplier steps.");
+        return definitions;
     }
     public static GameModDefinition? ForGame(uint appId) => Definitions.SingleOrDefault(d => d.AppId == appId);
     public static string Text(Dictionary<string, string> values, string language) => values.GetValueOrDefault(language) ?? values.GetValueOrDefault("en") ?? "";
@@ -111,7 +115,7 @@ public static class BundledModService
             Add("licenses/KairoMods/" + name["RuntimeNotice.".Length..], input);
         }
         using var json = output.CreateEntry("manifest.json").Open();
-        JsonSerializer.Serialize(json, new ModManifest(1, definition.AppId, definition.GameFolder, definition.Version,
-            "Beta", "Bundled game mod", definition.Targets, files));
+        JsonSerializer.Serialize(json, new ModManifest(2, definition.AppId, definition.GameFolder, null,
+            "Stable", "Bundled game mod", definition.Targets, files, definition.ReleaseDate));
     }
 }

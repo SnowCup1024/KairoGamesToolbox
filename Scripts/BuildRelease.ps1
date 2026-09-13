@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidatePattern('^(0|[1-9]\d*)\.(0|[1-9]\d*)\.([1-9]\d*)$')]
-    [string]$Version = '1.0.4',
+    [string]$Version = '1.0.5',
     [switch]$SkipLaunchCheck
 )
 
@@ -61,6 +61,63 @@ function Remove-GeneratedPath {
     }
 }
 
+function Remove-ReleaseBuildCache {
+    [CmdletBinding()]
+    param()
+
+    # 只在交付包成功生成后调用；清理失败不改变发布结果。
+    try {
+        $otherBuilds = @(Get-CimInstance Win32_Process -ErrorAction Stop | Where-Object {
+            $_.ProcessId -ne $PID -and (
+                ($_.Name -ieq 'dotnet.exe' -and $_.CommandLine -match '(?i)\s(build|publish|restore|run|test|msbuild)(\s|$)') -or
+                ($_.Name -ieq 'MSBuild.exe' -and $_.CommandLine -notmatch '(?i)/nodemode:')
+            )
+        })
+        if ($otherBuilds.Count -gt 0) {
+            throw '检测到其他 .NET 构建或运行命令，保留缓存；请在其结束后清理。'
+        }
+
+        $cachePaths = @((Join-Path $buildRoot 'Output'), (Join-Path $buildRoot 'Obj'))
+        # 删除前检查整个目标树；遇到目录联接或符号链接时保留现场。
+        foreach ($cachePath in $cachePaths) {
+            Assert-BuildChildPath -Path $cachePath
+            $ancestor = [IO.DirectoryInfo]::new([IO.Path]::GetFullPath($cachePath))
+            while ($null -ne $ancestor) {
+                if ($ancestor.Exists -and ($ancestor.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+                    throw "缓存路径包含重解析点：$($ancestor.FullName)"
+                }
+                $ancestor = $ancestor.Parent
+            }
+            if (-not (Test-Path -LiteralPath $cachePath)) { continue }
+            $pending = [Collections.Generic.Stack[string]]::new()
+            $pending.Push($cachePath)
+            while ($pending.Count -gt 0) {
+                $entry = Get-Item -LiteralPath $pending.Pop() -Force -ErrorAction Stop
+                if ($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                    throw "缓存目录包含重解析点：$($entry.FullName)"
+                }
+                if ($entry.PSIsContainer) {
+                    foreach ($child in Get-ChildItem -LiteralPath $entry.FullName -Force -ErrorAction Stop) {
+                        $pending.Push($child.FullName)
+                    }
+                }
+            }
+        }
+    }
+    catch {
+        Write-Warning "发布成功，但缓存清理失败：$($_.Exception.Message)" -WarningAction Continue
+        return
+    }
+
+    foreach ($cachePath in $cachePaths) {
+        try {
+            Remove-GeneratedPath -Path $cachePath
+        }
+        catch {
+            Write-Warning "发布成功，但缓存清理失败：$cachePath；$($_.Exception.Message)" -WarningAction Continue
+        }
+    }
+}
 function Invoke-DotNet {
     param([Parameter(Mandatory = $true)][string[]]$Arguments)
 
@@ -228,3 +285,6 @@ finally {
     Remove-GeneratedPath -Path $stagingDirectory
     Remove-GeneratedPath -Path $temporaryPackagePath
 }
+
+# 前面的构建、验证、打包或暂存清理失败时，不会执行到这里。
+Remove-ReleaseBuildCache

@@ -8,7 +8,7 @@ static class BetaChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("本版对外 v1.0 Beta 4，内部 1.0.4", ReleaseInfo.DisplayVersion == "v1.0 Beta 4" && ReleaseInfo.Version == "1.0.4");
+        check("本版对外 v1.0 Beta 5，内部 1.0.5", ReleaseInfo.DisplayVersion == "v1.0 Beta 5" && ReleaseInfo.Version == "1.0.5");
         check("正式版显示 Release 并隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3 Release");
         check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta 4");
         bool rejectedZero = false;
@@ -53,11 +53,11 @@ static class BetaChecks
                 File.WriteAllText(destination, "synthetic runtime");
                 files.Add(new(name, Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(destination)))));
             }
-            var receipt = new ModManifest(1, definition.AppId, definition.GameFolder, definition.Version, "Beta", "test", definition.Targets, files);
+            var receipt = new ModManifest(2, definition.AppId, definition.GameFolder, null, "Stable", "test", definition.Targets, files, definition.ReleaseDate);
             string receiptPath = Path.Combine(root, ".kairomods-install.json");
             File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt));
             check("当前版本且所有管理文件完整时为最新", ModPackageService.IsCurrent(root, definition));
-            File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt with { Version = "1.0.1" }));
+            File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt with { SchemaVersion = 1, Version = "1.0.1", ReleaseDate = null }));
             check("旧版安装记录允许更新", !ModPackageService.IsCurrent(root, definition));
             File.WriteAllText(receiptPath, JsonSerializer.Serialize(receipt));
             File.AppendAllText(Path.Combine(root, definition.Files[0].Path), "modified");

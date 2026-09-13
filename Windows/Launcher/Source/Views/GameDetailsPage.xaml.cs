@@ -66,7 +66,7 @@ public sealed partial class GameDetailsPage : UserControl
             && await Task.Run(() => ModPackageService.IsCurrent(directory, definition));
         if (revision != statusRevision || target != directory) return;
         InstalledModText.Text = L.T(latest ? "已安装最新 Mod" : installed ? "已安装 Mod" : "未安装 Mod");
-        if (latest) InstalledModText.Text += " · " + ReleaseInfo.FormatDisplay(definition!.Version, ReleaseInfo.IsBeta);
+        if (latest) InstalledModText.Text += " · " + definition!.ReleaseDate;
         InstallButton.IsEnabled = !latest && definition != null && GameFolderService.ContainsExecutable(directory);
     }
 

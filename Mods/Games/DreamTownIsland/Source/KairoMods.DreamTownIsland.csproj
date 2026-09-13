@@ -4,14 +4,18 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>1.0.4</Version>
+    <ModReleaseDate>2026-09-14</ModReleaseDate>
+    <Version>$(ModReleaseDate.Replace('-', '.'))</Version>
+    <InformationalVersion>$(ModReleaseDate)</InformationalVersion>
     <RuntimeDirectory Condition="'$(RuntimeDirectory)' == ''">$(MSBuildThisFileDirectory)../../../../.Build/Dependencies/BepInEx-IL2CPP-x86-788</RuntimeDirectory>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="control.json" LogicalName="ControlPlan.json" />
-    <!-- Keep the previous probe as development reference, outside the functional payload. -->
-    <Compile Remove="GameObservation.cs;ObservationPlan.cs;ObservationLog.cs;LoadProbeServer.cs" />
     <Compile Include="../../../Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>ModReleaseDate</_Parameter1>
+      <_Parameter2>$(ModReleaseDate)</_Parameter2>
+    </AssemblyAttribute>
     <Reference Include="BepInEx.Core"><HintPath>$(RuntimeDirectory)/BepInEx/core/BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="BepInEx.Unity.IL2CPP"><HintPath>$(RuntimeDirectory)/BepInEx/core/BepInEx.Unity.IL2CPP.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="0Harmony"><HintPath>$(RuntimeDirectory)/BepInEx/core/0Harmony.dll</HintPath><Private>false</Private></Reference>

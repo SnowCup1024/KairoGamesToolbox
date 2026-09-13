@@ -7,10 +7,10 @@
     <RootNamespace>KairosoftGameToolbox</RootNamespace>
     <AssemblyName>KairosoftGameToolbox</AssemblyName>
     <!-- 版本对外展示规则由 ReleaseInfo 统一生成。 -->
-    <Version>1.0.4</Version>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
-    <FileVersion>1.0.4</FileVersion>
-    <InformationalVersion>1.0.4</InformationalVersion>
+    <Version>1.0.5</Version>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <FileVersion>1.0.5</FileVersion>
+    <InformationalVersion>1.0.5</InformationalVersion>
     <Product>开罗游戏工具箱</Product>
     <ApplicationManifest>Source\app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>

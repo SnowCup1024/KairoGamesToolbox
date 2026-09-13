@@ -7,11 +7,11 @@ using Il2CppInterop.Runtime.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
 using KairoMods.Protocol;
 
-namespace KairoMods.Observer;
+namespace KairoMods.DoraemonDorayakiShopStory;
 
-internal sealed class GameObservation
+internal sealed class GameControl
 {
-    private static GameObservation current = null!;
+    private static GameControl current = null!;
     private readonly ManualLogSource log;
     private readonly Harmony harmony = new("snowcup.kairomods.observer");
     private readonly Dictionary<MethodBase, Resource> resources = new();
@@ -37,7 +37,7 @@ internal sealed class GameObservation
         public bool Reversed;
     }
 
-    public GameObservation(ManualLogSource logger) { log = logger; current = this; }
+    public GameControl(ManualLogSource logger) { log = logger; current = this; }
 
     public Dictionary<string, FeatureState> Snapshot() => new(features);
 
@@ -109,7 +109,7 @@ internal sealed class GameObservation
         catch { harmony.UnpatchSelf(); throw; }
     }
 
-    private static HarmonyMethod Hook(string name) => new(typeof(GameObservation), name);
+    private static HarmonyMethod Hook(string name) => new(typeof(GameControl), name);
     private static long Read(Resource resource, object owner) => Convert.ToInt64(resource.Reader.Invoke(resource.Reader.IsStatic ? null : owner, null));
 
     private static Call? Begin(Resource resource, object owner, bool deduction)

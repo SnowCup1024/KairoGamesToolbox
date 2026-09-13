@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)][ValidatePattern('^[A-Za-z0-9]+$')][string]$GameFolder,
+    [Parameter(Mandatory)][ValidateSet('DreamTownIsland')][string]$GameFolder,
     [Parameter(Mandatory)][string]$GameDirectory,
     [Parameter(Mandatory)][string]$RuntimeDirectory
 )
@@ -19,24 +19,21 @@ $projects = @(Get-ChildItem -LiteralPath (Join-Path $gameRoot 'Source') -Filter 
 if ($projects.Count -ne 1) { throw 'Expected exactly one plugin project' }
 $projectFile = $projects[0]
 $project = [xml](Get-Content -LiteralPath $projectFile.FullName -Raw)
-$version = [string]$project.Project.PropertyGroup.Version
-if ($version -notmatch '^\d+\.\d+\.[1-9]\d*$' -or $version -ne $definition.version) { throw 'Project and definition versions must match; z must be positive' }
+$releaseDate = [string]$project.Project.PropertyGroup.ModReleaseDate
+$parsedDate = [datetime]::MinValue
+if (-not [datetime]::TryParseExact($releaseDate, 'yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::None, [ref]$parsedDate) -or $releaseDate -cne $definition.releaseDate) { throw '模组项目与定义的发布日期必须一致且为有效的 YYYY-MM-DD。' }
 $assemblyName = $projectFile.BaseName
 if ($assemblyName -notmatch '^KairoMods\.[A-Za-z0-9]+$') { throw 'Unsupported assembly name' }
 $relativePayload = "BepInEx/plugins/$assemblyName/$assemblyName.dll"
 if (@($definition.files).Count -ne 1 -or $definition.files[0].path -cne $relativePayload) { throw 'Expected one game-specific plugin payload' }
 $runtimeRoot = (Resolve-Path -LiteralPath $RuntimeDirectory).Path
-$observationPlan = Join-Path $projectFile.DirectoryName 'observation.json'
-if (Test-Path -LiteralPath (Join-Path $projectFile.DirectoryName 'control.json')) { $observationPlan = Join-Path $projectFile.DirectoryName 'control.json' }
-if (Test-Path -LiteralPath $observationPlan) {
-    & (Join-Path $PSScriptRoot 'TestObservationSignatures.ps1') -GameDirectory $GameDirectory -PlanPath $observationPlan
-}
+$controlPlan = Join-Path $projectFile.DirectoryName 'control.json'
+if (-not (Test-Path -LiteralPath $controlPlan)) { throw '缺少正式控制计划 control.json。' }
+& (Join-Path $PSScriptRoot 'TestDreamTownSignatures.ps1') -GameDirectory $GameDirectory -PlanPath $controlPlan
 dotnet build $projectFile.FullName -c Release "-p:RuntimeDirectory=$runtimeRoot" "-p:GameDirectory=$GameDirectory"
 if ($LASTEXITCODE -ne 0) { throw 'Plugin build failed' }
 $output = Join-Path $root ".Build/Output/$assemblyName/Release/net6.0/$assemblyName.dll"
-if (Test-Path -LiteralPath $observationPlan) {
-    & (Join-Path $PSScriptRoot 'TestObservationSignatures.ps1') -GameDirectory $GameDirectory -PlanPath $observationPlan -PluginDll $output
-}
+& (Join-Path $PSScriptRoot 'TestDreamTownSignatures.ps1') -GameDirectory $GameDirectory -PlanPath $controlPlan -PluginDll $output
 $destination = Join-Path (Join-Path $gameRoot 'Payload') $relativePayload
 New-Item -ItemType Directory -Force (Split-Path $destination) | Out-Null
 Copy-Item -LiteralPath $output -Destination $destination -Force

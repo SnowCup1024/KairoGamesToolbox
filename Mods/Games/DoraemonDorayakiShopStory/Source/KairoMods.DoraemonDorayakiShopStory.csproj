@@ -4,11 +4,18 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- 已发布的 DLL 身份与安装路径保持兼容；项目和源码使用正式游戏名。 -->
     <AssemblyName>KairoMods.Observer</AssemblyName>
-    <Version>1.0.2</Version>
+    <ModReleaseDate>2026-09-14</ModReleaseDate>
+    <Version>$(ModReleaseDate.Replace('-', '.'))</Version>
+    <InformationalVersion>$(ModReleaseDate)</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../../Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>ModReleaseDate</_Parameter1>
+      <_Parameter2>$(ModReleaseDate)</_Parameter2>
+    </AssemblyAttribute>
     <Reference Include="BepInEx.Core">
       <HintPath>$(TestGameDirectory)/BepInEx/core/BepInEx.Core.dll</HintPath>
       <Private>false</Private>

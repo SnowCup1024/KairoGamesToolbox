@@ -3,6 +3,13 @@ namespace KairosoftGameToolbox.Services;
 /// <summary>进程生命周期内持有固定命名互斥量；名称不随版本、目录或 EXE 文件名改变。</summary>
 public sealed class LauncherInstanceLease : IDisposable
 {
+    public static bool IsOlderVersion(string? existing, string current)
+    {
+        if (!Version.TryParse(existing, out var previous) || !Version.TryParse(current, out var next)) return false;
+        static Version Normalize(Version v) => new(v.Major, v.Minor, Math.Max(v.Build, 0), Math.Max(v.Revision, 0));
+        return Normalize(previous) < Normalize(next);
+    }
+
     public const string InstanceName = @"Local\SnowCup1024.KairoGamesToolbox.Launcher";
     private readonly Mutex mutex;
     private bool disposed;

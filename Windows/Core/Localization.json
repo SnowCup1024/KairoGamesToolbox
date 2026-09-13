@@ -1,6 +1,14 @@
 {
-  "自动刷新日志": { "en": "Auto-refresh logs", "ja": "ログを自動更新", "zh-TW": "自動重新整理日誌" },
-  "清空日志": { "en": "Clear logs", "ja": "ログをクリア", "zh-TW": "清空日誌" },
+  "自动刷新日志": {
+    "en": "Auto-refresh logs",
+    "ja": "ログを自動更新",
+    "zh-TW": "自動重新整理日誌"
+  },
+  "清空日志": {
+    "en": "Clear logs",
+    "ja": "ログをクリア",
+    "zh-TW": "清空日誌"
+  },
   "当前模组用于开发观察，尚未提供游戏修改项。": {
     "en": "This mod is for development observation. Gameplay features are not available yet.",
     "ja": "現在のModは開発用の観測版です。ゲームの変更機能はまだありません。",
@@ -750,5 +758,25 @@
     "zh-TW": "連線失敗，請確認遊戲已啟動且 Mod 已載入，再重試。",
     "en": "Connection failed. Make sure the game is running with the Mod loaded, then retry.",
     "ja": "接続に失敗しました。ゲームが起動し、Mod が読み込まれていることを確認して再試行してください。"
+  },
+  "不消耗": {
+    "zh-TW": "不消耗",
+    "en": "No consumption",
+    "ja": "消費なし"
+  },
+  "切换启动器版本": {
+    "zh-TW": "切換啟動器版本",
+    "en": "Switch launcher version",
+    "ja": "ランチャーのバージョンを切り替え"
+  },
+  "无法关闭旧版本，请手动退出后重新启动。": {
+    "zh-TW": "無法關閉舊版本，請手動結束後重新啟動。",
+    "en": "Could not close the older version. Exit it manually and try again.",
+    "ja": "旧バージョンを終了できません。手動で終了してから再起動してください。"
+  },
+  "检测到旧版本 {0} 正在运行，当前版本为 {1}。是否关闭旧版本并启动当前版本？选择“否”将打开旧版本。": {
+    "zh-TW": "偵測到舊版本 {0} 正在執行，目前版本為 {1}。是否關閉舊版本並啟動目前版本？選擇「否」將開啟舊版本。",
+    "en": "Older version {0} is running. This version is {1}. Close the older version and start this one? Choose No to open the older version.",
+    "ja": "旧バージョン {0} が実行中です。現在のバージョンは {1} です。旧バージョンを終了して現在のバージョンを起動しますか？「いいえ」で旧バージョンを開きます。"
   }
 }

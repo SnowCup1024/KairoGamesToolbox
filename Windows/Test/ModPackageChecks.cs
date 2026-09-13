@@ -21,12 +21,12 @@ static class ModPackageChecks
             return dir;
         }
         var targets = new List<ModFile> { new("GameAssembly.dll", Hash("code")), new("KairoGames_Data/il2cpp_data/Metadata/global-metadata.dat", Hash("metadata")) };
-        string Package(string name, string channel = "Alpha", string path = "BepInEx/plugins/test.dll", string content = "plugin", string? extra = null, string declaredContent = "plugin")
+        string Package(string name, string channel = "Alpha", string path = "BepInEx/plugins/test.dll", string content = "plugin", string? extra = null, string declaredContent = "plugin", string? releaseDate = null, int schema = 1)
         {
             var file = Path.Combine(root, name + ".zip");
             using var zip = ZipFile.Open(file, ZipArchiveMode.Create);
             void Write(string entry, string text) { using var writer = new StreamWriter(zip.CreateEntry(entry).Open(), new UTF8Encoding(false)); writer.Write(text); }
-            Write("manifest.json", JsonSerializer.Serialize(new ModManifest(1, 123, "TestGame", "0.0.1", channel, "Test", targets, new() { new(path, Hash(declaredContent)) })));
+            Write("manifest.json", JsonSerializer.Serialize(new ModManifest(schema, 123, "TestGame", schema == 1 ? "0.0.1" : null, channel, "Test", targets, new() { new(path, Hash(declaredContent)) }, releaseDate)));
             Write("payload/" + path, content);
             if (extra != null) Write(extra, "extra");
             return file;
@@ -38,6 +38,22 @@ static class ModPackageChecks
         }
         try
         {
+            check("模组日期严格使用真实日历日期", ModPackageService.ValidReleaseDate("2026-09-14")
+                && ModPackageService.ValidReleaseDate("2024-02-29") && !ModPackageService.ValidReleaseDate("2026-02-29")
+                && !ModPackageService.ValidReleaseDate("2026-9-14") && !ModPackageService.ValidReleaseDate("1.0.5"));
+            var dated = Package("dated", releaseDate: "2026-09-14", schema: 2);
+            var datedManifest = ModPackageService.Read(dated, 123, "TestGame");
+            check("日期模组清单不维护旧版本字段", datedManifest.ReleaseDate == "2026-09-14" && datedManifest.Version == null
+                && !JsonSerializer.Serialize(datedManifest).Contains("\"Version\""));
+            Reject("拒绝日期清单中的无效日期", () => ModPackageService.Read(Package("bad-date", releaseDate: "2026-02-30", schema: 2), 123, "TestGame"));
+            var migration = Target("migration");
+            ModPackageService.Install(Package("legacy-migration"), migration, 123, "TestGame");
+            ModPackageService.Install(dated, migration, 123, "TestGame", update: true);
+            check("旧数字版本安装可升级为日期清单", Directory.GetFiles(migration, "*.json").Any(f => File.ReadAllText(f).Contains("2026-09-14"))
+                && File.ReadAllText(Path.Combine(migration, "BepInEx/plugins/test.dll")) == "plugin");
+            ModPackageService.Uninstall(migration, 123, "TestGame");
+            check("日期清单支持卸载并保留游戏原文件", !File.Exists(Path.Combine(migration, "BepInEx/plugins/test.dll"))
+                && File.ReadAllText(Path.Combine(migration, "GameAssembly.dll")) == "code");
             var package = Package("valid");
             var dir = Target("game");
             var mods = Path.Combine(root, "Mods");

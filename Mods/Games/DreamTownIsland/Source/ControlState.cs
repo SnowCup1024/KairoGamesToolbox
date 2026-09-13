@@ -11,7 +11,7 @@ internal sealed class ControlState
     public string? Configure(Dictionary<string, FeatureState>? desired)
     {
         if (desired == null || desired.Count != FeatureIds.Length || desired.Any(p => !states.ContainsKey(p.Key)
-            || p.Value == null || p.Value.Multiplier is not (0 or 1 or 20))) return "Invalid feature settings";
+            || p.Value == null || !ControlProtocol.ValidMultiplier(p.Value.Multiplier))) return "Invalid feature settings";
         states = new(desired);
         return null;
     }
@@ -22,7 +22,7 @@ internal sealed class ControlState
 
     public static long Refund(long before, long after, long requested, FeatureState setting, long maximum)
     {
-        if (!setting.Enabled || setting.Multiplier is not (0 or 1 or 20) || requested >= 0
+        if (!setting.Enabled || !ControlProtocol.ValidMultiplier(setting.Multiplier) || requested >= 0
             || before < 0 || after < 0 || maximum <= 0 || before > maximum || after > maximum) return 0;
         decimal spent = (decimal)before - after;
         decimal refund = spent * (setting.Multiplier + 1m);

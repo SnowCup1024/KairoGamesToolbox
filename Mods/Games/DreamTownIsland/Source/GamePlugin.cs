@@ -4,8 +4,8 @@ using KairoMods.Protocol;
 
 namespace KairoMods.DreamTownIsland;
 
-[BepInPlugin("snowcup.kairomods.dreamtownisland", "KairoMods.DreamTownIsland", "1.0.4")]
-public sealed class LoadProbePlugin : BasePlugin
+[BepInPlugin("snowcup.kairomods.dreamtownisland", "KairoMods.DreamTownIsland", "2026.9.14")]
+public sealed class GamePlugin : BasePlugin
 {
     private GameControlServer? server;
     private GameControl? control;
@@ -19,23 +19,23 @@ public sealed class LoadProbePlugin : BasePlugin
         control = new GameControl(Log, directory);
         server = new GameControlServer(directory);
         server.Start(error => Log.LogError("ModControl pipe failed | " + error.Message));
-        ObservationListener.Pump = () => { control.Pump(); server.Pump(control.Handle); };
-        AddComponent<ObservationListener>();
-        Log.LogInfo("Mod loaded | appId=2488340 | version=1.0.4 | revision=control-3 | all 4 features OFF | launcher control only | no hotkeys");
+        GameUpdateListener.Pump = () => { control.Pump(); server.Pump(control.Handle); };
+        AddComponent<GameUpdateListener>();
+        Log.LogInfo("Mod loaded | appId=2488340 | date=2026-09-14 | all 4 features OFF | launcher control only | no hotkeys");
     }
 
     public override bool Unload()
     {
         server?.Dispose();
-        ObservationListener.Pump = null;
+        GameUpdateListener.Pump = null;
         control?.Dispose();
         return true;
     }
 }
 
-public sealed class ObservationListener : UnityEngine.MonoBehaviour
+public sealed class GameUpdateListener : UnityEngine.MonoBehaviour
 {
     internal static Action? Pump;
-    public ObservationListener(IntPtr pointer) : base(pointer) { }
+    public GameUpdateListener(IntPtr pointer) : base(pointer) { }
     public void Update() => Pump?.Invoke();
 }

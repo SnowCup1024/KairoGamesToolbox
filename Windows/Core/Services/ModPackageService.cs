@@ -1,17 +1,23 @@
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace KairosoftGameToolbox.Services;
 
 public sealed record ModFile(string Path, string Sha256);
-public sealed record ModManifest(int SchemaVersion, uint AppId, string GameFolder, string Version,
-    string Channel, string Description, List<ModFile> Targets, List<ModFile> Files);
+public sealed record ModManifest(int SchemaVersion, uint AppId, string GameFolder, [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Version,
+    string Channel, string Description, List<ModFile> Targets, List<ModFile> Files,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? ReleaseDate = null);
 
 /// <summary>声明式 ZIP 模组：先校验整个包和游戏，暂存后安装；更新只覆盖清单管理且指纹匹配的文件。</summary>
 public static class ModPackageService
 {
+    public static bool ValidReleaseDate(string? value) => DateOnly.TryParseExact(value, "yyyy-MM-dd",
+        CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+
     private const long MaxBytes = 512L * 1024 * 1024;
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
     public static string GameFolder(string englishName)
@@ -64,9 +70,10 @@ public static class ModPackageService
         if (manifestEntry.Length > 1024 * 1024) throw new InvalidDataException(L.T("模组清单过大。"));
         using var json = manifestEntry.Open();
         var m = JsonSerializer.Deserialize<ModManifest>(json, JsonOptions) ?? throw new InvalidDataException(L.T("模组清单无效。"));
-        if (m.SchemaVersion != 1 || m.AppId != appId || m.GameFolder != folder)
+        if (m.SchemaVersion is not (1 or 2) || m.AppId != appId || m.GameFolder != folder)
             throw new InvalidDataException(L.T("模组与当前选中的游戏不匹配。"));
-        if (m.Channel is not ("Alpha" or "Beta" or "Stable") || !Regex.IsMatch(m.Version ?? "", @"^[0-9]+\.[0-9]+\.[0-9]+$"))
+        if (m.Channel is not ("Alpha" or "Beta" or "Stable") || !(m.SchemaVersion == 1 ? Regex.IsMatch(m.Version ?? "", @"^[0-9]+\.[0-9]+\.[0-9]+$")
+                : m.Version == null && ValidReleaseDate(m.ReleaseDate)))
             throw new InvalidDataException(L.T("模组版本或发布阶段无效。"));
         if (m.Targets == null || m.Files == null || m.Files.Count == 0 || m.Targets.Count != 2 ||
             !m.Targets.Select(t => t.Path).ToHashSet().SetEquals(new[] { "GameAssembly.dll", "KairoGames_Data/il2cpp_data/Metadata/global-metadata.dat" }))
@@ -107,7 +114,7 @@ public static class ModPackageService
             var m = Read(temporary, appId, folder);
             Directory.CreateDirectory(SafePath(modsRoot, folder + "/Alpha"));
             Directory.CreateDirectory(SafePath(modsRoot, folder + "/Beta"));
-            var relative = folder + "/" + (m.Channel == "Stable" ? "" : m.Channel + "/") + $"{folder}-{m.Version}.zip";
+            var relative = folder + "/" + (m.Channel == "Stable" ? "" : m.Channel + "/") + $"{folder}-{m.ReleaseDate ?? m.Version}.zip";
             var destination = SafePath(modsRoot, relative);
             if (File.Exists(destination))
             {
@@ -164,7 +171,7 @@ public static class ModPackageService
         {
             if (!File.Exists(SafePath(root, ReceiptName))) return false;
             var receipt = Previous(root, definition.AppId, definition.GameFolder);
-            if (receipt == null || receipt.Version != definition.Version) return false;
+            if (receipt == null || receipt.SchemaVersion != 2 || receipt.ReleaseDate != definition.ReleaseDate) return false;
             var files = receipt.Files.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
             if (!files.ContainsKey("winhttp.dll") || !files.ContainsKey("BepInEx/core/BepInEx.Unity.IL2CPP.dll")) return false;
             if (definition.Files.Any(f => !files.TryGetValue(f.Path, out var installed)
@@ -197,7 +204,7 @@ public static class ModPackageService
                 previous = previous! with { Files = previous!.Files.Select(f => f.Path == plugin ? new ModFile(plugin, testedHash) : f).ToList() };
         }
         else return null;
-        if (previous == null || previous.SchemaVersion != 1 || previous.AppId != appId || previous.GameFolder != folder
+        if (previous == null || previous.SchemaVersion is not (1 or 2) || previous.AppId != appId || previous.GameFolder != folder
             || previous.Files == null || previous.Files.Count == 0 || previous.Files.Count > 4096)
             throw new InvalidDataException(L.T("安装记录与当前游戏不匹配。"));
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

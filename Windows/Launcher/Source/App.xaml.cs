@@ -15,19 +15,26 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        instanceLease = Services.LauncherInstanceLease.TryAcquire();
-        if (instanceLease == null)
+        if (Services.ExistingLauncherWindow.HandleExisting())
         {
-            Services.ExistingLauncherWindow.Activate();
             Exit();
             return;
         }
-        if (Services.ExistingLauncherWindow.Activate())
+        instanceLease = Services.LauncherInstanceLease.TryAcquire();
+        if (instanceLease == null)
         {
-            instanceLease.Dispose();
-            instanceLease = null;
-            Exit();
-            return;
+            // 处理另一个实例在枚举结束后抢先启动的情况。
+            if (Services.ExistingLauncherWindow.HandleExisting())
+            {
+                Exit();
+                return;
+            }
+            instanceLease = Services.LauncherInstanceLease.TryAcquire();
+            if (instanceLease == null)
+            {
+                Exit();
+                return;
+            }
         }
         Services.SettingsService.Instance.InitializeSteamPath();
         MainWindowInstance = new MainWindow();

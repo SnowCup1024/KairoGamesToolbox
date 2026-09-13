@@ -9,5 +9,5 @@ public static class ControlProtocol
 {
     public const int Version = 2;
     public const int MaxMessageBytes = 16384;
-    public static bool ValidMultiplier(int value) => value is 0 or 1 or 2 or 5 or 20;
+    public static bool ValidMultiplier(int value) => value is 0 or 1 or 50;
 }

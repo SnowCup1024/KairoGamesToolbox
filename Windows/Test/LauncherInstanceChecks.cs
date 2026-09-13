@@ -4,6 +4,10 @@ static class LauncherInstanceChecks
 {
     public static void Run(Action<string, bool> check)
     {
+        check("旧版本可提示升级", LauncherInstanceLease.IsOlderVersion("1.0.4.0", "1.0.5"));
+        check("相同版本的三段和四段形式不误判旧版", !LauncherInstanceLease.IsOlderVersion("1.0.5.0", "1.0.5"));
+        check("新版本和未知版本不自动关闭", !LauncherInstanceLease.IsOlderVersion("1.0.6", "1.0.5")
+            && !LauncherInstanceLease.IsOlderVersion(null, "1.0.5") && !LauncherInstanceLease.IsOlderVersion("invalid", "1.0.5"));
         var name = @"Local\KairoInstanceTest-" + Guid.NewGuid();
         using (var first = LauncherInstanceLease.TryAcquire(name))
         {

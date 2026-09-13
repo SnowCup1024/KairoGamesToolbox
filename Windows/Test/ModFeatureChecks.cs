@@ -28,7 +28,7 @@ static class ModFeatureChecks
             File.Delete(plugin);
             check("删除模组后再次禁止连接", !ModFeatures.CanConnect(2934180, root));
             var probe = BundledModService.ForGame(2488340)!;
-            check("都市岛验收版提供四项修改且点数已合并", !probe.Development && probe.MultiplierSteps!.SequenceEqual(new[] { 0, 1, 20 }) && probe.Features.Count == 4 && probe.Features.Count(f => f.Id == "pointReverse") == 1);
+            check("都市岛验收版提供四项修改且点数已合并", !probe.Development && probe.MultiplierSteps!.SequenceEqual(new[] { 0, 1, 50 }) && probe.Features.Count == 4 && probe.Features.Count(f => f.Id == "pointReverse") == 1);
             var probeFile = Path.Combine(root, probe.Files.Single().Path);
             Directory.CreateDirectory(Path.GetDirectoryName(probeFile)!);
             File.WriteAllText(probeFile, "synthetic");

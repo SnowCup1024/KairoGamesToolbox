@@ -3,10 +3,8 @@
  <ItemGroup>
   <Compile Include="../Games/DoraemonDorayakiShopStory/Source/MoneyReversal.cs" Link="MoneyReversal.cs"/>
   <Compile Include="../Games/DoraemonDorayakiShopStory/Source/ControlServer.cs" Link="ControlServer.cs"/>
-  <Compile Include="../Games/DreamTownIsland/Source/LoadProbeServer.cs" Link="LoadProbeServer.cs"/>
   <Compile Include="../Games/DreamTownIsland/Source/GameControlServer.cs" Link="GameControlServer.cs"/>
   <Compile Include="../Games/DreamTownIsland/Source/ControlState.cs" Link="ControlState.cs"/>
-  <Compile Include="../Games/DreamTownIsland/Source/ObservationLog.cs" Link="ObservationLog.cs"/>
   <ProjectReference Include="../../Windows/Core/Core.csproj"/>
  </ItemGroup>
 </Project>

@@ -2,12 +2,12 @@ using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using KairoMods.Protocol;
 
-namespace KairoMods.Observer;
+namespace KairoMods.DoraemonDorayakiShopStory;
 
-[BepInPlugin("snowcup.kairomods.observer", "KairoMods.Doraemon", "1.0.2")]
-public sealed class ObserverPlugin : BasePlugin
+[BepInPlugin("snowcup.kairomods.observer", "KairoMods.Doraemon", "2026.9.14")]
+public sealed class GamePlugin : BasePlugin
 {
-    private GameObservation observation = null!;
+    private GameControl control = null!;
     private readonly ControlServer server = new();
     private readonly string session = Guid.NewGuid().ToString("N");
     private bool attempted;
@@ -31,11 +31,11 @@ public sealed class ObserverPlugin : BasePlugin
             if (ConsoleManager.ConsoleActive) ConsoleManager.DetachConsole();
         }
         catch (Exception ex) { Log.LogWarning("Console configuration: " + ex.Message); }
-        observation = new GameObservation(Log);
-        ActivationListener.Pump = Pump;
-        AddComponent<ActivationListener>();
+        control = new GameControl(Log);
+        GameUpdateListener.Pump = Pump;
+        AddComponent<GameUpdateListener>();
         server.Start();
-        Log.LogInfo("KairoMods 1.0.2 | launcher control only | all features OFF | no hotkeys");
+        Log.LogInfo("KairoMods 2026-09-14 | launcher control only | all features OFF | no hotkeys");
     }
 
     private void Pump()
@@ -47,10 +47,10 @@ public sealed class ObserverPlugin : BasePlugin
             nextCheck = Environment.TickCount64 + 1000;
             try
             {
-                if (GameObservation.NativeTypesReady())
+                if (GameControl.NativeTypesReady())
                 {
                     attempted = true;
-                    observation.Install();
+                    control.Install();
                 }
                 else if (!waitingLogged)
                 {
@@ -65,7 +65,7 @@ public sealed class ObserverPlugin : BasePlugin
                 Log.LogError(ex);
             }
         }
-        observation.FlushLogs();
+        control.FlushLogs();
     }
 
     private ModControlResponse HandleCommand(ModControlRequest request)
@@ -74,17 +74,17 @@ public sealed class ObserverPlugin : BasePlugin
         if (request.Protocol != ControlProtocol.Version) error = "Unsupported protocol";
         else if (request.Action == "set")
         {
-            if (error == null) error = observation.Configure(request.Features);
+            if (error == null) error = control.Configure(request.Features);
         }
         else if (request.Action != "status") error = "Unknown command";
         return new(ControlProtocol.Version, 2934180, ControlServer.GameDirectory, session,
-            setupError == null, observation.Snapshot(), error);
+            setupError == null, control.Snapshot(), error);
     }
 }
 
-public sealed class ActivationListener : UnityEngine.MonoBehaviour
+public sealed class GameUpdateListener : UnityEngine.MonoBehaviour
 {
     internal static Action? Pump;
-    public ActivationListener(IntPtr pointer) : base(pointer) { }
+    public GameUpdateListener(IntPtr pointer) : base(pointer) { }
     public void Update() => Pump?.Invoke();
 }

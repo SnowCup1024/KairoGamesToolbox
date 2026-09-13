@@ -1,2 +1,2 @@
-# Keep upstream license notices verbatim, including their original whitespace.
-Mods/Runtime/Notices/*.txt -whitespace
+# 保留上游许可原文及原始空白。
+Mods/Notices/*.txt -whitespace

@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using KairoMods.Protocol;
 
-namespace KairoMods.Observer;
+namespace KairoMods.DoraemonDorayakiShopStory;
 
 public sealed class ControlServer
 {

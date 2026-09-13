@@ -8,9 +8,9 @@ Add-Type -LiteralPath (Join-Path $TestGameDirectory 'BepInEx/core/Mono.Cecil.dll
 $game = [Mono.Cecil.AssemblyDefinition]::ReadAssembly((Join-Path $TestGameDirectory 'BepInEx/interop/Assembly-CSharp.dll'))
 $plugin = [Mono.Cecil.AssemblyDefinition]::ReadAssembly((Resolve-Path -LiteralPath $PluginDll).Path)
 try {
-    $observer = $plugin.MainModule.GetType('KairoMods.Observer.GameObservation')
+    $controller = $plugin.MainModule.GetType('KairoMods.DoraemonDorayakiShopStory.GameControl')
     foreach ($name in @('AfterVoid')) {
-        $hook = @($observer.Methods | Where-Object Name -EQ $name)
+        $hook = @($controller.Methods | Where-Object Name -EQ $name)
         if ($hook.Count -ne 1 -or @($hook[0].Parameters | Where-Object Name -EQ '__result').Count -ne 0) {
             throw "$name must support void methods without requesting __result"
         }
@@ -35,7 +35,7 @@ try {
         })
         if ($methods.Count -ne 1) { throw "Signature mismatch: $($target -join ' ')" }
     }
-    $longHook = @($observer.Methods | Where-Object Name -EQ 'AfterLong')
+    $longHook = @($controller.Methods | Where-Object Name -EQ 'AfterLong')
     if ($longHook.Count -ne 1 -or @($longHook[0].Parameters | Where-Object { $_.Name -eq '__result' -and $_.ParameterType.FullName -eq 'System.Int64&' }).Count -ne 1) { throw 'Long result hook mismatch' }
     Write-Output 'PASS: 11 game target signatures; void and long postfixes are separate.'
     Write-Output 'Static metadata check only; IL2CPP runtime hook installation still requires manual testing.'

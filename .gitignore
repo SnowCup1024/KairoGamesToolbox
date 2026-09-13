@@ -1,11 +1,13 @@
-# Generated build, test, publish, and package output
+# 构建、发布、缓存及临时开发记录
 .Build/
+.Docs/
+DEVELOPMENT.md
 
-# .NET / WinUI fallback output
+# .NET 与 WinUI 的备用输出目录
 **/[Bb]in/
 **/[Oo]bj/
 
-# User-specific IDE state
+# 本机编辑器状态
 .vs/
 .vscode/
 .idea/
@@ -14,35 +16,31 @@
 *.userosscache
 *.sln.docstates
 
-# Local secrets, backups, and operating-system files
+# 本机配置、备份及系统文件
 *.bak
 *.local
 *.user.json
 [Tt]humbs.db
 Desktop.ini
 
-# Local commercial game copies and saves
+# 本地商业游戏副本和存档
 .TestGames/
+**/.TestGames/
 
-# Local environment secrets
+# 本地环境密钥
 .env
 .env.*
 !.env.example
 
-# Local agent instructions
-AGENTS.md
+# AGENTS.md 是可提交的共享协作入口
 
-# Local-only Mod development (also when nested)
+# 旧的本地模组工作区、测试依赖及备份
 KairoMods/
-
-# Local test dependencies and backups, at any depth
-**/.TestGames/
 **/.Backups/
 **/.Downloads/
 **/interop/
 
-# Game-specific source and explicitly bundled payloads are tracked.
-# Shared runtimes, commercial assemblies and generated packages never are.
+# 保留自有专用载荷，排除共享运行组件、商业文件及生成包
 /Mods/**/*.zip
 /Mods/**/BepInEx/core/
 /Mods/**/dotnet/

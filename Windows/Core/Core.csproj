@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="LegacyModManifest.json" />
-    <EmbeddedResource Include="../../Mods/Runtime/Notices/*.txt" LogicalName="RuntimeNotice.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../Mods/Notices/*.txt" LogicalName="RuntimeNotice.%(Filename)%(Extension)" />
     <EmbeddedResource Include="Localization.json" LogicalName="Localization.json" />
     <EmbeddedResource Include="../Launcher/Data/KairosoftGames.json" LogicalName="GameNames.json" />
     <Compile Include="../../Mods/Shared/ControlProtocol.cs" Link="ControlProtocol.cs" />

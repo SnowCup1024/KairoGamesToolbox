@@ -9,7 +9,7 @@ internal static class DreamTownChecks
         var state = new ControlState();
         check("都市岛四项默认关闭，四种点数共享一个功能且拒绝未知 ID", state.Snapshot().Count == 4 && state.Snapshot().Values.All(s => !s.Enabled)
             && Enumerable.Range(0, 4).All(id => ControlState.PointFeature(id) == "pointReverse") && ControlState.PointFeature(4) == null && ControlState.PointFeature(-1) == null);
-        foreach (var multiplier in new[] { 0, 1, 20 })
+        foreach (var multiplier in new[] { 0, 1, 50 })
         {
             var on = new FeatureState(true, multiplier);
             check($"都市岛 {multiplier}x 使用实际扣除而非请求值", 94 + ControlState.Refund(100, 94, -10, on, 9999) == 100 + 6 * multiplier);
@@ -17,20 +17,20 @@ internal static class DreamTownChecks
             check($"都市岛 {multiplier}x 收入、未扣除与关闭不补回", ControlState.Refund(100, 110, 10, on, 9999) == 0
                 && ControlState.Refund(100, 100, -10, on, 9999) == 0 && ControlState.Refund(100, 90, -10, new(false, multiplier), 9999) == 0);
         }
-        check("游戏数值上限、非法倍率、负库存与 long 极值受保护", ControlState.Refund(9998, 9997, -1, new(true, 20), 9999) == 0
+        check("游戏数值上限、非法倍率、负库存与 long 极值受保护", ControlState.Refund(9998, 9997, -1, new(true, 50), 9999) == 0
             && ControlState.Refund(10, 9, -1, new(true, 3), 9999) == 0
             && ControlState.Refund(-1, -2, -1, new(true), 9999) == 0
-            && ControlState.Refund(long.MaxValue, long.MinValue, long.MinValue, new(true, 20), long.MaxValue) == 0);
+            && ControlState.Refund(long.MaxValue, long.MinValue, long.MinValue, new(true, 50), long.MaxValue) == 0);
         var desired = state.Snapshot();
         desired["pointReverse"] = new(true, 1);
-        desired["buildingReverse"] = new(true, 20);
+        desired["buildingReverse"] = new(true, 50);
         check("统一点数倍率不会开启道具或金钱", state.Configure(desired) == null && Enumerable.Range(0, 4).All(id => state.Get(ControlState.PointFeature(id)!) == new FeatureState(true, 1))
             && !state.Get("itemReverse").Enabled && !state.Get("moneyReverse").Enabled);
         var bad = new Dictionary<string, FeatureState>(desired) { ["itemReverse"] = new(true, 3) };
         check("拒绝不完整、未知和非法设置且原状态不变", state.Configure(bad) != null && state.Configure(new()) != null
-            && state.Get("buildingReverse") == new FeatureState(true, 20) && !state.Get("itemReverse").Enabled);
+            && state.Get("buildingReverse") == new FeatureState(true, 50) && !state.Get("itemReverse").Enabled);
         check("不接受旧四种点数设置混入新功能集合", state.Configure(new(desired) { ["foodReverse"] = new(true) }) != null);
-        foreach (var multiplier in new[] { 0, 1, 20 })
+        foreach (var multiplier in new[] { 0, 1, 50 })
             check($"道具消耗两份在 {multiplier}x 时只按实际扣除补回", 1 + ControlState.Refund(3, 1, -2, new(true, multiplier), 9999) == 3 + 2 * multiplier);
         check("新插件进程状态重新默认关闭", new ControlState().Snapshot().Values.All(s => !s.Enabled));
 

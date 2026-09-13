@@ -1,7 +1,6 @@
 {
   "appId": 2488340,
   "gameFolder": "DreamTownIsland",
-  "version": "1.0.4",
   "development": false,
   "runtime": {
     "id": "BepInEx-Unity-IL2CPP-win-x86-788",
@@ -21,7 +20,7 @@
   "files": [
     {
       "path": "BepInEx/plugins/KairoMods.DreamTownIsland/KairoMods.DreamTownIsland.dll",
-      "sha256": "E102B7C7AD05E823E7F039A854D2A0A962162CB79CF6C154EB84E20F18E9C381"
+      "sha256": "4B3BF3D22DBFD374047DB37C6C410357B236C2662056D4EDB538B1F568ACA96D"
     }
   ],
   "features": [
@@ -40,10 +39,10 @@
         "ja": "資金"
       },
       "descriptions": {
-        "zh-CN": "实际扣款后按倍率净增加，正常收入不变；保留游戏上限和购买条件。",
-        "zh-TW": "實際扣款後按倍率淨增加，正常收入不變；保留遊戲上限和購買條件。",
-        "en": "Turn actual spending into a multiplied net gain. Normal income, game caps and purchase requirements remain unchanged.",
-        "ja": "実際の消費を倍率に応じた純増に変換します。通常の収入、所持上限、購入条件は変わりません。"
+        "zh-CN": "仅支持 0／1／50 倍；0 倍不消耗，1／50 倍按实际消耗净反加。正常获得不变，仍受游戏条件和上限限制。",
+        "zh-TW": "僅支援 0／1／50 倍；0 倍不消耗，1／50 倍依實際消耗淨增加。正常獲得不變，仍受遊戲條件及上限限制。",
+        "en": "Only 0x, 1x and 50x. 0x: no consumption; 1x/50x: net gain based on actual spending. Normal gains, game requirements and limits remain unchanged.",
+        "ja": "倍率は0・1・50のみ。0倍は消費なし、1・50倍は実際の消費量に応じて純増します。通常の獲得量、ゲームの条件と上限は変わりません。"
       }
     },
     {
@@ -61,10 +60,10 @@
         "zh-CN": "点数"
       },
       "descriptions": {
-        "en": "One switch and multiplier for food, hospitality, entertainment and culture points. Only the consumed point type gains; normal income is unchanged.",
-        "zh-TW": "統一控制餐飲、服務、娛樂、文化四種點數的反加倍率，僅補回實際消耗的對應點數，正常獲得不變。",
-        "ja": "飲食・サービス・娯楽・文化ポイントの倍率を一括設定します。消費した種類だけを増加させ、通常の獲得量は変えません。",
-        "zh-CN": "统一控制餐饮、服务、娱乐、文化四种点数的反加倍率，仅补回实际消耗的对应点数，正常获得不变。"
+        "zh-CN": "仅支持 0／1／50 倍；0 倍不消耗，1／50 倍按实际消耗净反加。正常获得不变，仍受游戏条件和上限限制。",
+        "zh-TW": "僅支援 0／1／50 倍；0 倍不消耗，1／50 倍依實際消耗淨增加。正常獲得不變，仍受遊戲條件及上限限制。",
+        "en": "Only 0x, 1x and 50x. 0x: no consumption; 1x/50x: net gain based on actual spending. Normal gains, game requirements and limits remain unchanged.",
+        "ja": "倍率は0・1・50のみ。0倍は消費なし、1・50倍は実際の消費量に応じて純増します。通常の獲得量、ゲームの条件と上限は変わりません。"
       }
     },
     {
@@ -82,10 +81,10 @@
         "ja": "建築在庫"
       },
       "descriptions": {
-        "zh-CN": "消耗某建筑的可放置数量后按倍率净增加。不会解锁建筑，零库存、地形与建造条件仍由游戏判断。",
-        "zh-TW": "消耗某建築的可放置數量後按倍率淨增加。不會解鎖建築，零庫存、地形與建造條件仍由遊戲判斷。",
-        "en": "Turn consumed building stock into a multiplied net gain for that building. Does not unlock buildings or bypass zero stock, terrain or construction requirements.",
-        "ja": "消費した建築在庫を、その建物の倍率に応じた純増に変換します。未解放の建物、在庫ゼロ、地形や建築条件は変更しません。"
+        "zh-CN": "仅支持 0／1／50 倍；0 倍不消耗，1／50 倍按实际消耗净反加。正常获得不变，仍受游戏条件和上限限制。",
+        "zh-TW": "僅支援 0／1／50 倍；0 倍不消耗，1／50 倍依實際消耗淨增加。正常獲得不變，仍受遊戲條件及上限限制。",
+        "en": "Only 0x, 1x and 50x. 0x: no consumption; 1x/50x: net gain based on actual spending. Normal gains, game requirements and limits remain unchanged.",
+        "ja": "倍率は0・1・50のみ。0倍は消費なし、1・50倍は実際の消費量に応じて純増します。通常の獲得量、ゲームの条件と上限は変わりません。"
       }
     },
     {
@@ -103,10 +102,10 @@
         "zh-CN": "道具"
       },
       "descriptions": {
-        "en": "Turn actual item consumption into a multiplied net gain for that item. Normal gains, stock caps and use requirements are unchanged.",
-        "zh-TW": "將實際消耗的道具按倍率淨增加，正常獲得不變。只補回對應道具，保留庫存上限和使用條件。",
-        "ja": "実際に消費したアイテムを倍率に応じた純増に変換します。通常の獲得量、在庫上限、使用条件は変わりません。",
-        "zh-CN": "将实际消耗的道具按倍率净增加，正常获得不变。只补回对应道具，保留库存上限和使用条件。"
+        "zh-CN": "仅支持 0／1／50 倍；0 倍不消耗，1／50 倍按实际消耗净反加。正常获得不变，仍受游戏条件和上限限制。",
+        "zh-TW": "僅支援 0／1／50 倍；0 倍不消耗，1／50 倍依實際消耗淨增加。正常獲得不變，仍受遊戲條件及上限限制。",
+        "en": "Only 0x, 1x and 50x. 0x: no consumption; 1x/50x: net gain based on actual spending. Normal gains, game requirements and limits remain unchanged.",
+        "ja": "倍率は0・1・50のみ。0倍は消費なし、1・50倍は実際の消費量に応じて純増します。通常の獲得量、ゲームの条件と上限は変わりません。"
       }
     }
   ],
@@ -131,6 +130,7 @@
   "multiplierSteps": [
     0,
     1,
-    20
-  ]
+    50
+  ],
+  "releaseDate": "2026-09-14"
 }

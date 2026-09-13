@@ -29,11 +29,10 @@ public sealed partial class GameDetailsPage
     private bool sendingFeatures;
     private string? gameSession;
     private ModLogReader? logReader;
-    private int[] multipliers = { 1, 2, 5, 20 };
+    private readonly int[] multipliers = { 0, 1, 50 };
 
     private void InitializeControls()
     {
-        multipliers = BundledModService.ForGame(game.AppId)?.MultiplierSteps ?? multipliers;
         if (BundledModService.ForGame(game.AppId) is { Development: true, Features.Count: 0 })
             FeatureEmpty.Text = L.T("当前模组用于开发观察，尚未提供游戏修改项。");
         foreach (var feature in ModFeatures.ForGame(game.AppId))
@@ -42,7 +41,9 @@ public sealed partial class GameDetailsPage
             ToolTipService.SetToolTip(label, feature.Description);
             var toggle = new ToggleSwitch { OnContent = "", OffContent = "", MinWidth = 0, IsEnabled = false, VerticalAlignment = VerticalAlignment.Center };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(toggle, feature.Name);
-            var value = new TextBlock { Text = "1x", Width = 28, VerticalAlignment = VerticalAlignment.Center };
+            var zeroLabel = new TextBlock { Text = "0x（" + L.T("不消耗") + "）" };
+            zeroLabel.Measure(new Windows.Foundation.Size(double.PositiveInfinity, double.PositiveInfinity));
+            var value = new TextBlock { Text = "1x", Width = Math.Max(28, Math.Ceiling(zeroLabel.DesiredSize.Width)), VerticalAlignment = VerticalAlignment.Center };
             var slider = new Slider { Minimum = 0, Maximum = multipliers.Length - 1, StepFrequency = 1, TickFrequency = 1,
                 Value = Array.IndexOf(multipliers, 1), IsEnabled = false, IsThumbToolTipEnabled = false, VerticalAlignment = VerticalAlignment.Center };
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(slider, feature.Name + " " + L.T("倍率"));
@@ -60,7 +61,8 @@ public sealed partial class GameDetailsPage
             toggle.Toggled += (_, _) => { if (!updatingSwitch) QueueFeatures(); };
             slider.ValueChanged += (_, _) =>
             {
-                value.Text = multipliers[Math.Clamp((int)Math.Round(slider.Value), 0, multipliers.Length - 1)] + "x";
+                var multiplier = multipliers[Math.Clamp((int)Math.Round(slider.Value), 0, multipliers.Length - 1)];
+                value.Text = multiplier == 0 ? "0x（" + L.T("不消耗") + "）" : multiplier + "x";
                 if (!updatingSwitch) QueueFeatures();
             };
             slider.AddHandler(UIElement.PointerPressedEvent, new Microsoft.UI.Xaml.Input.PointerEventHandler((_, _) => draggingSliders.Add(slider)), true);
@@ -104,8 +106,9 @@ public sealed partial class GameDetailsPage
             longest = Math.Max(longest, label.DesiredSize.Width);
         }
         int columns = ModFeatures.Columns(FeatureGrid.Children.Count, FeatureGrid.ActualWidth);
-        if (columns == 2 && (FeatureGrid.ActualWidth - 16) / 2 < longest + 200) columns = 1;
-        double labelWidth = Math.Min(longest, Math.Max(40, (FeatureGrid.ActualWidth - 16 * (columns - 1)) / columns - 200));
+        double controlWidth = 172 + featureControls.Values.Select(c => c.Value.Width).DefaultIfEmpty(28).Max();
+        if (columns == 2 && (FeatureGrid.ActualWidth - 16) / 2 < longest + controlWidth) columns = 1;
+        double labelWidth = Math.Min(longest, Math.Max(40, (FeatureGrid.ActualWidth - 16 * (columns - 1)) / columns - controlWidth));
         FeatureGrid.ColumnDefinitions.Clear(); FeatureGrid.RowDefinitions.Clear();
         for (int i = 0; i < columns; i++) FeatureGrid.ColumnDefinitions.Add(new ColumnDefinition());
         for (int i = 0; i < (FeatureGrid.Children.Count + columns - 1) / columns; i++) FeatureGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });

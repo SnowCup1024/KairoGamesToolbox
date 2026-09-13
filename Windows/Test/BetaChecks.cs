@@ -8,12 +8,21 @@ static class BetaChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("本版对外 v1.0 Beta 5，内部 1.0.5", ReleaseInfo.DisplayVersion == "v1.0 Beta 5" && ReleaseInfo.Version == "1.0.5");
+        check("本版对外 v1.0 Beta 6，内部 1.0.6", ReleaseInfo.DisplayVersion == "v1.0 Beta 6" && ReleaseInfo.Version == "1.0.6");
         check("正式版显示 Release 并隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3 Release");
         check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta 4");
         bool rejectedZero = false;
         try { ReleaseInfo.FormatDisplay("2.3.0", true); } catch (ArgumentException) { rejectedZero = true; }
         check("版本序号不允许零", rejectedZero);
+        var changelogLines = ReleaseInfo.Changelog.Split('\n').Select(line => line.Trim()).Where(line => line.Length > 0).ToArray();
+        check("内嵌更新日志仅包含当前版本", changelogLines.Where(line => line.StartsWith("## ")).SequenceEqual(new[] { "## " + ReleaseInfo.DisplayVersion }));
+        using (var translations = typeof(L).Assembly.GetManifestResourceStream("Localization.json")!)
+        {
+            var entries = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(translations)!;
+            var bullets = changelogLines.Where(line => line.StartsWith("- ")).Select(line => line[2..]).ToArray();
+            check("更新日志内容具有四语言译文", bullets.Length > 0 && bullets.All(line => entries.TryGetValue(line, out var entry)
+                && new[] { "zh-TW", "en", "ja" }.All(language => !string.IsNullOrWhiteSpace(entry.GetValueOrDefault(language)))));
+        }
         var definition = BundledModService.ForGame(2934180)!;
         check("五项功能定义来自游戏模组", definition.Features.Select(f => f.Id).ToHashSet().SetEquals(new[] { "moneyReverse", "fPointReverse", "coinReverse", "trainingReverse", "itemReverse" }));
         var searchable = new KairosoftGameToolbox.Models.KairoGame { AppId = 2934180, EnglishName = "Doraemon Dorayaki Shop Story" };

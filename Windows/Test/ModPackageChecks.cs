@@ -41,6 +41,18 @@ static class ModPackageChecks
             check("模组日期严格使用真实日历日期", ModPackageService.ValidReleaseDate("2026-09-14")
                 && ModPackageService.ValidReleaseDate("2024-02-29") && !ModPackageService.ValidReleaseDate("2026-02-29")
                 && !ModPackageService.ValidReleaseDate("2026-9-14") && !ModPackageService.ValidReleaseDate("1.0.5"));
+            var occupied = Target("occupied");
+            var occupiedOriginal = Package("occupied-original", content: "old-plugin", declaredContent: "old-plugin");
+            ModPackageService.Install(occupiedOriginal, occupied, 123, "TestGame");
+            var occupiedDll = Path.Combine(occupied, "BepInEx/plugins/test.dll");
+            var occupiedUpdate = Package("occupied-update", content: "new-plugin", declaredContent: "new-plugin");
+            using (var locked = new FileStream(occupiedDll, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                Reject("目标文件被占用时更新报告失败", () => ModPackageService.Install(occupiedUpdate, occupied, 123, "TestGame", update: true));
+                check("占用失败保留原插件和安装记录", File.ReadAllText(occupiedDll) == "old-plugin" && ModPackageService.HasInstalledMod(occupied));
+            }
+            ModPackageService.Install(occupiedUpdate, occupied, 123, "TestGame", update: true);
+            check("解除占用后可以重试更新", File.ReadAllText(occupiedDll) == "new-plugin");
             var dated = Package("dated", releaseDate: "2026-09-14", schema: 2);
             var datedManifest = ModPackageService.Read(dated, 123, "TestGame");
             check("日期模组清单不维护旧版本字段", datedManifest.ReleaseDate == "2026-09-14" && datedManifest.Version == null

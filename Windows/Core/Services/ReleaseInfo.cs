@@ -2,8 +2,18 @@ namespace KairosoftGameToolbox.Services;
 
 public static class ReleaseInfo
 {
-    public const string Version = "1.0.5";
+    public const string Version = "1.0.6";
     public const bool IsBeta = true;
+    public static string Changelog { get; } = ReadChangelog();
+
+    private static string ReadChangelog()
+    {
+        using var stream = typeof(ReleaseInfo).Assembly.GetManifestResourceStream("CHANGELOG.md")
+            ?? throw new InvalidDataException("Bundled CHANGELOG.md is missing.");
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
     public static string DisplayVersion => FormatDisplay(Version, IsBeta);
 
     public static string FormatDisplay(string version, bool beta)

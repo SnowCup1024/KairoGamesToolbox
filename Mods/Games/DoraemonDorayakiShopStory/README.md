@@ -28,6 +28,6 @@ Steam AppID：`2934180`。发布日期以 `definition.json` 的 `releaseDate` �
 .\Scripts\UpdateDoraemonMod.ps1 -TestGameDirectory <游戏目录>
 ```
 
-`BuildDoraemonMod.ps1` 仅构建，`TestDoraemonSignatures.ps1` 检查本游戏签名。离线控制测试使用 `Mods/ControlTests/ControlTests.csproj`，不证明 IL2CPP 实际运行成功。游戏内由使用者验证各开关、三档倍率、正常收入、赠送嵌套、角色归属及保存加载。部署通过启动器事务安装，更新前先退出游戏。
+`BuildDoraemonMod.ps1` 仅构建，`TestDoraemonSignatures.ps1` 检查本游戏签名。离线控制测试使用 `Mods/ControlTests/ControlTests.csproj`，不证明 IL2CPP 实际运行成功。游戏内由使用者验证各开关、三档倍率、正常收入、赠送嵌套、角色归属及保存加载。部署通过启动器事务安装，安装与更新直接尝试；若文件被占用，关闭目标游戏后重试。运行中的游戏需重启才能加载新模组。
 
 共享安装、安全、日期管理及发布规范见 [贡献规范](../../../CONTRIBUTING.md)。

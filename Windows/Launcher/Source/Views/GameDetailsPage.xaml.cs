@@ -148,8 +148,14 @@ public sealed partial class GameDetailsPage : UserControl
         danger.Setters.Add(new Setter(Control.BackgroundSizingProperty, BackgroundSizing.OuterBorderEdge));
         confirm.PrimaryButtonStyle = danger;
         if (await confirm.ShowAsync() != ContentDialogResult.Primary) return;
-        CheckGameStopped();
-        await BundledModService.InstallAsync(game.AppId, target);
+        try
+        {
+            await BundledModService.InstallAsync(game.AppId, target);
+        }
+        catch (IOException ex) when ((ex.HResult & 0xFFFF) is 32 or 33)
+        {
+            throw new IOException(L.T("模组文件被占用，请关闭目标游戏后重试。") + "\n" + ex.Message, ex);
+        }
         UpdateTarget();
         ResultText.Text = L.T("Mod 已安装，请启动游戏并打开模组控制页。");
     });

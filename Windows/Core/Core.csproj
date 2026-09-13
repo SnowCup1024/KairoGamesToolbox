@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="LegacyModManifest.json" />
+    <EmbeddedResource Include="../../CHANGELOG.md" LogicalName="CHANGELOG.md" />
     <EmbeddedResource Include="../../Mods/Notices/*.txt" LogicalName="RuntimeNotice.%(Filename)%(Extension)" />
     <EmbeddedResource Include="Localization.json" LogicalName="Localization.json" />
     <EmbeddedResource Include="../Launcher/Data/KairosoftGames.json" LogicalName="GameNames.json" />

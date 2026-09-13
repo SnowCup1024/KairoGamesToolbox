@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Media;
 namespace KairosoftGameToolbox.Views;
 
 /// <summary>
-/// 关于页：显示版本和许可证摘要，并提供许可证全文查看入口。
+/// 关于页：显示版本、当前更新日志和许可证摘要。
 /// </summary>
 public sealed partial class AboutPage : UserControl
 {
@@ -31,6 +31,23 @@ public sealed partial class AboutPage : UserControl
     private void LoadAboutInfo()
     {
         VersionText.Content = _showInternalVersion ? "v" + ReleaseInfo.Version : ReleaseInfo.DisplayVersion;
+        ChangelogContent.Children.Clear();
+        foreach (var raw in ReleaseInfo.Changelog.Split('\n'))
+        {
+            var line = raw.Trim();
+            if (line.Length == 0 || line.StartsWith("# ")) continue;
+            var heading = line.StartsWith("## ");
+            var bullet = line.StartsWith("- ");
+            var text = heading ? line[3..] : bullet ? line[2..] : line;
+            var block = new TextBlock
+            {
+                Text = (bullet ? "• " : "") + L.T(text),
+                TextWrapping = TextWrapping.Wrap,
+                IsTextSelectionEnabled = true,
+            };
+            if (heading) block.Style = (Style)Application.Current.Resources["LabelStyle"];
+            ChangelogContent.Children.Add(block);
+        }
     }
 
     private static string ReadBundledText(string relativePath)

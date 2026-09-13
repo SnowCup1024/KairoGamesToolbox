@@ -778,5 +778,25 @@
     "zh-TW": "偵測到舊版本 {0} 正在執行，目前版本為 {1}。是否關閉舊版本並啟動目前版本？選擇「否」將開啟舊版本。",
     "en": "Older version {0} is running. This version is {1}. Close the older version and start this one? Choose No to open the older version.",
     "ja": "旧バージョン {0} が実行中です。現在のバージョンは {1} です。旧バージョンを終了して現在のバージョンを起動しますか？「いいえ」で旧バージョンを開きます。"
+  },
+  "更新日志": {
+    "en": "Changelog",
+    "ja": "更新履歴",
+    "zh-TW": "更新日誌"
+  },
+  "模组文件被占用，请关闭目标游戏后重试。": {
+    "en": "Mod files are in use. Close the target game and try again.",
+    "ja": "Modファイルが使用中です。対象のゲームを終了してから、もう一度お試しください。",
+    "zh-TW": "模組檔案被占用，請關閉目標遊戲後重試。"
+  },
+  "模组安装与更新不再按通用游戏进程名拦截，直接尝试操作；失败时显示原因，文件被占用时提示关闭目标游戏后重试。": {
+    "en": "Mod installation and updates now attempt the operation without blocking on shared game process names. Failures show the cause; if files are in use, close the target game and try again.",
+    "ja": "Modのインストールと更新は、共通のゲームプロセス名による制限を行わず実行します。失敗時は原因を表示し、ファイルが使用中の場合は対象ゲームの終了と再試行を案内します。",
+    "zh-TW": "模組安裝與更新不再依通用遊戲程序名稱攔截，直接嘗試操作；失敗時顯示原因，檔案被占用時提示關閉目標遊戲後重試。"
+  },
+  "关于页新增更新日志卡片，显示当前版本的更新内容。": {
+    "en": "Added a changelog card to the About page showing changes in the current version.",
+    "ja": "「このアプリについて」ページに、現在のバージョンの変更内容を表示する更新履歴カードを追加しました。",
+    "zh-TW": "關於頁新增更新日誌卡片，顯示目前版本的更新內容。"
   }
 }

@@ -11,6 +11,10 @@
     <TextBlock Text="{l:Text Key='管理 Steam 与非 Steam 开罗游戏，提供内置游戏模组、共享运行组件下载与实时控制。'}"/>
    </StackPanel></Border>
    <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
+    <TextBlock Text="{l:Text Key='更新日志'}" Style="{StaticResource SectionTitleStyle}"/>
+    <StackPanel x:Name="ChangelogContent" Spacing="8"/>
+   </StackPanel></Border>
+   <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">
     <TextBlock Text="{l:Text Key='许可证'}" Style="{StaticResource SectionTitleStyle}"/>
     <TextBlock Text="{l:Text Key='本项目使用 GNU General Public License v3.0（GPL-3.0）发布。你可以查看、修改和再发布符合许可证要求的代码。'}"/>
     <Button Content="{l:Text Key='查看完整许可证'}" Click="ViewLicense_Click"/>

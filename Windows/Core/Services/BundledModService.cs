@@ -77,9 +77,6 @@ public static class BundledModService
             token.ThrowIfCancellationRequested();
             await Task.Run(() =>
             {
-                var running = System.Diagnostics.Process.GetProcessesByName("KairoGames");
-                try { if (running.Length > 0) throw new IOException(L.T("请先退出正在运行的开罗游戏。")); }
-                finally { foreach (var process in running) process.Dispose(); }
                 ModPackageService.Install(composed, target, appId, definition.GameFolder, update: ModPackageService.HasInstalledMod(target));
             }, token);
         }

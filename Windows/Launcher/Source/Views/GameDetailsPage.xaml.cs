@@ -22,7 +22,6 @@ public sealed partial class GameDetailsPage : UserControl
         InitializeComponent();
         this.game = game;
         GameTitle.Text = game.Name;
-        GameStatus.Text = $"{game.LibraryStatusText} · AppID {game.AppId}";
         target = game.NonSteamDirectory ?? game.InstallDir;
         nonSteam = game.NonSteamDirectory != null;
         SteamButton.IsEnabled = game.IsInstalled && !game.IsNonSteam;
@@ -45,15 +44,16 @@ public sealed partial class GameDetailsPage : UserControl
     {
         TargetText.Text = string.IsNullOrWhiteSpace(target) ? L.T("尚未选择游戏目录") : (nonSteam ? L.T("非 Steam · ") : "Steam · ") + target;
         InstallButton.IsEnabled = false;
-        LaunchButton.Content = nonSteam || game.IsInstalled ? L.T("启动游戏") : L.T("打开 Steam 商店");
+        LaunchButton.Content = nonSteam || game.IsInstalled ? L.T("启动游戏") : game.Ownership == OwnershipStatus.Owned ? L.T("下载游戏") : L.T("打开 Steam 商店");
         var selected = GameFolderService.ContainsExecutable(target);
-        GameStatus.Text = $"{(selected && nonSteam ? L.T("已安装 · 非 Steam") : game.LibraryStatusText)} · AppID {game.AppId}";
         ModSection.Visibility = selected ? Visibility.Visible : Visibility.Collapsed;
         RemoveGameButton.Visibility = nonSteam ? Visibility.Visible : Visibility.Collapsed;
         var installed = selected && ModPackageService.HasInstalledMod(target!);
         InstallButton.Content = installed ? L.T("更新 Mod") : L.T("安装 Mod");
         RemoveModButton.IsEnabled = installed;
         InstalledModText.Text = installed ? L.T("已安装 Mod") : L.T("未安装 Mod");
+        ControlTab.Visibility = ModFeatures.CanConnect(game.AppId, target) ? Visibility.Visible : Visibility.Collapsed;
+        if (ControlTab.Visibility != Visibility.Visible && controlVisible) SelectPane(false);
         ResultText.Text = "";
         RestartControls();
         _ = RefreshInstalledVersionAsync(++statusRevision, target, installed);
@@ -111,21 +111,13 @@ public sealed partial class GameDetailsPage : UserControl
         target = game.InstallDir; nonSteam = false; UpdateTarget();
     }
 
-    private static void CheckGameStopped()
-    {
-        var running = Process.GetProcessesByName("KairoGames");
-        try { if (running.Length > 0) throw new IOException(L.T("请先退出正在运行的开罗游戏。")); }
-        finally { foreach (var process in running) process.Dispose(); }
-    }
-
     private async void RemoveMod_Click(object sender, RoutedEventArgs e) => await RunAsync(async () =>
     {
         if (target == null) return;
         var confirm = new ContentDialog { XamlRoot = XamlRoot, RequestedTheme = ActualTheme, Title = L.T("删除 Mod"),
-            Content = L.T("删除已识别的模组文件，保留游戏原文件与存档。存档中已经生效的修改不会撤销。"),
+            Content = L.T("请先关闭目标游戏再卸载。确认后尝试删除已识别的模组文件，保留游戏原文件与存档；已保存的修改不会撤销。"),
             PrimaryButtonText = L.T("删除 Mod"), CloseButtonText = L.T("取消"), DefaultButton = ContentDialogButton.Close };
         if (await confirm.ShowAsync() != ContentDialogResult.Primary) return;
-        CheckGameStopped();
         await Task.Run(() => ModPackageService.Uninstall(target, game.AppId, FolderName));
         ModSessionCache.Clear(game.AppId, target);
         UpdateTarget();
@@ -168,7 +160,7 @@ public sealed partial class GameDetailsPage : UserControl
             if (target == null || !GameFolderService.ContainsExecutable(target)) throw new IOException(L.T("游戏目录已不可用。"));
             Process.Start(new ProcessStartInfo(Path.Combine(target, "KairoGames.exe")) { UseShellExecute = true, WorkingDirectory = target });
         }
-        else Open(game.IsInstalled ? SteamLinkService.Run(game.AppId) : SteamLinkService.Store(game.AppId));
+        else Open(SteamLinkService.PrimaryAction(game.AppId, game.IsInstalled, game.Ownership));
         return Task.CompletedTask;
     });
 }

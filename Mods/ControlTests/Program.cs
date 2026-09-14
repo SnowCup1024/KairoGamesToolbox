@@ -58,14 +58,16 @@ Check("过期命令不会在下一帧延迟修改", mutations == previousMutatio
 if (args.Length == 2 && args[0] == "--verify-runtime")
 {
     string runtime = Path.GetFullPath(args[1]);
-    string package = Path.Combine(Path.GetDirectoryName(runtime)!, "bundle-test-" + Guid.NewGuid().ToString("N") + ".zip");
+    string package = Path.Combine(Path.GetTempPath(), "bundle-test-" + Guid.NewGuid().ToString("N") + ".zip");
     try
     {
         foreach (var definition in BundledModService.Definitions)
         {
             if (!Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(runtime))).Equals(definition.Runtime.Sha256, StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("Runtime hash differs from game definition");
+            var timer = System.Diagnostics.Stopwatch.StartNew();
             BundledModService.Compose(package, runtime, definition);
+            Console.WriteLine($"组合耗时：{timer.ElapsedMilliseconds} ms；临时包：{new FileInfo(package).Length} bytes");
             var manifest = ModPackageService.Read(package, definition.AppId, definition.GameFolder);
             Check(definition.GameFolder + " 实际运行组件与专用载荷通过安装器校验", manifest.Files.Count > 200 && manifest.Files.Any(f => f.Path == "winhttp.dll") && definition.Files.All(f => manifest.Files.Contains(f)));
             Check("组合包包含 BepInEx 与 .NET 许可", manifest.Files.Count(f => f.Path.StartsWith("licenses/KairoMods/")) == 3);

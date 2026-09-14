@@ -5,6 +5,10 @@ public static class SteamLinkService
 {
     public static string Run(uint appId) => $"steam://run/{appId}";
 
+    public static string PrimaryAction(uint appId, bool installed, KairosoftGameToolbox.Models.OwnershipStatus ownership)
+        => installed ? Run(appId) : ownership == KairosoftGameToolbox.Models.OwnershipStatus.Owned
+            ? $"steam://rungameid/{appId}" : Store(appId);
+
     public static string Install(uint appId) => $"steam://install/{appId}";
 
     public static string Store(uint appId) => $"https://store.steampowered.com/app/{appId}/";

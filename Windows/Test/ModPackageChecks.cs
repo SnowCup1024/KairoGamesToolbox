@@ -50,9 +50,16 @@ static class ModPackageChecks
             {
                 Reject("目标文件被占用时更新报告失败", () => ModPackageService.Install(occupiedUpdate, occupied, 123, "TestGame", update: true));
                 check("占用失败保留原插件和安装记录", File.ReadAllText(occupiedDll) == "old-plugin" && ModPackageService.HasInstalledMod(occupied));
+                Reject("目标文件被占用时卸载报告失败", () => ModPackageService.Uninstall(occupied, 123, "TestGame"));
+                check("卸载失败保留原插件和安装记录", File.ReadAllText(occupiedDll) == "old-plugin" && ModPackageService.HasInstalledMod(occupied));
             }
             ModPackageService.Install(occupiedUpdate, occupied, 123, "TestGame", update: true);
             check("解除占用后可以重试更新", File.ReadAllText(occupiedDll) == "new-plugin");
+            var identical = Target("identical");
+            Directory.CreateDirectory(Path.Combine(identical, "BepInEx/plugins"));
+            File.WriteAllText(Path.Combine(identical, "BepInEx/plugins/test.dll"), "plugin");
+            ModPackageService.Install(Package("identical-install"), identical, 123, "TestGame");
+            check("全部载荷已相同时仍建立安装记录", ModPackageService.HasInstalledMod(identical));
             var dated = Package("dated", releaseDate: "2026-09-14", schema: 2);
             var datedManifest = ModPackageService.Read(dated, 123, "TestGame");
             check("日期模组清单不维护旧版本字段", datedManifest.ReleaseDate == "2026-09-14" && datedManifest.Version == null

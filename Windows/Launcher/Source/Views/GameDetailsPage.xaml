@@ -9,9 +9,7 @@
     <Grid ColumnSpacing="24"><Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
      <Border CornerRadius="10" Background="{ThemeResource CoverGradientBrush}" Height="150"><Image x:Name="Cover" Stretch="UniformToFill"/></Border>
      <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
-      <TextBlock Text="{l:Text Key='模组管理'}" Style="{StaticResource LabelStyle}" Foreground="{ThemeResource AccentBrush}"/>
-      <TextBlock x:Name="GameTitle" Style="{StaticResource PageTitleStyle}"/>
-      <TextBlock x:Name="GameStatus" Foreground="{ThemeResource TextSecondaryBrush}"/>
+      <TextBlock x:Name="GameTitle" Style="{StaticResource PageTitleStyle}" FontSize="32" TextWrapping="Wrap"/>
       <Button x:Name="LaunchButton" Content="{l:Text Key='启动游戏'}" Style="{StaticResource AccentButtonStyle}" Click="Launch_Click"/>
      </StackPanel>
     </Grid>
@@ -19,7 +17,7 @@
    <Border Padding="4" CornerRadius="12" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" HorizontalAlignment="Left">
    <Grid ColumnSpacing="4"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
     <ToggleButton x:Name="ManageTab" Content="{l:Text Key='游戏目录与模组状态'}" IsChecked="True" Padding="18,10" CornerRadius="8" BorderThickness="0" Click="ManageTab_Click"/>
-    <ToggleButton x:Name="ControlTab" Grid.Column="1" Content="{l:Text Key='模组控制'}" Padding="18,10" CornerRadius="8" BorderThickness="0" Click="ControlTab_Click"/>
+    <ToggleButton x:Name="ControlTab" Visibility="Collapsed" Grid.Column="1" Content="{l:Text Key='模组控制'}" Padding="18,10" CornerRadius="8" BorderThickness="0" Click="ControlTab_Click"/>
    </Grid></Border>
    <StackPanel x:Name="ManagePane" Spacing="20">
     <Border Style="{StaticResource SectionCard}"><StackPanel Spacing="12">

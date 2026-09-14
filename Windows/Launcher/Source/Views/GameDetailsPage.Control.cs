@@ -83,6 +83,7 @@ public sealed partial class GameDetailsPage
     private void ControlTab_Click(object sender, RoutedEventArgs e) => SelectPane(true);
     private void SelectPane(bool control)
     {
+        control = control && ControlTab.Visibility == Visibility.Visible;
         controlVisible = control;
         ManageTab.IsChecked = !control; ControlTab.IsChecked = control;
         ManagePane.Visibility = control ? Visibility.Collapsed : Visibility.Visible;

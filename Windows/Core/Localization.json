@@ -798,5 +798,40 @@
     "en": "Added a changelog card to the About page showing changes in the current version.",
     "ja": "「このアプリについて」ページに、現在のバージョンの変更内容を表示する更新履歴カードを追加しました。",
     "zh-TW": "關於頁新增更新日誌卡片，顯示目前版本的更新內容。"
+  },
+  "下载游戏": {
+    "en": "Download game",
+    "ja": "ゲームをダウンロード",
+    "zh-TW": "下載遊戲"
+  },
+  "请先关闭目标游戏再卸载。确认后尝试删除已识别的模组文件，保留游戏原文件与存档；已保存的修改不会撤销。": {
+    "en": "Close the target game before uninstalling. After confirmation, removal of recognized mod files will be attempted. Original game files and saves are kept; saved changes are not undone.",
+    "ja": "アンインストール前に対象ゲームを終了してください。確認後、識別済みのModファイルの削除を試みます。元のゲームファイルとセーブデータは保持され、保存済みの変更は元に戻りません。",
+    "zh-TW": "請先關閉目標遊戲再解除安裝。確認後嘗試刪除已識別的模組檔案，保留遊戲原始檔案與存檔；已儲存的修改不會撤銷。"
+  },
+  "已拥有但未安装的 Steam 游戏显示“下载游戏”；详情页简化为封面、游戏名与操作按钮。": {
+    "en": "Owned Steam games that are not installed show “Download game”. Game details now focus on the cover, title and action button.",
+    "ja": "所有済みで未インストールのSteamゲームに「ゲームをダウンロード」を表示。詳細ページはカバー、ゲーム名、操作ボタンに整理しました。",
+    "zh-TW": "已擁有但未安裝的 Steam 遊戲顯示「下載遊戲」；詳情頁簡化為封面、遊戲名稱與操作按鈕。"
+  },
+  "未检测到当前游戏的模组时隐藏模组控制页；卸载前提醒关闭目标游戏，确认后直接尝试卸载。": {
+    "en": "Mod controls are hidden when the current game’s mod is not detected. Uninstalling reminds you to close the target game, then attempts removal after confirmation.",
+    "ja": "対象ゲームのModが検出されない場合は操作ページを非表示にします。アンインストール時は対象ゲームの終了を案内し、確認後に削除を試みます。",
+    "zh-TW": "未偵測到目前遊戲的模組時隱藏模組控制頁；解除安裝前提醒關閉目標遊戲，確認後直接嘗試解除安裝。"
+  },
+  "安装临时包不再重复压缩，更新时跳过未变化文件的解压与备份，保留完整性校验和失败回滚。": {
+    "en": "Temporary install packages avoid recompression. Updates skip extraction and backup of unchanged files while retaining integrity checks and rollback.",
+    "ja": "インストール用一時パッケージの再圧縮を廃止。更新では未変更ファイルの展開とバックアップを省き、整合性検証と失敗時の復元は維持します。",
+    "zh-TW": "安裝暫存包不再重複壓縮，更新時略過未變更檔案的解壓與備份，保留完整性校驗和失敗復原。"
+  },
+  "当前两款内嵌模组已由维护者完成人工实际游戏测试，确认功能正常；本版沿用已验证的模组载荷。": {
+    "en": "The maintainer tested both bundled mods in actual gameplay and confirmed normal operation. This release retains those verified payloads.",
+    "ja": "同梱の2つのModは管理者による実ゲームテストで正常動作を確認済みです。本版でも検証済みのファイルを使用します。",
+    "zh-TW": "目前兩款內嵌模組已由維護者完成人工實際遊戲測試，確認功能正常；本版沿用已驗證的模組檔案。"
+  },
+  "新增长期更新历史，按职责拆分贡献规范，并在项目说明中注明 AI Agent 参与开发。": {
+    "en": "Added maintained release history, split contribution rules by responsibility, and documented AI Agent involvement.",
+    "ja": "継続管理する更新履歴を追加し、貢献規約を役割別に分割。AI Agentによる開発についても明記しました。",
+    "zh-TW": "新增長期更新歷史，依職責拆分貢獻規範，並在專案說明中註明 AI Agent 參與開發。"
   }
 }

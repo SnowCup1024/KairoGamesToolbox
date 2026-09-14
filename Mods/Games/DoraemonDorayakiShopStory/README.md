@@ -22,12 +22,14 @@ Steam AppID：`2934180`。发布日期以 `definition.json` 的 `releaseDate` �
 
 ## 构建与验证
 
+维护者于 2026-09-15 确认当前内嵌模组已经过人工实际游戏测试，功能完全正常。该结论对应 `releaseDate=2026-09-14` 的现有载荷；本轮启动器更新未修改模组 DLL。后续修改仍按影响范围重新验证。
+
 使用本游戏匹配的 x86 IL2CPP 运行组件及已生成互操作程序集；不能以其他游戏的程序集代替。脚本从游戏目录读取依赖，核对游戏指纹与发布日期后编译、检查签名并更新自有载荷及哈希：
 
 ```powershell
 .\Scripts\UpdateDoraemonMod.ps1 -TestGameDirectory <游戏目录>
 ```
 
-`BuildDoraemonMod.ps1` 仅构建，`TestDoraemonSignatures.ps1` 检查本游戏签名。离线控制测试使用 `Mods/ControlTests/ControlTests.csproj`，不证明 IL2CPP 实际运行成功。游戏内由使用者验证各开关、三档倍率、正常收入、赠送嵌套、角色归属及保存加载。部署通过启动器事务安装，安装与更新直接尝试；若文件被占用，关闭目标游戏后重试。运行中的游戏需重启才能加载新模组。
+`BuildDoraemonMod.ps1` 仅构建，`TestDoraemonSignatures.ps1` 检查本游戏签名。离线控制测试使用 `Mods/ControlTests/ControlTests.csproj`，不证明 IL2CPP 实际运行成功。后续变更由使用者在游戏内验证各开关、三档倍率、正常收入、赠送嵌套、角色归属及保存加载。部署通过启动器事务安装，安装与更新直接尝试；若文件被占用，关闭目标游戏后重试。运行中的游戏需重启才能加载新模组。
 
 共享安装、安全、日期管理及发布规范见 [贡献规范](../../../CONTRIBUTING.md)。

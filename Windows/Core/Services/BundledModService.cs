@@ -88,12 +88,20 @@ public static class BundledModService
         using var output = ZipFile.Open(path, ZipArchiveMode.Create);
         using var loader = ZipFile.OpenRead(runtime);
         var files = new List<ModFile>();
+        var buffer = new byte[128 * 1024];
         void Add(string name, Stream input, string? expected = null)
         {
-            using var memory = new MemoryStream(); input.CopyTo(memory);
-            string hash = Convert.ToHexString(SHA256.HashData(memory.ToArray()));
+            // 临时组合包只用于本地安装，不重复压缩共享组件；边复制边计算指纹。
+            using var destination = output.CreateEntry("payload/" + name, CompressionLevel.NoCompression).Open();
+            using var hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+            int read;
+            while ((read = input.Read(buffer)) != 0)
+            {
+                hasher.AppendData(buffer, 0, read);
+                destination.Write(buffer, 0, read);
+            }
+            string hash = Convert.ToHexString(hasher.GetHashAndReset());
             if (expected != null && !hash.Equals(expected, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("Bundled mod hash mismatch");
-            using var destination = output.CreateEntry("payload/" + name).Open(); memory.Position = 0; memory.CopyTo(destination);
             files.Add(new(name, hash));
         }
         foreach (var entry in loader.Entries.Where(e => !e.FullName.EndsWith('/')))

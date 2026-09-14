@@ -8,7 +8,7 @@ static class BetaChecks
 {
     public static void Run(Action<string, bool> check)
     {
-        check("本版对外 v1.0 Beta 6，内部 1.0.6", ReleaseInfo.DisplayVersion == "v1.0 Beta 6" && ReleaseInfo.Version == "1.0.6");
+        check("本版对外 v1.0 Release，内部 1.0.7", ReleaseInfo.DisplayVersion == "v1.0 Release" && ReleaseInfo.Version == "1.0.7");
         check("正式版显示 Release 并隐藏内部构建序号", ReleaseInfo.FormatDisplay("2.3.5", false) == "v2.3 Release");
         check("测试版展示对应测试序号", ReleaseInfo.FormatDisplay("2.3.4", true) == "v2.3 Beta 4");
         bool rejectedZero = false;
@@ -23,6 +23,10 @@ static class BetaChecks
             check("更新日志内容具有四语言译文", bullets.Length > 0 && bullets.All(line => entries.TryGetValue(line, out var entry)
                 && new[] { "zh-TW", "en", "ja" }.All(language => !string.IsNullOrWhiteSpace(entry.GetValueOrDefault(language)))));
         }
+        check("已拥有未安装游戏使用 Steam 下载启动入口", SteamLinkService.PrimaryAction(123, false, KairosoftGameToolbox.Models.OwnershipStatus.Owned) == "steam://rungameid/123");
+        check("已安装游戏仍启动，未拥有或未知仍打开商店", SteamLinkService.PrimaryAction(123, true, KairosoftGameToolbox.Models.OwnershipStatus.Unknown) == SteamLinkService.Run(123)
+            && SteamLinkService.PrimaryAction(123, false, KairosoftGameToolbox.Models.OwnershipStatus.NotOwned) == SteamLinkService.Store(123)
+            && SteamLinkService.PrimaryAction(123, false, KairosoftGameToolbox.Models.OwnershipStatus.Unknown) == SteamLinkService.Store(123));
         var definition = BundledModService.ForGame(2934180)!;
         check("五项功能定义来自游戏模组", definition.Features.Select(f => f.Id).ToHashSet().SetEquals(new[] { "moneyReverse", "fPointReverse", "coinReverse", "trainingReverse", "itemReverse" }));
         var searchable = new KairosoftGameToolbox.Models.KairoGame { AppId = 2934180, EnglishName = "Doraemon Dorayaki Shop Story" };

@@ -2,8 +2,8 @@ namespace KairosoftGameToolbox.Services;
 
 public static class ReleaseInfo
 {
-    public const string Version = "1.0.6";
-    public const bool IsBeta = true;
+    public const string Version = "1.0.7";
+    public const bool IsBeta = false;
     public static string Changelog { get; } = ReadChangelog();
 
     private static string ReadChangelog()

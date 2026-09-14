@@ -247,20 +247,23 @@ public static class ModPackageService
             bool sameNew = newFiles.TryGetValue(relative, out var next) && hash.Equals(next.Sha256, StringComparison.OrdinalIgnoreCase);
             if (!knownOld && !sameNew) throw new IOException(L.T("未知或被修改的模组文件，拒绝覆盖：") + relative);
         }
+        var changedPaths = paths.Where(relative => !newFiles.TryGetValue(relative, out var next)
+            || originalHashes[relative] == null || !originalHashes[relative]!.Equals(next.Sha256, StringComparison.OrdinalIgnoreCase)).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var receipt = SafePath(gameRoot, ReceiptName);
         var stage = SafePath(gameRoot, ".kairomods-" + Guid.NewGuid().ToString("N"));
         var changed = new List<(string Target, string? Backup)>();
         bool preserveStage = false;
         try
         {
-            foreach (var f in m.Files)
+            Directory.CreateDirectory(stage);
+            foreach (var f in m.Files.Where(f => changedPaths.Contains(f.Path)))
             {
                 var staged = SafePath(stage, "new/" + f.Path);
                 Directory.CreateDirectory(Path.GetDirectoryName(staged)!);
                 zip.GetEntry("payload/" + f.Path)!.ExtractToFile(staged);
             }
             // 先备份所有将被替换的文件，再开始提交写入。
-            foreach (var relative in paths.Append(ReceiptName))
+            foreach (var relative in changedPaths.Append(ReceiptName))
             {
                 var target = SafePath(gameRoot, relative);
                 if (!File.Exists(target)) continue;
